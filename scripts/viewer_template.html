@@ -1,0 +1,734 @@
+<title>Quant Interview Wiki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+:root {
+  --ground: #f4f5f3;
+  --surface: #ffffff;
+  --ink: #17212a;
+  --muted: #5b6770;
+  --faint: #8a949b;
+  --rule: #dde2e0;
+  --accent: #1d6b86;
+  --accent-soft: #e3eff3;
+  --code-bg: #f0f2f1;
+  --d-prob-stats: #4a67b0;
+  --d-stochastic-finance: #6f5bb8;
+  --d-signal-research: #c0642a;
+  --d-portfolio-construction: #b8402f;
+  --d-pricing: #1d6b86;
+  --d-quant-models: #2e8f5a;
+  --d-risk-management: #8a7a1c;
+  --d-quant-dev: #5d6b78;
+  --edge: rgba(23, 33, 42, 0.16);
+  --font-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-read: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #0f1417; --surface: #161d22; --ink: #e3e9ec; --muted: #9aa6ae; --faint: #6f7b83; --rule: #27323a;
+    --accent: #6bb8d3; --accent-soft: #1a3039; --code-bg: #1d262c; --edge: rgba(227, 233, 236, 0.14);
+    --d-prob-stats: #8aa4ee; --d-stochastic-finance: #ad9cf0; --d-signal-research: #ec9a5c; --d-portfolio-construction: #ef7f6c;
+    --d-pricing: #6bb8d3; --d-quant-models: #66c98f; --d-risk-management: #d6c45a; --d-quant-dev: #9aa8b4;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #0f1417; --surface: #161d22; --ink: #e3e9ec; --muted: #9aa6ae; --faint: #6f7b83; --rule: #27323a;
+  --accent: #6bb8d3; --accent-soft: #1a3039; --code-bg: #1d262c; --edge: rgba(227, 233, 236, 0.14);
+  --d-prob-stats: #8aa4ee; --d-stochastic-finance: #ad9cf0; --d-signal-research: #ec9a5c; --d-portfolio-construction: #ef7f6c;
+  --d-pricing: #6bb8d3; --d-quant-models: #66c98f; --d-risk-management: #d6c45a; --d-quant-dev: #9aa8b4;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { background: var(--ground); color: var(--ink); font-family: var(--font-ui); font-size: 14px; }
+button { font: inherit; color: inherit; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.shell { height: 100%; display: grid; grid-template-columns: 290px minmax(0, 1fr); }
+
+.side { background: var(--surface); border-right: 1px solid var(--rule); display: flex; flex-direction: column; min-height: 0; }
+.side-head { padding: 16px 16px 12px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--rule); }
+.brand { display: flex; flex-direction: column; gap: 2px; }
+.brand a { font-weight: 600; font-size: 15px; color: var(--ink); text-decoration: none; }
+.brand .count { font-family: var(--font-mono); font-size: 11px; color: var(--faint); }
+.search { position: relative; }
+.search input { width: 100%; padding: 7px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--ground); color: var(--ink); font: inherit; }
+.results { position: absolute; z-index: 30; top: calc(100% + 4px); left: 0; width: min(420px, 86vw); margin: 0; padding: 4px; list-style: none; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; box-shadow: 0 10px 28px rgba(0,0,0,0.14); max-height: 60vh; overflow-y: auto; }
+.results button { display: grid; grid-template-columns: 62px 1fr; gap: 8px; width: 100%; text-align: left; padding: 6px 8px; border: 0; background: none; border-radius: 4px; cursor: pointer; line-height: 1.35; }
+.results button:hover, .results button.active { background: var(--accent-soft); }
+.results .kind { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); padding-top: 2px; }
+.toc { overflow-y: auto; padding: 10px 8px 40px; flex: 1; }
+.toc a, .toc summary { display: block; padding: 4px 8px; border-radius: 4px; color: var(--ink); text-decoration: none; line-height: 1.35; cursor: pointer; }
+.toc a:hover, .toc summary:hover { background: var(--accent-soft); }
+.toc a.current { background: var(--accent-soft); color: var(--accent); font-weight: 500; }
+.toc .glabel { display: block; margin: 16px 8px 4px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); text-decoration: none; padding: 0; }
+.toc a.glabel:hover { color: var(--accent); background: none; }
+.toc details > summary { list-style: none; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+.toc details > summary::-webkit-details-marker { display: none; }
+.toc details > summary::before { content: ""; width: 0; height: 0; border-left: 4px solid var(--faint); border-top: 4px solid transparent; border-bottom: 4px solid transparent; transition: transform .15s; flex: none; }
+.toc details[open] > summary::before { transform: rotate(90deg); }
+.toc .swatch { width: 8px; height: 8px; border-radius: 2px; flex: none; }
+.toc .n { margin-left: auto; font-family: var(--font-mono); font-size: 10.5px; color: var(--faint); font-weight: 400; }
+.toc .lvl { margin: 2px 0 8px 12px; padding-left: 6px; border-left: 1px solid var(--rule); }
+.toc a.ov, .toc a.qb { font-size: 12.5px; color: var(--muted); display: flex; }
+.toc a.qb .n { margin-left: auto; }
+.toc a.tp { font-size: 13.5px; }
+.toc ul.secs { list-style: none; margin: 1px 0 6px 10px; padding: 0; }
+.toc ul.secs a { font-size: 12.5px; color: var(--muted); padding-top: 3px; padding-bottom: 3px; }
+
+.main { overflow-y: auto; min-height: 0; }
+.topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 10px; padding: 10px 24px; background: var(--ground); border-bottom: 1px solid var(--rule); }
+.crumbs { font-size: 12.5px; color: var(--muted); display: flex; gap: 6px; flex-wrap: wrap; align-items: center; min-width: 0; }
+.crumbs a { color: var(--muted); text-decoration: none; }
+.crumbs a:hover { color: var(--accent); }
+.crumbs .sep { color: var(--faint); }
+.topbar .spacer { flex: 1; }
+.btn { padding: 5px 11px; border: 1px solid var(--rule); background: var(--surface); border-radius: 6px; cursor: pointer; font-size: 12.5px; white-space: nowrap; }
+.btn:hover { border-color: var(--accent); }
+.menu-btn { display: none; }
+
+.page { display: grid; grid-template-columns: minmax(0, 720px) 240px; gap: 48px; padding: 28px 24px 80px; max-width: 1080px; }
+.article { min-width: 0; }
+.kicker { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.kicker .swatch { width: 9px; height: 9px; border-radius: 2px; }
+.article h1.title { font-family: var(--font-read); font-size: 32px; line-height: 1.18; font-weight: 600; margin: 8px 0 14px; text-wrap: balance; letter-spacing: -0.01em; }
+.lead { font-family: var(--font-read); font-size: 19px; line-height: 1.5; margin: 0 0 22px; padding-left: 14px; border-left: 3px solid var(--dcolor, var(--accent)); }
+
+.prose { font-family: var(--font-read); font-size: 16.5px; line-height: 1.65; overflow-wrap: anywhere; }
+.prose > :first-child { margin-top: 0; }
+.prose h1 { display: none; }
+.prose h2 { font-family: var(--font-read); font-size: 25px; line-height: 1.25; font-weight: 600; margin: 8px 0 12px; text-wrap: balance; letter-spacing: -0.005em; }
+.prose h3 { font-family: var(--font-ui); font-size: 12.5px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); margin: 26px 0 8px; }
+.prose h4 { font-family: var(--font-ui); font-size: 14.5px; font-weight: 600; margin: 20px 0 6px; }
+.intro > p:first-child { font-size: 18.5px; line-height: 1.55; }
+.chapter-toc { margin: 22px 0 8px; padding: 14px 18px; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; }
+.chapter-toc span { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.chapter-toc ol { margin: 6px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 3px; }
+.chapter-toc a { color: var(--ink); text-decoration: none; }
+.chapter-toc a:hover { color: var(--accent); }
+.sec { margin-top: 44px; padding-top: 26px; border-top: 1px solid var(--rule); scroll-margin-top: 60px; }
+.sec.flash { animation: flash 1.4s ease-out; }
+@keyframes flash { from { background: var(--accent-soft); } to { background: transparent; } }
+.prose a[id] { scroll-margin-top: 64px; display: block; position: relative; top: -30px; }
+.secq { margin-top: 18px; }
+.secq h5 { margin: 0 0 4px; font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.secq h5 .n { color: var(--faint); }
+.qa { scroll-margin-top: 64px; }
+.pagelist .secs { font-size: 12.5px; color: var(--faint); display: flex; flex-wrap: wrap; gap: 2px 0; }
+.pagelist .secs a { color: var(--muted); text-decoration: none; }
+.pagelist .secs a:hover { color: var(--accent); }
+.dot-sep { margin: 0 6px; color: var(--faint); }
+.results small { color: var(--faint); font-size: 11.5px; }
+.prose p { margin: 10px 0; }
+.prose ul, .prose ol { padding-left: 22px; margin: 10px 0; }
+.prose li { margin: 4px 0; }
+.prose strong { font-weight: 600; }
+.prose code { font-family: var(--font-mono); font-size: 13px; background: var(--code-bg); padding: 1px 5px; border-radius: 3px; }
+.prose pre { background: var(--code-bg); padding: 12px 14px; border-radius: 6px; overflow-x: auto; font-size: 12.5px; line-height: 1.5; }
+.prose pre code { background: none; padding: 0; }
+.prose .table-wrap { overflow-x: auto; margin: 14px 0; }
+.prose table { border-collapse: collapse; font-family: var(--font-read); font-size: 15px; font-variant-numeric: tabular-nums; border-top: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink); }
+.prose th, .prose td { padding: 5px 12px; text-align: left; vertical-align: top; }
+.prose th { font-weight: 600; border-bottom: 1px solid var(--ink); }
+.prose tbody tr + tr td { border-top: 0; }
+
+/* course-notes typesetting */
+.chapno { font-family: var(--font-read); font-size: 15px; font-style: italic; color: var(--muted); margin-top: 18px; }
+.article h1.title.chapter { font-size: 34px; margin-top: 2px; padding-bottom: 14px; border-bottom: 1.5px solid var(--ink); }
+.chapter-toc .num, .toc .num, .rail .num { font-family: var(--font-mono); font-size: 0.85em; color: var(--faint); margin-right: 8px; font-variant-numeric: tabular-nums; }
+.chapter-toc ol { list-style: none; padding-left: 0; }
+.box { border: 1px solid var(--rule); border-left: 3px solid var(--dcolor, var(--accent)); background: var(--surface); border-radius: 3px; padding: 2px 18px 10px; margin: 16px 0; }
+.box.def::before { content: "Formula"; display: block; font-family: var(--font-ui); font-size: 11.5px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--dcolor, var(--accent)); margin: 10px 0 2px; }
+.box.def > h3 { display: none; }
+.box.titled > h3 { color: var(--dcolor, var(--accent)); margin: 10px 0 2px; font-size: 11.5px; }
+.box.example { border-left-style: dashed; background: transparent; }
+.box.example::before { content: "Example"; display: block; font-family: var(--font-ui); font-size: 11.5px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); margin: 10px 0 2px; }
+.box.example > h3 { display: none; }
+.block.seealso { font-size: 14.5px; color: var(--muted); margin-top: 18px; }
+.block.seealso h3 { margin-bottom: 4px; }
+.vars { margin: 6px 0 12px; }
+.vars-h { font-family: var(--font-read); font-style: italic; color: var(--muted); }
+.vars table { border: 0; margin-top: 2px; font-size: 15px; }
+.vars td { padding: 2px 12px 2px 0; border: 0; }
+.vars td.sym { white-space: nowrap; text-align: right; padding-right: 14px; }
+.exercise { margin: 12px 0; }
+.lockbox { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; margin: 8px 0; border: 1px dashed var(--rule); border-radius: 6px; font-size: 14px; color: var(--muted); }
+.lockrow { display: flex; gap: 8px; flex-wrap: wrap; }
+.lockrow input { flex: 1 1 180px; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--ground); color: var(--ink); font: inherit; }
+.lockerr { font-size: 12.5px; color: var(--d-portfolio-construction); min-height: 1em; }
+.ex-q { font-family: var(--font-read); font-size: 16px; line-height: 1.5; }
+.ex-label { font-family: var(--font-ui); font-weight: 600; font-size: 13.5px; margin-right: 6px; color: var(--dcolor, var(--accent)); }
+.exercise .qa { margin: 6px 0 0; border: 0; background: none; }
+.exercise .qa > summary { display: inline-block; font-family: var(--font-ui); font-size: 12.5px; font-weight: 500; color: var(--accent); padding: 2px 0; }
+.exercise .qa > summary::before { content: "▸ "; font-family: inherit; font-size: inherit; color: inherit; padding: 0; }
+.exercise .qa[open] > summary::before { content: "▾ "; }
+.exercise .qa[open] > summary { border: 0; }
+.exercise .qa .qbody { padding: 4px 0 4px 16px; border-left: 2px solid var(--rule); margin-top: 4px; }
+.prose mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; max-width: 100%; padding: 6px 0; margin: 8px 0 !important; }
+a.wl { color: var(--accent); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); cursor: pointer; }
+a.wl:hover { border-bottom-color: var(--accent); }
+a.wl.broken { color: var(--muted); border-bottom-style: dashed; cursor: default; }
+
+.qsection { margin-top: 40px; }
+.qsection > h2 { font-family: var(--font-ui); font-size: 13px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; padding-top: 14px; border-top: 1px solid var(--rule); display: flex; gap: 8px; align-items: baseline; }
+.qsection > h2 .n { font-family: var(--font-mono); font-weight: 400; }
+.qsection > h2 a { color: inherit; text-decoration: none; }
+.qsection > h2 a:hover { color: var(--accent); }
+.qa { border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); margin: 10px 0; }
+.qa > summary { list-style: none; cursor: pointer; padding: 12px 14px; display: grid; grid-template-columns: 18px 1fr; gap: 8px; font-family: var(--font-read); font-size: 16px; line-height: 1.45; font-weight: 600; }
+.qa > summary::-webkit-details-marker { display: none; }
+.qa > summary::before { content: "Q"; font-family: var(--font-mono); font-size: 12px; color: var(--dcolor, var(--accent)); padding-top: 3px; font-weight: 500; }
+.qa[open] > summary { border-bottom: 1px solid var(--rule); }
+.qa .qbody { padding: 4px 16px 14px 40px; font-size: 15.5px; }
+.qtools { display: flex; gap: 8px; margin: 0 0 8px; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; margin: 16px 0 8px; }
+.card { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; border-top: 3px solid var(--dcolor, var(--accent)); }
+.card h3 { margin: 0; font-family: var(--font-ui); font-size: 15px; }
+.card h3 a { color: var(--ink); text-decoration: none; }
+.card h3 a:hover { color: var(--accent); }
+.card .stat { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+.card ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3px; font-size: 13px; }
+.card li a { color: var(--muted); text-decoration: none; }
+.card li a:hover { color: var(--accent); }
+.pagelist { list-style: none; padding: 0; margin: 4px 0; display: flex; flex-direction: column; }
+.pagelist li { padding: 10px 0; border-bottom: 1px solid var(--rule); display: flex; flex-direction: column; gap: 3px; }
+.pagelist a.t { font-family: var(--font-ui); font-weight: 600; font-size: 15px; color: var(--ink); text-decoration: none; }
+.pagelist a.t:hover { color: var(--accent); }
+.pagelist .s { font-family: var(--font-read); font-size: 15px; color: var(--muted); line-height: 1.45; }
+.pagelist .qn { font-family: var(--font-mono); font-size: 11px; color: var(--faint); }
+
+.rail { position: sticky; top: 64px; align-self: start; display: flex; flex-direction: column; gap: 18px; font-size: 13px; max-height: calc(100vh - 80px); overflow-y: auto; padding-bottom: 20px; }
+.rail h4 { margin: 0 0 6px; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-family: var(--font-mono); font-weight: 500; }
+.rail ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.rail a { display: flex; gap: 7px; align-items: baseline; color: var(--ink); text-decoration: none; padding: 3px 6px; border-radius: 4px; line-height: 1.35; }
+.rail a:hover { background: var(--accent-soft); }
+.rail ul.onpage a, .toc ul.secs a { border-left: 2px solid transparent; border-radius: 0 4px 4px 0; }
+.rail a.active, .toc ul.secs a.active { color: var(--accent); border-left-color: var(--accent); background: var(--accent-soft); }
+.rail .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; transform: translateY(-1px); }
+.rail .path { font-family: var(--font-mono); font-size: 11px; color: var(--faint); word-break: break-all; }
+
+.graph-overlay { position: fixed; inset: 0; z-index: 50; background: var(--ground); display: grid; grid-template-rows: auto 1fr; }
+.graph-overlay header { display: flex; align-items: center; gap: 12px; padding: 10px 16px; padding-top: calc(10px + env(safe-area-inset-top, 0px)); border-bottom: 1px solid var(--rule); background: var(--surface); }
+.graph-overlay header p { margin: 0; color: var(--muted); font-size: 12.5px; flex: 1; }
+#graph { position: relative; min-height: 0; overflow: hidden; }
+.scrim { display: none; }
+
+@media (max-width: 1180px) {
+  .page { grid-template-columns: minmax(0, 720px); }
+  .rail { position: static; max-height: none; border-top: 1px solid var(--rule); padding-top: 18px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}
+@media (max-width: 860px) {
+  .shell { display: block; height: auto; }
+  html, body { height: auto; }
+  .main { overflow: visible; }
+  .side { position: fixed; z-index: 40; top: 0; bottom: 0; left: 0; width: min(320px, 86vw); transform: translateX(-100%); transition: transform .2s; padding-top: env(safe-area-inset-top, 0px); }
+  .side.open { transform: none; box-shadow: 0 0 40px rgba(0,0,0,0.25); }
+  .scrim.open { display: block; position: fixed; inset: 0; z-index: 35; background: rgba(0,0,0,0.3); }
+  .menu-btn { display: inline-block; }
+  .topbar { padding: 10px 16px; top: env(safe-area-inset-top, 0px); }
+  .page { padding: 20px 16px 60px; }
+  .article h1.title { font-size: 26px; }
+  .lead { font-size: 17px; }
+  .prose { font-size: 16px; }
+  .qa .qbody { padding-left: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="shell">
+  <nav class="side" id="side" aria-label="Contents">
+    <div class="side-head">
+      <div class="brand"><a href="#home" data-id="home">Quant Interview Wiki</a><span class="count" id="count"></span></div>
+      <div class="search">
+        <input id="q" type="search" placeholder="Search pages and questions" autocomplete="off" aria-label="Search pages and questions">
+        <ul class="results" id="results" hidden></ul>
+      </div>
+    </div>
+    <div class="toc" id="toc"></div>
+  </nav>
+  <div class="scrim" id="scrim"></div>
+  <div class="main" id="main">
+    <div class="topbar">
+      <button type="button" class="btn menu-btn" id="menuBtn">Contents</button>
+      <div class="crumbs" id="crumbs"></div>
+      <span class="spacer"></span>
+      <button type="button" class="btn" id="graphBtn">Graph</button>
+    </div>
+    <div class="page">
+      <article class="article" id="article" aria-live="polite"></article>
+      <aside class="rail" id="rail" aria-label="Connections"></aside>
+    </div>
+  </div>
+</div>
+<div class="graph-overlay" id="graphOverlay" hidden>
+  <header><strong>Graph</strong><p>Pages linked to the current page are highlighted. Click a node to open it.</p><button type="button" class="btn" id="graphClose">Close</button></header>
+  <div id="graph"></div>
+</div>
+
+<script>
+window.MathJax = {
+  tex: { inlineMath: [["$", "$"]], displayMath: [["$$", "$$"]], processEscapes: true },
+  svg: { fontCache: "global" },
+  startup: { typeset: false }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/force-graph@1.47.4/dist/force-graph.min.js"></script>
+<script>
+const DATA = /*__GRAPH_DATA__*/null;
+
+const GROUPS = [
+  { id: "map-foundations", name: "Foundations", tracks: ["prob-stats", "stochastic-finance"] },
+  { id: "map-buyside", name: "Buy-side", tracks: ["signal-research", "portfolio-construction"] },
+  { id: "map-sellside", name: "Sell-side", tracks: ["pricing", "quant-models", "risk-management", "quant-dev"] }
+];
+const TYPE_LABEL = { concept: "Section", topic: "Chapter", map: "Overview", question: "Question", "question-bank": "Question bank", source: "Source" };
+
+const byId = new Map(DATA.nodes.map(n => [n.id, n]));
+const adj = new Map(DATA.nodes.map(n => [n.id, []]));
+for (const l of DATA.links) {
+  adj.get(l.source).push({ other: l.target, type: l.type, dir: "out" });
+  adj.get(l.target).push({ other: l.source, type: l.type, dir: "in" });
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const cleanTitle = t => t.replace(/^(Map|Source|Questions): /, "");
+const WIKI = /\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|([^\]]*))?\]\]/g;
+const pageOf = id => { const n = byId.get(id); return n && n.type === "concept" ? n.topic : n && n.type === "question" ? id.split("/")[0] : id; };
+
+// ---- structure: group → track → topic documents → sections ----
+const TRACKS = {};
+for (const g of GROUPS) for (const t of g.tracks) {
+  const map = byId.get("map-" + t);
+  const topics = [];
+  for (const m of (map ? map.content : "").matchAll(WIKI)) {
+    const n = byId.get(m[1].trim());
+    if (n && n.type === "topic" && n.domain === t && !topics.includes(n.id)) topics.push(n.id);
+  }
+  const banks = DATA.nodes.filter(n => n.type === "question-bank" && n.domain === t).map(n => n.id);
+  TRACKS[t] = { id: t, map, name: map ? map.title : t, group: g, topics, banks };
+}
+const CHAPTER_NO = {};
+{ let k = 0; for (const g of GROUPS) for (const t of g.tracks) for (const id of TRACKS[t].topics) CHAPTER_NO[id] = ++k; }
+const secNo = sid => { const n = byId.get(sid); const t = byId.get(n.topic); return `${CHAPTER_NO[t.id]}.${t.sections.indexOf(sid) + 1}`; };
+const questionsOf = bank => DATA.nodes.filter(n => n.type === "question" && n.id.startsWith(bank + "/"));
+const testsOf = sid => (adj.get(sid) || []).filter(a => a.type === "tests").map(a => byId.get(a.other));
+const topicQuestions = tid => byId.get(tid).sections.reduce((s, sid) => s + testsOf(sid).length, 0);
+const counts = {};
+DATA.nodes.forEach(n => counts[n.type] = (counts[n.type] || 0) + 1);
+document.getElementById("count").textContent = `${counts.topic} chapters · ${counts.concept} sections` + (counts.question ? ` · ${counts.question} Qs` : "");
+
+// ---- markdown ----
+function md(src, eq) {
+  const math = [];
+  src = src.replace(/\$\$([\s\S]+?)\$\$/g, (m, body) => {
+    if (eq && !/\\tag/.test(body)) m = `$$${body}\\tag{${eq.prefix}.${++eq.n}}$$`;
+    return `@@MATH${math.push(m) - 1}@@`;
+  })
+           .replace(/(^|[^\\$])\$([^$\n]+?)\$/g, (m, pre, body) => `${pre}@@MATH${math.push("$" + body + "$") - 1}@@`);
+  src = src.replace(WIKI, (m, id, label) => {
+    id = id.trim(); const n = byId.get(id);
+    const text = esc(label || (n ? cleanTitle(n.title) : id));
+    return n ? `<a class="wl" href="#${esc(id)}" data-id="${esc(id)}">${text}</a>` : `<a class="wl broken">${text}</a>`;
+  });
+  let html = marked.parse(src, { gfm: true });
+  html = html.replace(/@@MATH(\d+)@@/g, (m, i) => esc(math[+i]));
+  return html.replace(/<table>/g, '<div class="table-wrap"><table>').replace(/<\/table>/g, "</table></div>");
+}
+const mdInline = src => md(src).trim().replace(/^<p>/, "").replace(/<\/p>$/, "");
+
+// ---- building blocks ----
+function qCard(q, label) {
+  const body = q.content.replace(/^## Q\d*:.*\n?/, "").replace(/^\*\*Seen in:\*\*.*\n?/m, "").replace(/\*\*Answer\.\*\*\s*/, "");
+  return `<div class="exercise" id="q-${esc(q.id.split("/")[1])}"><div class="ex-q"><span class="ex-label">${label}</span> ${mdInline(q.title)}</div>
+    <details class="qa"><summary>Solution</summary><div class="qbody prose">${md(body)}</div></details></div>`;
+}
+function lockBox(key) {
+  return `<form class="lockbox" data-unlock><label for="pw-${key}">These exercises are password-protected.</label>
+    <div class="lockrow"><input id="pw-${key}" type="password" autocomplete="current-password" placeholder="Password"><button type="submit" class="btn">Unlock</button></div>
+    <span class="lockerr" role="alert"></span></form>`;
+}
+function qBlock(title, qs, big, prefix) {
+  if (!qs.length) return "";
+  if (qs.some(q => q.locked)) return `<section class="${big ? "qsection" : "secq"}"><h${big ? 2 : 5}>${title} <span class="n">${qs.length}</span></h${big ? 2 : 5}>${lockBox(String(prefix || "bank").replace(/\W/g, "-"))}</section>`;
+  return `<section class="${big ? "qsection" : "secq"}"><h${big ? 2 : 5}>${title} <span class="n">${qs.length}</span></h${big ? 2 : 5}>
+    <div class="qtools"><button type="button" class="btn" data-expand>Show all solutions</button></div>${qs.map(q => qCard(q, q.qno || "Q")).join("")}</section>`;
+}
+function kicker(n) {
+  const t = TRACKS[n.domain];
+  return `<div class="kicker">${t ? `<span class="swatch" style="background:var(--d-${n.domain})"></span>${esc(t.group.name)} · ${esc(t.name)} · ` : ""}${TYPE_LABEL[n.type]}</div>`;
+}
+function header(n) { return kicker(n) + `<h1 class="title">${esc(cleanTitle(n.title))}</h1>`; }
+function topicList(ids) {
+  return `<ul class="pagelist">${ids.map(id => {
+    const n = byId.get(id), nq = n.type === "topic" ? topicQuestions(id) : n.type === "question-bank" ? questionsOf(id).length : 0;
+    const secs = n.type === "topic" ? `<span class="secs">${n.sections.map(s => `<a href="#${s}" data-id="${s}">${esc(byId.get(s).title)}</a>`).join("<span class='dot-sep'>·</span>")}</span>` : "";
+    return `<li><a class="t" href="#${id}" data-id="${id}">${esc(cleanTitle(n.title))}</a>${n.type === "topic" ? `<span class="s">${mdInline(n.summary || "")}</span>` : ""}${secs}${nq ? `<span class="qn">${nq} interview question${nq > 1 ? "s" : ""}</span>` : ""}</li>`;
+  }).join("")}</ul>`;
+}
+function trackCard(t) {
+  const tr = TRACKS[t];
+  const nq = tr.banks.reduce((s, b) => s + questionsOf(b).length, 0);
+  return `<div class="card" style="--dcolor:var(--d-${t})">
+    <h3><a href="#${tr.map.id}" data-id="${tr.map.id}">${esc(tr.name)}</a></h3>
+    <span class="stat">${tr.topics.length} chapters${nq ? ` · ${nq} questions` : ""}</span>
+    <ul>${tr.topics.map(id => `<li><a href="#${id}" data-id="${id}">${esc(byId.get(id).title)}</a></li>`).join("")}</ul></div>`;
+}
+
+// ---- page renderers ----
+function renderTopic(n) {
+  const k = CHAPTER_NO[n.id], eq = { prefix: k, n: 0 };
+  const body = n.content;
+  const first = body.search(/^<a id="/m);
+  const intro = (first >= 0 ? body.slice(0, first) : body).replace(/^# .*\n?/, "").replace(/^\*\*Sections:\*\*.*$/m, "").trim();
+  const t = TRACKS[n.domain];
+  let html = `<div class="kicker"><span class="swatch" style="background:var(--d-${n.domain})"></span>${esc(t.group.name)} · ${esc(t.name)}</div>
+    <div class="chapno">Chapter ${k}</div><h1 class="title chapter">${esc(n.title)}</h1>`;
+  if (intro) html += `<div class="prose intro">${md(intro, eq)}</div>`;
+  html += `<nav class="chapter-toc" aria-label="Contents"><span>Contents</span><ol>${n.sections.map(s => `<li><span class="num">${secNo(s)}</span><a href="#${s}" data-id="${s}">${esc(byId.get(s).title)}</a></li>`).join("")}</ol></nav>`;
+  for (const sid of n.sections) {
+    const s = byId.get(sid);
+    const content = s.content.replace(/^## (.+)$/m, (m, title) => `## ${secNo(sid)}\u2003${title}`);
+    html += `<section class="sec" data-sec="${sid}"><div class="prose">${md(content, eq)}</div>${qBlock("Exercises", testsOf(sid), false, secNo(sid))}</section>`;
+  }
+  return html;
+}
+
+// Course-notes typesetting: box formula/example blocks, "where" tables for variables.
+function enhance(root) {
+  root.querySelectorAll(".sec > .prose").forEach(prose => {
+    const kids = [...prose.children];
+    let group = null;
+    const kindOf = h => { const t = h.textContent.toLowerCase();
+      return /formula|definition|model|closed form/.test(t) ? "def" : /example|worked/.test(t) ? "example" : /connection/.test(t) ? "seealso" : "plain"; };
+    // content between the section title and the first h3 that holds display math becomes a formula box
+    const lead = [];
+    let seenTitle = false;
+    for (const el of kids) { if (el.tagName === "H3") break; if (el.tagName === "H2") { seenTitle = true; continue; } if (seenTitle) lead.push(el); }
+    if (lead.some(el => /\$\$/.test(el.textContent))) {
+      const box = document.createElement("div"); box.className = "box def";
+      lead[0].before(box); lead.forEach(el => box.appendChild(el));
+    }
+    for (const el of [...prose.children]) {
+      if (el.tagName === "H3") {
+        group = document.createElement("div"); group.className = "block " + kindOf(el);
+        if (group.classList.contains("def") || group.classList.contains("example")) group.classList.add("box");
+        group.dataset.pending = "1";
+        if (group.classList.contains("seealso")) el.textContent = "See also";
+        el.before(group); group.appendChild(el);
+      } else if (group && el.tagName !== "H2") group.appendChild(el);
+    }
+  });
+  // any other block that contains display math is boxed too, keeping its own heading as the label
+  root.querySelectorAll(".block.plain[data-pending]").forEach(b => { if (/\$\$/.test(b.textContent)) b.classList.add("box", "titled"); });
+  root.querySelectorAll("[data-pending]").forEach(b => delete b.dataset.pending);
+  // example paragraphs outside h3 blocks: "**Example:** ..." / "**Worked example**"
+  root.querySelectorAll(".prose p").forEach(p => {
+    const st = p.firstElementChild;
+    if (st && st.tagName === "STRONG" && p.firstChild === st && /^example|^worked example/i.test(st.textContent) && !p.closest(".box")) {
+      const box = document.createElement("div"); box.className = "box example"; p.before(box); box.appendChild(p);
+    }
+  });
+  // Variables → "where" table
+  root.querySelectorAll(".prose p").forEach(p => {
+    const st = p.firstElementChild;
+    if (!st || st.tagName !== "STRONG" || p.firstChild !== st || !/^Variables:?$/.test(st.textContent.trim())) return;
+    let items = [];
+    const next = p.nextElementSibling;
+    if (p.textContent.trim().replace(/^Variables:\s*/, "") === "" && next && next.tagName === "UL") { items = [...next.children].map(li => li.innerHTML); next.remove(); }
+    else { st.remove(); items = [p.innerHTML.trim()]; }
+    const rows = items.map(h => {
+      const m = h.match(/^\s*((?:\$[^$]+\$(?:\s*(?:,|\/|and|or)\s*)?)+)\s*[—:–-]?\s*([\s\S]*)$/);
+      return m && m[2].trim() ? `<tr><td class="sym">${m[1]}</td><td>${m[2]}</td></tr>` : `<tr><td colspan="2">${h}</td></tr>`;
+    }).join("");
+    const div = document.createElement("div"); div.className = "vars";
+    div.innerHTML = `<span class="vars-h">where</span><table>${rows}</table>`;
+    p.replaceWith(div);
+  });
+}
+function renderBank(n) {
+  const intro = n.content.replace(/^# .*\n?/, "").trim();
+  return header(n) + (intro ? `<div class="prose">${md(intro)}</div>` : "") + qBlock("Questions", questionsOf(n.id), true, "");
+}
+function renderMap(n) {
+  if (n.id === "home") {
+    return `<div class="kicker">Start here</div><h1 class="title">Quant Interview Wiki</h1>
+      <p class="lead">Each chapter is one document. Links jump to the exact section.</p>` +
+      GROUPS.map(g => `<section class="qsection"><h2><a href="#${g.id}" data-id="${g.id}">${g.name}</a></h2><div class="cards">${g.tracks.map(trackCard).join("")}</div></section>`).join("") +
+      "";
+  }
+  const g = GROUPS.find(g => g.id === n.id);
+  if (g) return header(n) + `<div class="prose">${md(n.content.replace(/^# .*\n?/, ""))}</div><div class="cards">${g.tracks.map(trackCard).join("")}</div>`;
+  const t = TRACKS[n.domain];
+  const intro = n.content.split(/^## /m)[0].replace(/^# .*\n?/, "");
+  return header(n) + `<div class="prose">${md(intro)}</div>` +
+    `<section class="qsection"><h2>Chapters, in reading order <span class="n">${t.topics.length}</span></h2>${topicList(t.topics)}</section>` +
+    (t.banks.length ? `<section class="qsection"><h2>Question banks</h2>${topicList(t.banks)}</section>` : "");
+}
+function renderSource(n) { return header(n) + `<div class="prose">${md(n.content.replace(/^# .*\n?/, ""))}</div>`; }
+
+// ---- right rail ----
+function railList(label, ids) {
+  if (!ids.length) return "";
+  return `<div><h4>${label}</h4><ul>${ids.map(id => { const i = byId.get(id);
+    return `<li><a href="#${esc(id)}" data-id="${esc(id)}"><span class="dot" style="background:var(--d-${i.domain || "none"}, var(--faint))"></span><span>${esc(cleanTitle(i.title))}</span></a></li>`; }).join("")}</ul></div>`;
+}
+function renderRail(n) {
+  let out = "";
+  if (n.type === "topic") {
+    out += `<div><h4>On this page</h4><ul class="onpage">${n.sections.map(s => `<li><a href="#${s}" data-id="${s}" data-sec-link="${s}"><span class="num">${secNo(s)}</span><span>${esc(byId.get(s).title)}</span></a></li>`).join("")}</ul></div>`;
+    const mine = new Set(n.sections);
+    const other = (type, dir) => {
+      const set = new Set();
+      for (const s of n.sections) for (const a of adj.get(s)) {
+        const o = byId.get(a.other);
+        if (a.type === type && (!dir || a.dir === dir) && o.type === "concept" && !mine.has(o.id)) set.add(o.topic);
+      }
+      set.delete(n.id); return [...set];
+    };
+    const pre = other("prerequisite", "out"), post = other("prerequisite", "in");
+    const rel = other("related", null).filter(x => !pre.includes(x) && !post.includes(x));
+    out += railList("Builds on", pre) + railList("Leads to", post) + railList("Related chapters", rel);
+  } else {
+    const list = (adj.get(n.id) || []).filter(a => a.type !== "domain").map(a => pageOf(a.other)).filter(id => id !== n.id && !["question-bank", "source"].includes(byId.get(id).type));
+    out += railList("Linked pages", [...new Set(list)].filter(id => byId.get(id).type !== "map" || id !== "home"));
+  }
+  return out + `<div><h4>File</h4><span class="path">${esc(n.path)}</span></div>`;
+}
+
+// ---- sidebar ----
+const toc = document.getElementById("toc");
+(function buildToc() {
+  let h = `<a href="#home" data-id="home">Home</a>`;
+  for (const g of GROUPS) {
+    h += `<a class="glabel" href="#${g.id}" data-id="${g.id}">${g.name}</a>`;
+    for (const t of g.tracks) {
+      const tr = TRACKS[t];
+      const nq = tr.banks.reduce((s, b) => s + questionsOf(b).length, 0);
+      h += `<details class="track" data-track="${t}"><summary><span class="swatch" style="background:var(--d-${t})"></span>${esc(tr.name)}<span class="n">${tr.topics.length}</span></summary><div class="lvl">
+        <a class="ov" href="#${tr.map.id}" data-id="${tr.map.id}">Overview</a>
+        ${tr.topics.map(id => `<a class="tp" href="#${id}" data-id="${id}"><span class="num">${CHAPTER_NO[id]}</span>${esc(byId.get(id).title)}</a><ul class="secs" data-secs="${id}" hidden>${byId.get(id).sections.map(s => `<li><a href="#${s}" data-id="${s}" data-sec-link="${s}"><span class="num">${secNo(s)}</span>${esc(byId.get(s).title)}</a></li>`).join("")}</ul>`).join("")}
+        ${tr.banks.map(b => `<a class="qb" href="#${b}" data-id="${b}">Questions · ${esc(cleanTitle(byId.get(b).title).replace(/^Questions: /, ""))} <span class="n">${questionsOf(b).length}</span></a>`).join("")}
+      </div></details>`;
+    }
+  }
+  toc.innerHTML = h;
+})();
+function syncToc(pageId) {
+  const n = byId.get(pageId);
+  toc.querySelectorAll("a.current").forEach(a => a.classList.remove("current"));
+  toc.querySelectorAll("ul.secs").forEach(u => u.hidden = u.dataset.secs !== pageId);
+  if (n.domain) toc.querySelectorAll("details.track").forEach(d => d.open = d.dataset.track === n.domain);
+  const a = toc.querySelector(`a[data-id="${CSS.escape(pageId)}"]`);
+  if (a) { a.classList.add("current"); a.scrollIntoView({ block: "nearest" }); }
+}
+
+// ---- router ----
+const article = document.getElementById("article"), rail = document.getElementById("rail"), crumbs = document.getElementById("crumbs");
+const mainEl = document.getElementById("main");
+let current = null;
+function crumbsFor(n) {
+  const parts = [`<a href="#home" data-id="home">Home</a>`];
+  if (n.id !== "home") {
+    const t = TRACKS[n.domain];
+    if (t) parts.push(`<a href="#${t.group.id}" data-id="${t.group.id}">${t.group.name}</a>`);
+    if (t && t.map.id !== n.id) parts.push(`<a href="#${t.map.id}" data-id="${t.map.id}">${esc(t.name)}</a>`);
+    parts.push(`<span>${esc(cleanTitle(n.title))}</span>`);
+  }
+  return parts.join('<span class="sep">/</span>');
+}
+function scrollToAnchor(anchor) {
+  const el = anchor && document.getElementById(anchor);
+  if (!el) { mainEl.scrollTop = 0; window.scrollTo(0, 0); return; }
+  if (el.tagName === "DETAILS") el.open = true;
+  el.scrollIntoView({ block: "start" });
+  const sec = el.closest(".sec");
+  if (sec) { sec.classList.remove("flash"); void sec.offsetWidth; sec.classList.add("flash"); }
+}
+function open(id, { push = true } = {}) {
+  const target = byId.get(id);
+  if (!target) return;
+  const pid = pageOf(id);
+  const anchor = target.type === "concept" ? id : target.type === "question" ? "q-" + id.split("/")[1] : null;
+  if (push) { try { history.pushState(null, "", "#" + (target.type === "question" ? pid : id)); } catch (e) {} }
+  closeMenu();
+  if (pid === current) { scrollToAnchor(anchor); markSection(anchor); return; }
+  current = pid;
+  const n = byId.get(pid);
+  article.style.setProperty("--dcolor", n.domain ? `var(--d-${n.domain})` : "var(--accent)");
+  article.innerHTML = n.type === "topic" ? renderTopic(n) : n.type === "question-bank" ? renderBank(n) : n.type === "map" ? renderMap(n) : renderSource(n);
+  enhance(article);
+  rail.innerHTML = renderRail(n);
+  crumbs.innerHTML = crumbsFor(n);
+  syncToc(pid);
+  typeset().then(() => scrollToAnchor(anchor));
+  scrollToAnchor(anchor);
+  watchSections();
+}
+function typeset() { return (window.MathJax && MathJax.typesetPromise) ? MathJax.typesetPromise([article]).catch(() => {}) : Promise.resolve(); }
+window.addEventListener("popstate", () => { const id = location.hash.slice(1); open(byId.has(id) ? id : "home", { push: false }); });
+
+// highlight the section being read in the rail and sidebar
+let observer = null;
+function markSection(sid) {
+  document.querySelectorAll("[data-sec-link]").forEach(a => a.classList.toggle("active", a.dataset.secLink === sid));
+}
+function watchSections() {
+  if (observer) observer.disconnect();
+  const secs = article.querySelectorAll(".sec");
+  if (!secs.length || !("IntersectionObserver" in window)) return;
+  observer = new IntersectionObserver(entries => {
+    const vis = entries.filter(e => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+    if (vis) markSection(vis.target.dataset.sec);
+  }, { rootMargin: "-15% 0px -70% 0px" });
+  secs.forEach(s => observer.observe(s));
+}
+
+document.addEventListener("click", e => {
+  const expand = e.target.closest("[data-expand]");
+  if (expand) {
+    const sec = expand.closest("section");
+    const cards = sec.querySelectorAll("details.qa");
+    const openAll = [...cards].some(c => !c.open);
+    cards.forEach(c => c.open = openAll);
+    expand.textContent = openAll ? "Hide all solutions" : "Show all solutions";
+    return;
+  }
+  const a = e.target.closest("a[data-id]");
+  if (!a) return;
+  e.preventDefault(); overlay.hidden = true; open(a.dataset.id);
+});
+
+// ---- mobile menu ----
+const side = document.getElementById("side"), scrim = document.getElementById("scrim");
+function closeMenu() { side.classList.remove("open"); scrim.classList.remove("open"); }
+document.getElementById("menuBtn").addEventListener("click", () => { side.classList.add("open"); scrim.classList.add("open"); });
+scrim.addEventListener("click", closeMenu);
+
+// ---- search ----
+const q = document.getElementById("q"), results = document.getElementById("results");
+let searchable = [];
+function buildSearch() {
+  searchable = DATA.nodes.filter(n => n.type !== "source" && !n.locked)
+    .map(n => ({ n, hay: ((n.qno || "") + " " + n.title + " " + (n.tags || []).join(" ") + " " + (n.summary || "") + (n.type === "question" ? "" : " " + n.id)).toLowerCase() }));
+}
+buildSearch();
+let active = 0, hits = [];
+const rank = n => ({ topic: 0, concept: 1, map: 2, "question-bank": 3, question: 4, source: 5 }[n.type]);
+q.addEventListener("input", () => {
+  const s = q.value.trim().toLowerCase();
+  if (!s) { results.hidden = true; return; }
+  const words = s.split(/\s+/);
+  hits = searchable.filter(x => words.every(w => x.hay.includes(w))).map(x => x.n)
+    .sort((a, b) => (b.title.toLowerCase().includes(s) - a.title.toLowerCase().includes(s)) || rank(a) - rank(b) || a.title.length - b.title.length)
+    .slice(0, 14);
+  active = 0;
+  results.innerHTML = hits.length ? hits.map((n, i) =>
+    `<li><button type="button" data-hit="${i}" class="${i ? "" : "active"}"><span class="kind">${TYPE_LABEL[n.type]}</span><span>${n.qno ? `<b>${n.qno}</b> ` : ""}${esc(cleanTitle(n.title))}${n.type === "concept" ? `<small> in ${esc(byId.get(n.topic).title)}</small>` : ""}</span></button></li>`).join("")
+    : `<li style="padding:8px;color:var(--muted)">No matches. Try a single keyword such as "skew".</li>`;
+  results.hidden = false;
+});
+q.addEventListener("keydown", e => {
+  if (results.hidden || !hits.length) return;
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    e.preventDefault(); active = (active + (e.key === "ArrowDown" ? 1 : -1) + hits.length) % hits.length;
+    results.querySelectorAll("button").forEach((b, i) => b.classList.toggle("active", i === active));
+  } else if (e.key === "Enter") { pick(hits[active]); }
+  else if (e.key === "Escape") { results.hidden = true; }
+});
+results.addEventListener("click", e => { const b = e.target.closest("button[data-hit]"); if (b) pick(hits[+b.dataset.hit]); });
+document.addEventListener("click", e => { if (!e.target.closest(".search")) results.hidden = true; });
+function pick(n) { results.hidden = true; q.value = ""; open(n.id); }
+
+// ---- graph (secondary view): chapters and how they connect ----
+const overlay = document.getElementById("graphOverlay");
+let fg = null, hi = null, T = {}, fitted = false;
+function tokens() {
+  const cs = getComputedStyle(document.documentElement), g = k => cs.getPropertyValue(k).trim();
+  T = { edge: g("--edge"), ink: g("--ink"), ground: g("--ground"), surface: g("--surface"), faint: g("--faint"), d: {} };
+  for (const t of Object.keys(TRACKS)) T.d[t] = g("--d-" + t);
+}
+function chapterGraph() {
+  const topics = DATA.nodes.filter(n => n.type === "topic");
+  const w = new Map();
+  for (const l of DATA.links) {
+    if (!["prerequisite", "related", "mention"].includes(l.type)) continue;
+    const a = pageOf(l.source), b = pageOf(l.target);
+    if (a === b || byId.get(a).type !== "topic" || byId.get(b).type !== "topic") continue;
+    const k = [a, b].sort().join("|"); w.set(k, (w.get(k) || 0) + 1);
+  }
+  return { nodes: topics.map(t => ({ id: t.id })), links: [...w].map(([k, v]) => { const [s, t] = k.split("|"); return { source: s, target: t, w: v }; }) };
+}
+function openGraph() {
+  overlay.hidden = false; tokens();
+  hi = new Set([current]);
+  if (fg) fg.graphData().links.forEach(l => { if (l.source.id === current) hi.add(l.target.id); if (l.target.id === current) hi.add(l.source.id); });
+  if (fg) return;
+  const el = document.getElementById("graph");
+  const data = chapterGraph();
+  data.links.forEach(l => { if (l.source === current) hi.add(l.target); if (l.target === current) hi.add(l.source); });
+  fg = ForceGraph()(el).graphData(data).backgroundColor("rgba(0,0,0,0)").autoPauseRedraw(false)
+    .width(el.clientWidth).height(el.clientHeight)
+    .nodeLabel(n => byId.get(n.id).title)
+    .linkColor(() => T.edge).linkWidth(l => Math.min(4, 0.4 + l.w * 0.35))
+    .nodeCanvasObject((n, ctx, scale) => {
+      const d = byId.get(n.id), on = !hi || hi.size < 2 || hi.has(n.id);
+      const r = 4 + Math.sqrt(d.sections.length) * 2.2;
+      ctx.globalAlpha = on ? 1 : 0.18;
+      ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, 2 * Math.PI); ctx.fillStyle = T.d[d.domain] || T.faint; ctx.fill();
+      if (n.id === current) { ctx.beginPath(); ctx.arc(n.x, n.y, r + 3, 0, 2 * Math.PI); ctx.lineWidth = 1.5; ctx.strokeStyle = T.ink; ctx.stroke(); }
+      const fs = 11 / scale;
+      ctx.font = `500 ${fs}px "IBM Plex Sans", system-ui, sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "top";
+      ctx.lineWidth = 3 / scale; ctx.strokeStyle = T.ground; ctx.strokeText(d.title, n.x, n.y + r + 2 / scale);
+      ctx.fillStyle = T.ink; ctx.fillText(d.title, n.x, n.y + r + 2 / scale);
+      ctx.globalAlpha = 1;
+    })
+    .nodePointerAreaPaint((n, color, ctx) => { ctx.fillStyle = color; ctx.beginPath(); ctx.arc(n.x, n.y, 12, 0, 2 * Math.PI); ctx.fill(); })
+    .onNodeClick(n => { overlay.hidden = true; open(n.id); })
+    .cooldownTicks(200).onEngineStop(() => { if (!fitted) { fitted = true; fg.zoomToFit(400, 60); } });
+  fg.d3Force("charge").strength(-260);
+  new ResizeObserver(() => fg.width(el.clientWidth).height(el.clientHeight)).observe(el);
+}
+document.getElementById("graphBtn").addEventListener("click", openGraph);
+document.getElementById("graphClose").addEventListener("click", () => overlay.hidden = true);
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !overlay.hidden) overlay.hidden = true; });
+
+// ---- password-protected exercises ----
+const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+async function unlock(password) {
+  const L = DATA.locked;
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
+  const key = await crypto.subtle.deriveKey({ name: "PBKDF2", salt: b64(L.salt), iterations: L.iter, hash: "SHA-256" },
+    base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+  const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64(L.iv) }, key, b64(L.ct));
+  const secret = JSON.parse(new TextDecoder().decode(plain));
+  for (const [id, v] of Object.entries(secret)) { const n = byId.get(id); if (n) Object.assign(n, v, { locked: false }); }
+  DATA.locked = null;
+  buildSearch();
+  const page = current; current = null; open(page, { push: false });
+}
+document.addEventListener("submit", async e => {
+  const form = e.target.closest("[data-unlock]");
+  if (!form) return;
+  e.preventDefault();
+  const input = form.querySelector("input"), err = form.querySelector(".lockerr");
+  err.textContent = "Checking…";
+  try {
+    await unlock(input.value);
+    try { sessionStorage.setItem("kb-pw", input.value); } catch (x) {}
+  } catch (x) { err.textContent = "Wrong password. Try again."; input.select(); }
+});
+
+// ---- boot ----
+const startId = location.hash.slice(1);
+open(byId.has(startId) ? startId : "home", { push: false });
+if (window.MathJax && MathJax.startup) MathJax.startup.promise.then(() => typeset()).catch(() => {});
+if (DATA.locked) { try { const pw = sessionStorage.getItem("kb-pw"); if (pw) unlock(pw).catch(() => {}); } catch (x) {} }
+</script>

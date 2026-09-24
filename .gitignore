@@ -1,0 +1,11 @@
+__pycache__/
+.obsidian/workspace*.json
+.DS_Store
+
+# Sources stay local: never upload (see AGENTS.md rule 0b)
+sources/
+inbox/
+
+# Interview questions stay local: never upload (see AGENTS.md rule 0c)
+questions/
+local/
