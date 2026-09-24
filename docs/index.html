@@ -245,6 +245,7 @@ a.wl.broken { color: var(--muted); border-bottom-style: dashed; cursor: default;
 .graph-overlay header { display: flex; align-items: center; gap: 12px; padding: 10px 16px; padding-top: calc(10px + env(safe-area-inset-top, 0px)); border-bottom: 1px solid var(--rule); background: var(--surface); }
 .graph-overlay header p { margin: 0; color: var(--muted); font-size: 12.5px; flex: 1; }
 #graph { position: relative; min-height: 0; overflow: hidden; }
+.version { position: fixed; left: 14px; bottom: 12px; z-index: 45; padding: 4px 7px; border: 1px solid var(--rule); border-radius: 4px; background: color-mix(in srgb, var(--surface) 90%, transparent); color: var(--faint); font-family: var(--font-mono); font-size: 10px; letter-spacing: .04em; pointer-events: none; }
 .scrim { display: none; }
 
 @container main (max-width: 1180px) {
@@ -321,6 +322,7 @@ a.wl.broken { color: var(--muted); border-bottom-style: dashed; cursor: default;
     </div>
   </div>
 </div>
+<div class="version" aria-label="Version 1.01" title="Version 1.01">v1.01</div>
 <div class="graph-overlay" id="graphOverlay" hidden>
   <header><strong>Graph</strong><p>Pages linked to the current page are highlighted. Click a node to open it.</p><button type="button" class="btn" id="graphClose">Close</button></header>
   <div id="graph"></div>
