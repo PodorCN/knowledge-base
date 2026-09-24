@@ -141,8 +141,8 @@ Rules:
 - Math: `$inline$`, `$$display$$`. Keep any **(自己推理)** marks that appear in the user's material.
 
 The wiki typesets this like course notes automatically: numbered chapters/sections/equations, boxed
-`### Formula` / `### Definition` blocks (and any block containing `$$`), `### Worked example` / `**Example:**`
-as an Example box, `### Connections` as "See also", variables as a "where" table.
+`### Formula` / `### Definition` blocks, individual display equations in custom subsections, `### Worked example` /
+`**Example:**` as an Example box, `### Connections` as "See also", and variables as a "where" table.
 
 ### Question (`questions/qb-*.md`)
 

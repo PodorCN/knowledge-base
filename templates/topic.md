@@ -16,7 +16,10 @@ sources: []
 
 ### Formula
 $$ … $$
-**Variables:** …
+
+**Variables:**
+
+- $x$ meaning
 
 ### Key points
 - …

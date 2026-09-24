@@ -16,10 +16,10 @@ Under each track: **chapters** (`topics/*.md`), each one complete document on a 
 
 ## Ways to browse
 
-1. **Wiki site**: open `docs/index.html` (works offline) or enable GitHub Pages
-   (Settings → Pages → Deploy from branch → `/docs`). Menu on the left (group → track → chapter),
-   the chapter in the middle, and "On this page"
-   plus builds-on / leads-to chapters on the right. The graph is one click away.
+1. **Wiki course notes**: open `docs/index.html` (works offline) or enable GitHub Pages
+   (Settings → Pages → Deploy from branch → `/docs`). The collapsible contents menu stays on the left;
+   the full-width chapter reader stays in the middle, with "On this page" and related chapters on the
+   right when space allows. The graph is one click away.
 2. **Obsidian** (recommended for editing): *Open folder as vault* → this repo. Graph view,
    backlinks and `[[wikilinks]]` work without extra setup.
 3. **GitHub**: start at [`maps/home.md`](maps/home.md).
