@@ -13,6 +13,12 @@
   --accent: #1d6b86;
   --accent-soft: #e3eff3;
   --code-bg: #f0f2f1;
+  --hl-keyword: #a1365f;
+  --hl-type: #1f6f8b;
+  --hl-title: #7a4fd0;
+  --hl-string: #2e7d3a;
+  --hl-number: #b35c00;
+  --hl-comment: #6f7b83;
   --d-prob-stats: #4a67b0;
   --d-stochastic-finance: #6f5bb8;
   --d-signal-research: #c0642a;
@@ -31,7 +37,7 @@
   :root:not([data-theme="light"]) {
     color-scheme: dark;
     --ground: #0f1417; --surface: #161d22; --ink: #e3e9ec; --muted: #9aa6ae; --faint: #6f7b83; --rule: #27323a;
-    --accent: #6bb8d3; --accent-soft: #1a3039; --code-bg: #1d262c; --edge: rgba(227, 233, 236, 0.14);
+    --accent: #6bb8d3; --accent-soft: #1a3039; --code-bg: #1d262c; --hl-keyword: #f08ab4; --hl-type: #6bc4e0; --hl-title: #b89cf5; --hl-string: #8bd49a; --hl-number: #f0a860; --hl-comment: #8894a0; --edge: rgba(227, 233, 236, 0.14);
     --d-prob-stats: #8aa4ee; --d-stochastic-finance: #ad9cf0; --d-signal-research: #ec9a5c; --d-portfolio-construction: #ef7f6c;
     --d-pricing: #6bb8d3; --d-black-scholes: #8ea6ee; --d-quant-models: #66c98f; --d-risk-management: #d6c45a; --d-quant-dev: #9aa8b4;
   }
@@ -39,7 +45,7 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
   --ground: #0f1417; --surface: #161d22; --ink: #e3e9ec; --muted: #9aa6ae; --faint: #6f7b83; --rule: #27323a;
-  --accent: #6bb8d3; --accent-soft: #1a3039; --code-bg: #1d262c; --edge: rgba(227, 233, 236, 0.14);
+  --accent: #6bb8d3; --accent-soft: #1a3039; --code-bg: #1d262c; --hl-keyword: #f08ab4; --hl-type: #6bc4e0; --hl-title: #b89cf5; --hl-string: #8bd49a; --hl-number: #f0a860; --hl-comment: #8894a0; --edge: rgba(227, 233, 236, 0.14);
   --d-prob-stats: #8aa4ee; --d-stochastic-finance: #ad9cf0; --d-signal-research: #ec9a5c; --d-portfolio-construction: #ef7f6c;
   --d-pricing: #6bb8d3; --d-black-scholes: #8ea6ee; --d-quant-models: #66c98f; --d-risk-management: #d6c45a; --d-quant-dev: #9aa8b4;
 }
@@ -132,7 +138,14 @@ a { color: var(--accent); }
 .prose strong { font-weight: 600; }
 .prose code { font-family: var(--font-mono); font-size: 13px; background: var(--code-bg); padding: 1px 5px; border-radius: 3px; }
 .prose pre { background: var(--code-bg); padding: 12px 14px; border-radius: 6px; overflow-x: auto; font-size: 12.5px; line-height: 1.5; }
-.prose pre code { background: none; padding: 0; }
+.prose pre code { background: none; padding: 0; color: var(--ink); }
+.hljs-keyword, .hljs-literal, .hljs-meta .hljs-keyword { color: var(--hl-keyword); font-weight: 500; }
+.hljs-built_in, .hljs-type { color: var(--hl-type); }
+.hljs-title, .hljs-title.class_, .hljs-title.function_ { color: var(--hl-title); }
+.hljs-string, .hljs-char.escape_ { color: var(--hl-string); }
+.hljs-number { color: var(--hl-number); }
+.hljs-comment { color: var(--hl-comment); font-style: italic; }
+.hljs-meta { color: var(--hl-comment); }
 .prose .table-wrap { overflow-x: auto; margin: 14px 0; }
 .prose table { border-collapse: collapse; font-family: var(--font-read); font-size: 15px; font-variant-numeric: tabular-nums; border-top: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink); }
 .prose th, .prose td { padding: 5px 12px; text-align: left; vertical-align: top; }
@@ -283,6 +296,7 @@ window.MathJax = {
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/force-graph@1.47.4/dist/force-graph.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
 <script>
 const DATA = /*__GRAPH_DATA__*/null;
 
@@ -569,6 +583,7 @@ function open(id, { push = true } = {}) {
   article.style.setProperty("--dcolor", n.domain ? `var(--d-${n.domain})` : "var(--accent)");
   article.innerHTML = n.type === "topic" ? renderTopic(n) : n.type === "question-bank" ? renderBank(n) : n.type === "map" ? renderMap(n) : renderSource(n);
   enhance(article);
+  if (window.hljs) article.querySelectorAll('pre code[class*="language-"]').forEach(el => { try { hljs.highlightElement(el); } catch (e) {} });
   rail.innerHTML = renderRail(n);
   crumbs.innerHTML = crumbsFor(n);
   syncToc(pid);
