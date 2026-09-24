@@ -18,6 +18,7 @@
   --d-signal-research: #c0642a;
   --d-portfolio-construction: #b8402f;
   --d-pricing: #1d6b86;
+  --d-black-scholes: #3f5fa8;
   --d-quant-models: #2e8f5a;
   --d-risk-management: #8a7a1c;
   --d-quant-dev: #5d6b78;
@@ -32,7 +33,7 @@
     --ground: #0f1417; --surface: #161d22; --ink: #e3e9ec; --muted: #9aa6ae; --faint: #6f7b83; --rule: #27323a;
     --accent: #6bb8d3; --accent-soft: #1a3039; --code-bg: #1d262c; --edge: rgba(227, 233, 236, 0.14);
     --d-prob-stats: #8aa4ee; --d-stochastic-finance: #ad9cf0; --d-signal-research: #ec9a5c; --d-portfolio-construction: #ef7f6c;
-    --d-pricing: #6bb8d3; --d-quant-models: #66c98f; --d-risk-management: #d6c45a; --d-quant-dev: #9aa8b4;
+    --d-pricing: #6bb8d3; --d-black-scholes: #8ea6ee; --d-quant-models: #66c98f; --d-risk-management: #d6c45a; --d-quant-dev: #9aa8b4;
   }
 }
 :root[data-theme="dark"] {
@@ -40,7 +41,7 @@
   --ground: #0f1417; --surface: #161d22; --ink: #e3e9ec; --muted: #9aa6ae; --faint: #6f7b83; --rule: #27323a;
   --accent: #6bb8d3; --accent-soft: #1a3039; --code-bg: #1d262c; --edge: rgba(227, 233, 236, 0.14);
   --d-prob-stats: #8aa4ee; --d-stochastic-finance: #ad9cf0; --d-signal-research: #ec9a5c; --d-portfolio-construction: #ef7f6c;
-  --d-pricing: #6bb8d3; --d-quant-models: #66c98f; --d-risk-management: #d6c45a; --d-quant-dev: #9aa8b4;
+  --d-pricing: #6bb8d3; --d-black-scholes: #8ea6ee; --d-quant-models: #66c98f; --d-risk-management: #d6c45a; --d-quant-dev: #9aa8b4;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -288,7 +289,7 @@ const DATA = /*__GRAPH_DATA__*/null;
 const GROUPS = [
   { id: "map-foundations", name: "Foundations", tracks: ["prob-stats", "stochastic-finance"] },
   { id: "map-buyside", name: "Buy-side", tracks: ["signal-research", "portfolio-construction"] },
-  { id: "map-sellside", name: "Sell-side", tracks: ["pricing", "quant-models", "risk-management", "quant-dev"] }
+  { id: "map-sellside", name: "Sell-side", tracks: ["pricing", "black-scholes", "quant-models", "risk-management", "quant-dev"] }
 ];
 const TYPE_LABEL = { concept: "Section", topic: "Chapter", map: "Overview", question: "Question", "question-bank": "Question bank", source: "Source" };
 

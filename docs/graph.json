@@ -9,10 +9,25 @@
     "index"
    ],
    "path": "maps/home.md",
-   "content": "# Home — Knowledge Map\n\n- **[[map-foundations]]**: [[map-prob-stats]] · [[map-stochastic-finance]]\n- **[[map-buyside]]**: [[map-signal-research]] · [[map-portfolio-construction]]\n- **[[map-sellside]]**: [[map-pricing]] · [[map-quant-models]] · [[map-risk-management]] · [[map-quant-dev]]",
+   "content": "# Home — Knowledge Map\n\n- **[[map-foundations]]**: [[map-prob-stats]] · [[map-stochastic-finance]]\n- **[[map-buyside]]**: [[map-signal-research]] · [[map-portfolio-construction]]\n- **[[map-sellside]]**: [[map-pricing]] · [[map-black-scholes]] · [[map-quant-models]] · [[map-risk-management]] · [[map-quant-dev]]",
    "summary": "",
    "topic": "",
-   "degree": 11
+   "degree": 12
+  },
+  {
+   "id": "map-black-scholes",
+   "title": "Black–Scholes",
+   "type": "map",
+   "domain": "black-scholes",
+   "tags": [
+    "map",
+    "track"
+   ],
+   "path": "maps/map-black-scholes.md",
+   "content": "# Black–Scholes\n\nPart of [[map-sellside]].\n\n## Topics (in reading order)\n\n- [[black-scholes]]\n- [[greeks-sensitivities]]",
+   "summary": "Part of map-sellside.",
+   "topic": "",
+   "degree": 4
   },
   {
    "id": "map-buyside",
@@ -69,10 +84,10 @@
     "track"
    ],
    "path": "maps/map-pricing.md",
-   "content": "# Pricing\n\nPart of [[map-sellside]].\n\n## Topics (in reading order)\n\n- [[no-arbitrage-parity]]\n- [[black-scholes]]\n- [[exotic-options]]\n- [[structured-products-delta-one]]",
+   "content": "# Pricing\n\nPart of [[map-sellside]].\n\n## Topics (in reading order)\n\n- [[no-arbitrage-parity]]\n- [[exotic-options]]\n- [[structured-products-delta-one]]",
    "summary": "Part of map-sellside.",
    "topic": "",
-   "degree": 7
+   "degree": 6
   },
   {
    "id": "map-prob-stats",
@@ -144,10 +159,10 @@
     "group"
    ],
    "path": "maps/map-sellside.md",
-   "content": "# Sell-side\n\n- [[map-pricing]]\n- [[map-quant-models]]\n- [[map-risk-management]]\n- [[map-quant-dev]]\n\nBack to [[home]].",
+   "content": "# Sell-side\n\n- [[map-pricing]]\n- [[map-black-scholes]]\n- [[map-quant-models]]\n- [[map-risk-management]]\n- [[map-quant-dev]]\n\nBack to [[home]].",
    "summary": "Back to home.",
    "topic": "",
-   "degree": 5
+   "degree": 6
   },
   {
    "id": "map-signal-research",
@@ -183,7 +198,7 @@
    "id": "black-scholes-pde",
    "title": "Black–Scholes PDE (derivation)",
    "type": "concept",
-   "domain": "pricing",
+   "domain": "black-scholes",
    "tags": [
     "pde",
     "delta-hedging",
@@ -199,7 +214,7 @@
    "id": "black-scholes-formula",
    "title": "Black–Scholes Formula",
    "type": "concept",
-   "domain": "pricing",
+   "domain": "black-scholes",
    "tags": [
     "black-scholes",
     "bsm"
@@ -211,60 +226,10 @@
    "degree": 21
   },
   {
-   "id": "greeks",
-   "title": "The Greeks (Δ, Γ, vega, Θ, ρ)",
-   "type": "concept",
-   "domain": "pricing",
-   "tags": [
-    "delta",
-    "gamma",
-    "vega",
-    "theta",
-    "rho"
-   ],
-   "path": "topics/black-scholes.md",
-   "content": "<a id=\"greeks\"></a>\n\n## The Greeks (Δ, Γ, vega, Θ, ρ)\n<!-- section: greeks | prerequisites: [black-scholes-formula] | related: [delta-hedging, gamma-theta-pnl, second-order-greeks, greeks-conventions-bumping, delta-vs-itm-probability, sticky-strike-vs-sticky-moneyness] | tags: [delta, gamma, vega, theta, rho] -->\n\n$$\\Delta_C=e^{-q\\tau}N(d_1),\\quad \\Delta_P=e^{-q\\tau}(N(d_1)-1),\\quad \\Gamma=\\frac{e^{-q\\tau}n(d_1)}{S\\sigma\\sqrt\\tau},\\quad \\mathcal V=Se^{-q\\tau}n(d_1)\\sqrt\\tau$$\n$$\\Theta_C=-\\frac{Se^{-q\\tau}n(d_1)\\sigma}{2\\sqrt\\tau}+qSe^{-q\\tau}N(d_1)-rKe^{-r\\tau}N(d_2),\\qquad \\rho_C=\\tau Ke^{-r\\tau}N(d_2)$$\n\n**Variables:**\n\n- $n$ standard normal pdf\n- others as in [[black-scholes-formula]]. Γ and vega identical for call and put\n\n### Reference ($S=K=100,T=1,r=q=0,\\sigma=20\\%$)\nΔ = 0.54, Γ = 0.397/20 = 0.0199, vega = 39.7 per 100% vol = 0.397 per vol point.\n\n### Profiles\n- Γ peaks near ATM, grows as expiry approaches (ATM Γ ~ $1/\\sqrt T$) → short-dated = gamma-heavy.\n- Vega peaks near ATM, grows with $\\sqrt T$ → long-dated = vega-heavy.\n- Long vanilla: Γ, vega > 0; Θ usually < 0 (not always for puts/with dividends).\n\n### Local P&L\n$$\\Delta V\\approx\\Delta\\,\\delta S+\\tfrac12\\Gamma(\\delta S)^2+\\mathcal V\\,\\delta\\sigma+\\Theta\\,\\delta t+\\rho\\,\\delta r$$\nΔ = 0.5, Γ = 0.02, stock +2 → ≈ 1.04. A long call can lose while the stock rises (Θ, vol crush).\n\n### Connections\n- [[delta-hedging]], [[gamma-theta-pnl]], [[second-order-greeks]], units & bumps in [[greeks-conventions-bumping]].\n- **Surface-aware delta:** [[sticky-strike-vs-sticky-moneyness]].",
-   "summary": "<a id=\"greeks\"></a>",
-   "topic": "black-scholes",
-   "degree": 20
-  },
-  {
-   "id": "second-order-greeks",
-   "title": "Vanna, Volga & Vanna–Volga",
-   "type": "concept",
-   "domain": "pricing",
-   "tags": [
-    "vanna",
-    "volga",
-    "cross-greeks"
-   ],
-   "path": "topics/black-scholes.md",
-   "content": "<a id=\"second-order-greeks\"></a>\n\n## Vanna, Volga & Vanna–Volga\n<!-- section: second-order-greeks | prerequisites: [greeks] | related: [fx-vol-conventions, barrier-options, sticky-strike-vs-sticky-moneyness] | tags: [vanna, volga, cross-greeks] -->\n\n$$\\text{Vanna}=\\frac{\\partial\\Delta}{\\partial\\sigma}=\\frac{\\partial\\mathcal V}{\\partial S},\\qquad \\text{Volga}=\\frac{\\partial\\mathcal V}{\\partial\\sigma}$$\n\n**Variables:**\n\n- Δ delta\n- $\\mathcal V$ vega\n- σ vol\n- $S$ spot\n\n- Matter when spot and vol move together (equities: spot ↓ vol ↑) and for exotic / barrier books.\n- **Vanna–volga**: quick smile-adjustment pricing method; FX market standard for interpolating across delta (not arbitrage-free).",
-   "summary": "<a id=\"second-order-greeks\"></a>",
-   "topic": "black-scholes",
-   "degree": 8
-  },
-  {
-   "id": "greeks-conventions-bumping",
-   "title": "Greek Units, Conventions & Bump-and-Reprice",
-   "type": "concept",
-   "domain": "pricing",
-   "tags": [
-    "finite-difference",
-    "cash-greeks",
-    "conventions"
-   ],
-   "path": "topics/black-scholes.md",
-   "content": "<a id=\"greeks-conventions-bumping\"></a>\n\n## Greek Units, Conventions & Bump-and-Reprice\n<!-- section: greeks-conventions-bumping | prerequisites: [greeks] | related: [price-reconciliation, sticky-strike-vs-sticky-moneyness, monte-carlo-pricing] | tags: [finite-difference, cash-greeks, conventions] -->\n\n### Units (be explicit in an app)\n- Delta in shares and **$ delta** $=\\Delta S\\cdot qty$; gamma as $ gamma per 1% move ($\\tfrac12\\Gamma S^2(1\\%)^2$ or $\\Gamma S\\cdot qty$ per 1%).\n- Vega per 1 vol point (analytic vega × 0.01); theta per calendar or business day; rho per 1 bp.\n- Mismatched conventions between app and risk system = classic \"numbers don't match\" ticket.\n\n### Bump-and-reprice\n$$\\Delta\\approx\\frac{V(S+h)-V(S-h)}{2h},\\qquad \\Gamma\\approx\\frac{V(S+h)-2V(S)+V(S-h)}{h^2}$$\n\n**Variables:** $h$ bump size (~1% of spot).\n\n- Too small → round-off / MC noise; too large → truncation error.\n- Desk \"cash\" Greeks bump the whole surface → must define sticky strike vs sticky delta.\n\n### Connections\n- [[price-reconciliation]], [[sticky-strike-vs-sticky-moneyness]], [[monte-carlo-pricing]] (AAD alternative).",
-   "summary": "<a id=\"greeks-conventions-bumping\"></a>",
-   "topic": "black-scholes",
-   "degree": 10
-  },
-  {
    "id": "delta-vs-itm-probability",
    "title": "Delta vs Probability of Finishing ITM (N(d1) vs N(d2))",
    "type": "concept",
-   "domain": "pricing",
+   "domain": "black-scholes",
    "tags": [
     "delta",
     "probability",
@@ -280,7 +245,7 @@
    "id": "black-76",
    "title": "Black-76 (forward-based Black formula)",
    "type": "concept",
-   "domain": "pricing",
+   "domain": "black-scholes",
    "tags": [
     "black-76",
     "forward",
@@ -296,7 +261,7 @@
    "id": "american-early-exercise",
    "title": "American Options, Early Exercise & De-Americanisation",
    "type": "concept",
-   "domain": "pricing",
+   "domain": "black-scholes",
    "tags": [
     "american",
     "early-exercise",
@@ -310,25 +275,22 @@
   },
   {
    "id": "black-scholes",
-   "title": "Black–Scholes",
+   "title": "Black–Scholes Model",
    "type": "topic",
-   "domain": "pricing",
+   "domain": "black-scholes",
    "tags": [],
    "path": "topics/black-scholes.md",
-   "content": "# Black–Scholes\n\n**Sections:** [[black-scholes-pde]] · [[black-scholes-formula]] · [[greeks]] · [[second-order-greeks]] · [[greeks-conventions-bumping]] · [[delta-vs-itm-probability]] · [[black-76]] · [[american-early-exercise]]\n\n<a id=\"black-scholes-pde\"></a>\n\n## Black–Scholes PDE (derivation)\n<!-- section: black-scholes-pde | prerequisites: [ito-lemma, binomial-replication] | related: [black-scholes-formula, gamma-theta-pnl, pde-finite-difference, delta-hedging] | tags: [pde, delta-hedging, replication] -->\n\n$$\\frac{\\partial V}{\\partial t}+\\tfrac12\\sigma^2S^2\\frac{\\partial^2V}{\\partial S^2}+(r-q)S\\frac{\\partial V}{\\partial S}-rV=0,\\qquad V(T,S)=h(S)$$\n\n**Variables:**\n\n- $V(S,t)$ option value\n- $\\sigma$ vol\n- $r$ rate\n- $q$ dividend yield\n- $h$ payoff\n\n### Derivation (4 steps)\n1. Itô on $V(S,t)$: $dV=(V_t+\\mu SV_S+\\tfrac12\\sigma^2S^2V_{SS})dt+\\sigma SV_SdW$.\n2. Hold $\\Delta=V_S$ shares → the $dW$ term cancels.\n3. Hedged portfolio is riskless ⇒ must earn $r$ (else arbitrage).\n4. μ cancels → PDE contains only $r,\\sigma$, contract terms.\n\n**Why no μ:** dynamic replication prices the risk away; your stock forecast is irrelevant.\n\n### Connections\n- **Rearranged as:** $\\Theta+\\tfrac12\\Gamma\\sigma^2S^2+rSV_S-rV=0$ → [[gamma-theta-pnl]].\n- **Solved numerically by:** [[pde-finite-difference]].\n\n<a id=\"black-scholes-formula\"></a>\n\n## Black–Scholes Formula\n<!-- section: black-scholes-formula | prerequisites: [geometric-brownian-motion, risk-neutral-pricing] | related: [black-scholes-pde, greeks, implied-volatility, black-76, put-call-parity, delta-vs-itm-probability] | tags: [black-scholes, bsm] -->\n\n$$C=Se^{-q\\tau}N(d_1)-Ke^{-r\\tau}N(d_2),\\qquad P=Ke^{-r\\tau}N(-d_2)-Se^{-q\\tau}N(-d_1)$$\n$$d_1=\\frac{\\ln(S/K)+(r-q+\\tfrac12\\sigma^2)\\tau}{\\sigma\\sqrt\\tau},\\qquad d_2=d_1-\\sigma\\sqrt\\tau$$\n\n**Variables:**\n\n- $S$ spot\n- $K$ strike\n- $\\tau=T-t$ years to expiry\n- $r$ rate\n- $q$ dividend yield (or borrow-adjusted carry)\n- $\\sigma$ volatility\n- $N$ standard normal CDF\n\n### Reference numbers\n$S=K=100,T=1,r=q=0,\\sigma=20\\%$: $d_1=0.1,d_2=-0.1$, $C=100(0.5398-0.4602)=7.97$.\n\n**ATM shortcut:** $C_{ATM}\\approx0.4\\,S\\sigma\\sqrt T$ ($0.4\\approx1/\\sqrt{2\\pi}$) → 8.0.\n\n### Assumptions and where they break (equities)\nGBM with constant σ, frictionless continuous hedging, constant r, no jumps, known dividends → broken by skew, jumps/gaps, discrete dividends, borrow, costs. BS survives as a **quoting language** ([[implied-volatility]]).\n\n### Connections\n- **Derived from:** [[black-scholes-pde]] or [[risk-neutral-pricing]]. **Sensitivities:** [[greeks]]. **Forward form:** [[black-76]].\n- **Decomposition:** $C=\\text{AoN}-K\\cdot\\text{CoN}$ → [[digital-options]].\n\n<a id=\"greeks\"></a>\n\n## The Greeks (Δ, Γ, vega, Θ, ρ)\n<!-- section: greeks | prerequisites: [black-scholes-formula] | related: [delta-hedging, gamma-theta-pnl, second-order-greeks, greeks-conventions-bumping, delta-vs-itm-probability, sticky-strike-vs-sticky-moneyness] | tags: [delta, gamma, vega, theta, rho] -->\n\n$$\\Delta_C=e^{-q\\tau}N(d_1),\\quad \\Delta_P=e^{-q\\tau}(N(d_1)-1),\\quad \\Gamma=\\frac{e^{-q\\tau}n(d_1)}{S\\sigma\\sqrt\\tau},\\quad \\mathcal V=Se^{-q\\tau}n(d_1)\\sqrt\\tau$$\n$$\\Theta_C=-\\frac{Se^{-q\\tau}n(d_1)\\sigma}{2\\sqrt\\tau}+qSe^{-q\\tau}N(d_1)-rKe^{-r\\tau}N(d_2),\\qquad \\rho_C=\\tau Ke^{-r\\tau}N(d_2)$$\n\n**Variables:**\n\n- $n$ standard normal pdf\n- others as in [[black-scholes-formula]]. Γ and vega identical for call and put\n\n### Reference ($S=K=100,T=1,r=q=0,\\sigma=20\\%$)\nΔ = 0.54, Γ = 0.397/20 = 0.0199, vega = 39.7 per 100% vol = 0.397 per vol point.\n\n### Profiles\n- Γ peaks near ATM, grows as expiry approaches (ATM Γ ~ $1/\\sqrt T$) → short-dated = gamma-heavy.\n- Vega peaks near ATM, grows with $\\sqrt T$ → long-dated = vega-heavy.\n- Long vanilla: Γ, vega > 0; Θ usually < 0 (not always for puts/with dividends).\n\n### Local P&L\n$$\\Delta V\\approx\\Delta\\,\\delta S+\\tfrac12\\Gamma(\\delta S)^2+\\mathcal V\\,\\delta\\sigma+\\Theta\\,\\delta t+\\rho\\,\\delta r$$\nΔ = 0.5, Γ = 0.02, stock +2 → ≈ 1.04. A long call can lose while the stock rises (Θ, vol crush).\n\n### Connections\n- [[delta-hedging]], [[gamma-theta-pnl]], [[second-order-greeks]], units & bumps in [[greeks-conventions-bumping]].\n- **Surface-aware delta:** [[sticky-strike-vs-sticky-moneyness]].\n\n<a id=\"second-order-greeks\"></a>\n\n## Vanna, Volga & Vanna–Volga\n<!-- section: second-order-greeks | prerequisites: [greeks] | related: [fx-vol-conventions, barrier-options, sticky-strike-vs-sticky-moneyness] | tags: [vanna, volga, cross-greeks] -->\n\n$$\\text{Vanna}=\\frac{\\partial\\Delta}{\\partial\\sigma}=\\frac{\\partial\\mathcal V}{\\partial S},\\qquad \\text{Volga}=\\frac{\\partial\\mathcal V}{\\partial\\sigma}$$\n\n**Variables:**\n\n- Δ delta\n- $\\mathcal V$ vega\n- σ vol\n- $S$ spot\n\n- Matter when spot and vol move together (equities: spot ↓ vol ↑) and for exotic / barrier books.\n- **Vanna–volga**: quick smile-adjustment pricing method; FX market standard for interpolating across delta (not arbitrage-free).\n\n<a id=\"greeks-conventions-bumping\"></a>\n\n## Greek Units, Conventions & Bump-and-Reprice\n<!-- section: greeks-conventions-bumping | prerequisites: [greeks] | related: [price-reconciliation, sticky-strike-vs-sticky-moneyness, monte-carlo-pricing] | tags: [finite-difference, cash-greeks, conventions] -->\n\n### Units (be explicit in an app)\n- Delta in shares and **$ delta** $=\\Delta S\\cdot qty$; gamma as $ gamma per 1% move ($\\tfrac12\\Gamma S^2(1\\%)^2$ or $\\Gamma S\\cdot qty$ per 1%).\n- Vega per 1 vol point (analytic vega × 0.01); theta per calendar or business day; rho per 1 bp.\n- Mismatched conventions between app and risk system = classic \"numbers don't match\" ticket.\n\n### Bump-and-reprice\n$$\\Delta\\approx\\frac{V(S+h)-V(S-h)}{2h},\\qquad \\Gamma\\approx\\frac{V(S+h)-2V(S)+V(S-h)}{h^2}$$\n\n**Variables:** $h$ bump size (~1% of spot).\n\n- Too small → round-off / MC noise; too large → truncation error.\n- Desk \"cash\" Greeks bump the whole surface → must define sticky strike vs sticky delta.\n\n### Connections\n- [[price-reconciliation]], [[sticky-strike-vs-sticky-moneyness]], [[monte-carlo-pricing]] (AAD alternative).\n\n<a id=\"delta-vs-itm-probability\"></a>\n\n## Delta vs Probability of Finishing ITM (N(d1) vs N(d2))\n<!-- section: delta-vs-itm-probability | prerequisites: [greeks, risk-neutral-pricing] | related: [digital-options, lognormal-distribution] | tags: [delta, probability, measure] -->\n\n- $N(d_2)$ = **risk-neutral** probability $S_T>K$ (= undiscounted cash-or-nothing digital).\n- $N(d_1)$ = that probability under the **share measure** (stock as numeraire); call delta $=e^{-q\\tau}N(d_1)$.\n- Neither is the physical probability. Close for short-dated ATM, diverge for long-dated / high vol.\n- **ATM-forward call delta > 0.5:** at $K=F$, $d_1=\\tfrac12\\sigma\\sqrt T>0$. Lognormal is right-skewed: median < forward.\n\n### Connections\n- **Why it matters:** [[digital-options]] are priced off $N(d_2)$; skew adjusts it. Built on [[lognormal-distribution]].\n\n<a id=\"black-76\"></a>\n\n## Black-76 (forward-based Black formula)\n<!-- section: black-76 | prerequisites: [black-scholes-formula, forward-pricing] | related: [implied-forward-regression, swaptions, sabr] | tags: [black-76, forward, swaption] -->\n\n$$C=D\\,[F\\,N(d_1)-K\\,N(d_2)],\\qquad d_{1,2}=\\frac{\\ln(F/K)\\pm\\tfrac12\\sigma^2T}{\\sigma\\sqrt T}$$\n\n**Variables:**\n\n- $D$ discount factor\n- $F$ forward\n- $K$ strike\n- σ Black vol\n- $T$ expiry\n\n- Surface practice: get $D,F$ from [[implied-forward-regression]], then invert Black-76 → no dividend/rate guesses needed.\n- Swaptions: replace $D$ by annuity $A$ and $F$ by forward swap rate → [[swaptions]]. Rates often quoted in **normal (Bachelier)** vol.\n\n<a id=\"american-early-exercise\"></a>\n\n## American Options, Early Exercise & De-Americanisation\n<!-- section: american-early-exercise | prerequisites: [option-payoffs-moneyness, forward-pricing] | related: [first-step-analysis, pde-finite-difference, vol-surface-construction, put-call-parity] | tags: [american, early-exercise, dividends] -->\n\n- **American call, no dividends, r ≥ 0:** never exercise early (lose optionality, pay K early).\n- **With dividends:** exercise only just before an ex-date, if dividend > time value lost (≈ $D>K(1-e^{-r\\Delta t})$ + remaining optionality).\n- **American put:** early exercise when deep ITM (receive K earlier, earn interest). Borrow costs matter.\n- Parity becomes an inequality.\n\n### De-Americanisation (for vol surfaces)\nSingle-stock listed options are American → convert prices to European-equivalents (tree / PDE) **before** inverting to IV, or invert the American pricer directly. Surface always built on European-equivalent vols; mixing is a common consistency bug.\n\n### Connections\n- **Backward induction:** [[first-step-analysis]], [[pde-finite-difference]], Longstaff–Schwartz in [[monte-carlo-pricing]].\n- **Feeds:** [[vol-surface-construction]] (single-stock case).",
+   "content": "# Black–Scholes Model\n\n**Sections:** [[black-scholes-pde]] · [[black-scholes-formula]] · [[delta-vs-itm-probability]] · [[black-76]] · [[american-early-exercise]]\n\n<a id=\"black-scholes-pde\"></a>\n\n## Black–Scholes PDE (derivation)\n<!-- section: black-scholes-pde | prerequisites: [ito-lemma, binomial-replication] | related: [black-scholes-formula, gamma-theta-pnl, pde-finite-difference, delta-hedging] | tags: [pde, delta-hedging, replication] -->\n\n$$\\frac{\\partial V}{\\partial t}+\\tfrac12\\sigma^2S^2\\frac{\\partial^2V}{\\partial S^2}+(r-q)S\\frac{\\partial V}{\\partial S}-rV=0,\\qquad V(T,S)=h(S)$$\n\n**Variables:**\n\n- $V(S,t)$ option value\n- $\\sigma$ vol\n- $r$ rate\n- $q$ dividend yield\n- $h$ payoff\n\n### Derivation (4 steps)\n1. Itô on $V(S,t)$: $dV=(V_t+\\mu SV_S+\\tfrac12\\sigma^2S^2V_{SS})dt+\\sigma SV_SdW$.\n2. Hold $\\Delta=V_S$ shares → the $dW$ term cancels.\n3. Hedged portfolio is riskless ⇒ must earn $r$ (else arbitrage).\n4. μ cancels → PDE contains only $r,\\sigma$, contract terms.\n\n**Why no μ:** dynamic replication prices the risk away; your stock forecast is irrelevant.\n\n### Connections\n- **Rearranged as:** $\\Theta+\\tfrac12\\Gamma\\sigma^2S^2+rSV_S-rV=0$ → [[gamma-theta-pnl]].\n- **Solved numerically by:** [[pde-finite-difference]].\n\n<a id=\"black-scholes-formula\"></a>\n\n## Black–Scholes Formula\n<!-- section: black-scholes-formula | prerequisites: [geometric-brownian-motion, risk-neutral-pricing] | related: [black-scholes-pde, greeks, implied-volatility, black-76, put-call-parity, delta-vs-itm-probability] | tags: [black-scholes, bsm] -->\n\n$$C=Se^{-q\\tau}N(d_1)-Ke^{-r\\tau}N(d_2),\\qquad P=Ke^{-r\\tau}N(-d_2)-Se^{-q\\tau}N(-d_1)$$\n$$d_1=\\frac{\\ln(S/K)+(r-q+\\tfrac12\\sigma^2)\\tau}{\\sigma\\sqrt\\tau},\\qquad d_2=d_1-\\sigma\\sqrt\\tau$$\n\n**Variables:**\n\n- $S$ spot\n- $K$ strike\n- $\\tau=T-t$ years to expiry\n- $r$ rate\n- $q$ dividend yield (or borrow-adjusted carry)\n- $\\sigma$ volatility\n- $N$ standard normal CDF\n\n### Reference numbers\n$S=K=100,T=1,r=q=0,\\sigma=20\\%$: $d_1=0.1,d_2=-0.1$, $C=100(0.5398-0.4602)=7.97$.\n\n**ATM shortcut:** $C_{ATM}\\approx0.4\\,S\\sigma\\sqrt T$ ($0.4\\approx1/\\sqrt{2\\pi}$) → 8.0.\n\n### Assumptions and where they break (equities)\nGBM with constant σ, frictionless continuous hedging, constant r, no jumps, known dividends → broken by skew, jumps/gaps, discrete dividends, borrow, costs. BS survives as a **quoting language** ([[implied-volatility]]).\n\n### Connections\n- **Derived from:** [[black-scholes-pde]] or [[risk-neutral-pricing]]. **Sensitivities:** [[greeks]]. **Forward form:** [[black-76]].\n- **Decomposition:** $C=\\text{AoN}-K\\cdot\\text{CoN}$ → [[digital-options]].\n\n<a id=\"delta-vs-itm-probability\"></a>\n\n## Delta vs Probability of Finishing ITM (N(d1) vs N(d2))\n<!-- section: delta-vs-itm-probability | prerequisites: [greeks, risk-neutral-pricing] | related: [digital-options, lognormal-distribution] | tags: [delta, probability, measure] -->\n\n- $N(d_2)$ = **risk-neutral** probability $S_T>K$ (= undiscounted cash-or-nothing digital).\n- $N(d_1)$ = that probability under the **share measure** (stock as numeraire); call delta $=e^{-q\\tau}N(d_1)$.\n- Neither is the physical probability. Close for short-dated ATM, diverge for long-dated / high vol.\n- **ATM-forward call delta > 0.5:** at $K=F$, $d_1=\\tfrac12\\sigma\\sqrt T>0$. Lognormal is right-skewed: median < forward.\n\n### Connections\n- **Why it matters:** [[digital-options]] are priced off $N(d_2)$; skew adjusts it. Built on [[lognormal-distribution]].\n\n<a id=\"black-76\"></a>\n\n## Black-76 (forward-based Black formula)\n<!-- section: black-76 | prerequisites: [black-scholes-formula, forward-pricing] | related: [implied-forward-regression, swaptions, sabr] | tags: [black-76, forward, swaption] -->\n\n$$C=D\\,[F\\,N(d_1)-K\\,N(d_2)],\\qquad d_{1,2}=\\frac{\\ln(F/K)\\pm\\tfrac12\\sigma^2T}{\\sigma\\sqrt T}$$\n\n**Variables:**\n\n- $D$ discount factor\n- $F$ forward\n- $K$ strike\n- σ Black vol\n- $T$ expiry\n\n- Surface practice: get $D,F$ from [[implied-forward-regression]], then invert Black-76 → no dividend/rate guesses needed.\n- Swaptions: replace $D$ by annuity $A$ and $F$ by forward swap rate → [[swaptions]]. Rates often quoted in **normal (Bachelier)** vol.\n\n<a id=\"american-early-exercise\"></a>\n\n## American Options, Early Exercise & De-Americanisation\n<!-- section: american-early-exercise | prerequisites: [option-payoffs-moneyness, forward-pricing] | related: [first-step-analysis, pde-finite-difference, vol-surface-construction, put-call-parity] | tags: [american, early-exercise, dividends] -->\n\n- **American call, no dividends, r ≥ 0:** never exercise early (lose optionality, pay K early).\n- **With dividends:** exercise only just before an ex-date, if dividend > time value lost (≈ $D>K(1-e^{-r\\Delta t})$ + remaining optionality).\n- **American put:** early exercise when deep ITM (receive K earlier, earn interest). Borrow costs matter.\n- Parity becomes an inequality.\n\n### De-Americanisation (for vol surfaces)\nSingle-stock listed options are American → convert prices to European-equivalents (tree / PDE) **before** inverting to IV, or invert the American pricer directly. Surface always built on European-equivalent vols; mixing is a common consistency bug.\n\n### Connections\n- **Backward induction:** [[first-step-analysis]], [[pde-finite-difference]], Longstaff–Schwartz in [[monte-carlo-pricing]].\n- **Feeds:** [[vol-surface-construction]] (single-stock case).",
    "summary": "",
    "topic": "",
    "sections": [
     "black-scholes-pde",
     "black-scholes-formula",
-    "greeks",
-    "second-order-greeks",
-    "greeks-conventions-bumping",
     "delta-vs-itm-probability",
     "black-76",
     "american-early-exercise"
    ],
-   "degree": 13
+   "degree": 10
   },
   {
    "id": "csharp-essentials",
@@ -703,6 +665,73 @@
     "quanto-options"
    ],
    "degree": 10
+  },
+  {
+   "id": "greeks",
+   "title": "The Greeks (Δ, Γ, vega, Θ, ρ)",
+   "type": "concept",
+   "domain": "black-scholes",
+   "tags": [
+    "delta",
+    "gamma",
+    "vega",
+    "theta",
+    "rho"
+   ],
+   "path": "topics/greeks-sensitivities.md",
+   "content": "<a id=\"greeks\"></a>\n\n## The Greeks (Δ, Γ, vega, Θ, ρ)\n<!-- section: greeks | prerequisites: [black-scholes-formula] | related: [delta-hedging, gamma-theta-pnl, second-order-greeks, greeks-conventions-bumping, delta-vs-itm-probability, sticky-strike-vs-sticky-moneyness] | tags: [delta, gamma, vega, theta, rho] -->\n\n$$\\Delta_C=e^{-q\\tau}N(d_1),\\quad \\Delta_P=e^{-q\\tau}(N(d_1)-1),\\quad \\Gamma=\\frac{e^{-q\\tau}n(d_1)}{S\\sigma\\sqrt\\tau},\\quad \\mathcal V=Se^{-q\\tau}n(d_1)\\sqrt\\tau$$\n$$\\Theta_C=-\\frac{Se^{-q\\tau}n(d_1)\\sigma}{2\\sqrt\\tau}+qSe^{-q\\tau}N(d_1)-rKe^{-r\\tau}N(d_2),\\qquad \\rho_C=\\tau Ke^{-r\\tau}N(d_2)$$\n\n**Variables:**\n\n- $n$ standard normal pdf\n- others as in [[black-scholes-formula]]. Γ and vega identical for call and put\n\n### Reference ($S=K=100,T=1,r=q=0,\\sigma=20\\%$)\nΔ = 0.54, Γ = 0.397/20 = 0.0199, vega = 39.7 per 100% vol = 0.397 per vol point.\n\n### Profiles\n- Γ peaks near ATM, grows as expiry approaches (ATM Γ ~ $1/\\sqrt T$) → short-dated = gamma-heavy.\n- Vega peaks near ATM, grows with $\\sqrt T$ → long-dated = vega-heavy.\n- Long vanilla: Γ, vega > 0; Θ usually < 0 (not always for puts/with dividends).\n\n### Local P&L\n$$\\Delta V\\approx\\Delta\\,\\delta S+\\tfrac12\\Gamma(\\delta S)^2+\\mathcal V\\,\\delta\\sigma+\\Theta\\,\\delta t+\\rho\\,\\delta r$$\nΔ = 0.5, Γ = 0.02, stock +2 → ≈ 1.04. A long call can lose while the stock rises (Θ, vol crush).\n\n### Connections\n- [[delta-hedging]], [[gamma-theta-pnl]], [[second-order-greeks]], units & bumps in [[greeks-conventions-bumping]].\n- **Surface-aware delta:** [[sticky-strike-vs-sticky-moneyness]].",
+   "summary": "<a id=\"greeks\"></a>",
+   "topic": "greeks-sensitivities",
+   "degree": 20
+  },
+  {
+   "id": "second-order-greeks",
+   "title": "Vanna, Volga & Vanna–Volga",
+   "type": "concept",
+   "domain": "black-scholes",
+   "tags": [
+    "vanna",
+    "volga",
+    "cross-greeks"
+   ],
+   "path": "topics/greeks-sensitivities.md",
+   "content": "<a id=\"second-order-greeks\"></a>\n\n## Vanna, Volga & Vanna–Volga\n<!-- section: second-order-greeks | prerequisites: [greeks] | related: [fx-vol-conventions, barrier-options, sticky-strike-vs-sticky-moneyness] | tags: [vanna, volga, cross-greeks] -->\n\n$$\\text{Vanna}=\\frac{\\partial\\Delta}{\\partial\\sigma}=\\frac{\\partial\\mathcal V}{\\partial S},\\qquad \\text{Volga}=\\frac{\\partial\\mathcal V}{\\partial\\sigma}$$\n\n**Variables:**\n\n- Δ delta\n- $\\mathcal V$ vega\n- σ vol\n- $S$ spot\n\n- Matter when spot and vol move together (equities: spot ↓ vol ↑) and for exotic / barrier books.\n- **Vanna–volga**: quick smile-adjustment pricing method; FX market standard for interpolating across delta (not arbitrage-free).",
+   "summary": "<a id=\"second-order-greeks\"></a>",
+   "topic": "greeks-sensitivities",
+   "degree": 8
+  },
+  {
+   "id": "greeks-conventions-bumping",
+   "title": "Greek Units, Conventions & Bump-and-Reprice",
+   "type": "concept",
+   "domain": "black-scholes",
+   "tags": [
+    "finite-difference",
+    "cash-greeks",
+    "conventions"
+   ],
+   "path": "topics/greeks-sensitivities.md",
+   "content": "<a id=\"greeks-conventions-bumping\"></a>\n\n## Greek Units, Conventions & Bump-and-Reprice\n<!-- section: greeks-conventions-bumping | prerequisites: [greeks] | related: [price-reconciliation, sticky-strike-vs-sticky-moneyness, monte-carlo-pricing] | tags: [finite-difference, cash-greeks, conventions] -->\n\n### Units (be explicit in an app)\n- Delta in shares and **$ delta** $=\\Delta S\\cdot qty$; gamma as $ gamma per 1% move ($\\tfrac12\\Gamma S^2(1\\%)^2$ or $\\Gamma S\\cdot qty$ per 1%).\n- Vega per 1 vol point (analytic vega × 0.01); theta per calendar or business day; rho per 1 bp.\n- Mismatched conventions between app and risk system = classic \"numbers don't match\" ticket.\n\n### Bump-and-reprice\n$$\\Delta\\approx\\frac{V(S+h)-V(S-h)}{2h},\\qquad \\Gamma\\approx\\frac{V(S+h)-2V(S)+V(S-h)}{h^2}$$\n\n**Variables:** $h$ bump size (~1% of spot).\n\n- Too small → round-off / MC noise; too large → truncation error.\n- Desk \"cash\" Greeks bump the whole surface → must define sticky strike vs sticky delta.\n\n### Connections\n- [[price-reconciliation]], [[sticky-strike-vs-sticky-moneyness]], [[monte-carlo-pricing]] (AAD alternative).",
+   "summary": "<a id=\"greeks-conventions-bumping\"></a>",
+   "topic": "greeks-sensitivities",
+   "degree": 10
+  },
+  {
+   "id": "greeks-sensitivities",
+   "title": "Greeks",
+   "type": "topic",
+   "domain": "black-scholes",
+   "tags": [],
+   "path": "topics/greeks-sensitivities.md",
+   "content": "# Greeks\n\n**Sections:** [[greeks]] · [[second-order-greeks]] · [[greeks-conventions-bumping]]\n\n<a id=\"greeks\"></a>\n\n## The Greeks (Δ, Γ, vega, Θ, ρ)\n<!-- section: greeks | prerequisites: [black-scholes-formula] | related: [delta-hedging, gamma-theta-pnl, second-order-greeks, greeks-conventions-bumping, delta-vs-itm-probability, sticky-strike-vs-sticky-moneyness] | tags: [delta, gamma, vega, theta, rho] -->\n\n$$\\Delta_C=e^{-q\\tau}N(d_1),\\quad \\Delta_P=e^{-q\\tau}(N(d_1)-1),\\quad \\Gamma=\\frac{e^{-q\\tau}n(d_1)}{S\\sigma\\sqrt\\tau},\\quad \\mathcal V=Se^{-q\\tau}n(d_1)\\sqrt\\tau$$\n$$\\Theta_C=-\\frac{Se^{-q\\tau}n(d_1)\\sigma}{2\\sqrt\\tau}+qSe^{-q\\tau}N(d_1)-rKe^{-r\\tau}N(d_2),\\qquad \\rho_C=\\tau Ke^{-r\\tau}N(d_2)$$\n\n**Variables:**\n\n- $n$ standard normal pdf\n- others as in [[black-scholes-formula]]. Γ and vega identical for call and put\n\n### Reference ($S=K=100,T=1,r=q=0,\\sigma=20\\%$)\nΔ = 0.54, Γ = 0.397/20 = 0.0199, vega = 39.7 per 100% vol = 0.397 per vol point.\n\n### Profiles\n- Γ peaks near ATM, grows as expiry approaches (ATM Γ ~ $1/\\sqrt T$) → short-dated = gamma-heavy.\n- Vega peaks near ATM, grows with $\\sqrt T$ → long-dated = vega-heavy.\n- Long vanilla: Γ, vega > 0; Θ usually < 0 (not always for puts/with dividends).\n\n### Local P&L\n$$\\Delta V\\approx\\Delta\\,\\delta S+\\tfrac12\\Gamma(\\delta S)^2+\\mathcal V\\,\\delta\\sigma+\\Theta\\,\\delta t+\\rho\\,\\delta r$$\nΔ = 0.5, Γ = 0.02, stock +2 → ≈ 1.04. A long call can lose while the stock rises (Θ, vol crush).\n\n### Connections\n- [[delta-hedging]], [[gamma-theta-pnl]], [[second-order-greeks]], units & bumps in [[greeks-conventions-bumping]].\n- **Surface-aware delta:** [[sticky-strike-vs-sticky-moneyness]].\n\n<a id=\"second-order-greeks\"></a>\n\n## Vanna, Volga & Vanna–Volga\n<!-- section: second-order-greeks | prerequisites: [greeks] | related: [fx-vol-conventions, barrier-options, sticky-strike-vs-sticky-moneyness] | tags: [vanna, volga, cross-greeks] -->\n\n$$\\text{Vanna}=\\frac{\\partial\\Delta}{\\partial\\sigma}=\\frac{\\partial\\mathcal V}{\\partial S},\\qquad \\text{Volga}=\\frac{\\partial\\mathcal V}{\\partial\\sigma}$$\n\n**Variables:**\n\n- Δ delta\n- $\\mathcal V$ vega\n- σ vol\n- $S$ spot\n\n- Matter when spot and vol move together (equities: spot ↓ vol ↑) and for exotic / barrier books.\n- **Vanna–volga**: quick smile-adjustment pricing method; FX market standard for interpolating across delta (not arbitrage-free).\n\n<a id=\"greeks-conventions-bumping\"></a>\n\n## Greek Units, Conventions & Bump-and-Reprice\n<!-- section: greeks-conventions-bumping | prerequisites: [greeks] | related: [price-reconciliation, sticky-strike-vs-sticky-moneyness, monte-carlo-pricing] | tags: [finite-difference, cash-greeks, conventions] -->\n\n### Units (be explicit in an app)\n- Delta in shares and **$ delta** $=\\Delta S\\cdot qty$; gamma as $ gamma per 1% move ($\\tfrac12\\Gamma S^2(1\\%)^2$ or $\\Gamma S\\cdot qty$ per 1%).\n- Vega per 1 vol point (analytic vega × 0.01); theta per calendar or business day; rho per 1 bp.\n- Mismatched conventions between app and risk system = classic \"numbers don't match\" ticket.\n\n### Bump-and-reprice\n$$\\Delta\\approx\\frac{V(S+h)-V(S-h)}{2h},\\qquad \\Gamma\\approx\\frac{V(S+h)-2V(S)+V(S-h)}{h^2}$$\n\n**Variables:** $h$ bump size (~1% of spot).\n\n- Too small → round-off / MC noise; too large → truncation error.\n- Desk \"cash\" Greeks bump the whole surface → must define sticky strike vs sticky delta.\n\n### Connections\n- [[price-reconciliation]], [[sticky-strike-vs-sticky-moneyness]], [[monte-carlo-pricing]] (AAD alternative).",
+   "summary": "",
+   "topic": "",
+   "sections": [
+    "greeks",
+    "second-order-greeks",
+    "greeks-conventions-bumping"
+   ],
+   "degree": 8
   },
   {
    "id": "delta-hedging",
@@ -2708,6 +2737,11 @@
   },
   {
    "source": "home",
+   "target": "map-black-scholes",
+   "type": "mention"
+  },
+  {
+   "source": "home",
    "target": "map-quant-models",
    "type": "mention"
   },
@@ -2719,6 +2753,21 @@
   {
    "source": "home",
    "target": "map-quant-dev",
+   "type": "mention"
+  },
+  {
+   "source": "map-black-scholes",
+   "target": "map-sellside",
+   "type": "mention"
+  },
+  {
+   "source": "map-black-scholes",
+   "target": "black-scholes",
+   "type": "mention"
+  },
+  {
+   "source": "map-black-scholes",
+   "target": "greeks-sensitivities",
    "type": "mention"
   },
   {
@@ -2764,11 +2813,6 @@
   {
    "source": "map-pricing",
    "target": "no-arbitrage-parity",
-   "type": "mention"
-  },
-  {
-   "source": "map-pricing",
-   "target": "black-scholes",
    "type": "mention"
   },
   {
@@ -2908,21 +2952,6 @@
   },
   {
    "source": "black-scholes",
-   "target": "greeks",
-   "type": "contains"
-  },
-  {
-   "source": "black-scholes",
-   "target": "second-order-greeks",
-   "type": "contains"
-  },
-  {
-   "source": "black-scholes",
-   "target": "greeks-conventions-bumping",
-   "type": "contains"
-  },
-  {
-   "source": "black-scholes",
    "target": "delta-vs-itm-probability",
    "type": "contains"
   },
@@ -3007,66 +3036,6 @@
    "type": "related"
   },
   {
-   "source": "delta-hedging",
-   "target": "greeks",
-   "type": "prerequisite"
-  },
-  {
-   "source": "gamma-theta-pnl",
-   "target": "greeks",
-   "type": "prerequisite"
-  },
-  {
-   "source": "second-order-greeks",
-   "target": "greeks",
-   "type": "prerequisite"
-  },
-  {
-   "source": "greeks-conventions-bumping",
-   "target": "greeks",
-   "type": "prerequisite"
-  },
-  {
-   "source": "sticky-strike-vs-sticky-moneyness",
-   "target": "greeks",
-   "type": "prerequisite"
-  },
-  {
-   "source": "delta-vs-itm-probability",
-   "target": "greeks",
-   "type": "prerequisite"
-  },
-  {
-   "source": "second-order-greeks",
-   "target": "fx-vol-conventions",
-   "type": "related"
-  },
-  {
-   "source": "second-order-greeks",
-   "target": "barrier-options",
-   "type": "related"
-  },
-  {
-   "source": "second-order-greeks",
-   "target": "sticky-strike-vs-sticky-moneyness",
-   "type": "related"
-  },
-  {
-   "source": "greeks-conventions-bumping",
-   "target": "price-reconciliation",
-   "type": "related"
-  },
-  {
-   "source": "greeks-conventions-bumping",
-   "target": "sticky-strike-vs-sticky-moneyness",
-   "type": "related"
-  },
-  {
-   "source": "greeks-conventions-bumping",
-   "target": "monte-carlo-pricing",
-   "type": "related"
-  },
-  {
    "source": "delta-vs-itm-probability",
    "target": "digital-options",
    "type": "related"
@@ -3075,6 +3044,11 @@
    "source": "delta-vs-itm-probability",
    "target": "lognormal-distribution",
    "type": "related"
+  },
+  {
+   "source": "delta-vs-itm-probability",
+   "target": "greeks",
+   "type": "prerequisite"
   },
   {
    "source": "delta-vs-itm-probability",
@@ -3542,6 +3516,11 @@
    "type": "related"
   },
   {
+   "source": "barrier-options",
+   "target": "second-order-greeks",
+   "type": "related"
+  },
+  {
    "source": "asian-options",
    "target": "black-scholes-formula",
    "type": "prerequisite"
@@ -3614,6 +3593,71 @@
   {
    "source": "quanto-options",
    "target": "pricing-app-architecture",
+   "type": "related"
+  },
+  {
+   "source": "greeks-sensitivities",
+   "target": "greeks",
+   "type": "contains"
+  },
+  {
+   "source": "greeks-sensitivities",
+   "target": "second-order-greeks",
+   "type": "contains"
+  },
+  {
+   "source": "greeks-sensitivities",
+   "target": "greeks-conventions-bumping",
+   "type": "contains"
+  },
+  {
+   "source": "delta-hedging",
+   "target": "greeks",
+   "type": "prerequisite"
+  },
+  {
+   "source": "gamma-theta-pnl",
+   "target": "greeks",
+   "type": "prerequisite"
+  },
+  {
+   "source": "second-order-greeks",
+   "target": "greeks",
+   "type": "prerequisite"
+  },
+  {
+   "source": "greeks-conventions-bumping",
+   "target": "greeks",
+   "type": "prerequisite"
+  },
+  {
+   "source": "sticky-strike-vs-sticky-moneyness",
+   "target": "greeks",
+   "type": "prerequisite"
+  },
+  {
+   "source": "second-order-greeks",
+   "target": "fx-vol-conventions",
+   "type": "related"
+  },
+  {
+   "source": "second-order-greeks",
+   "target": "sticky-strike-vs-sticky-moneyness",
+   "type": "related"
+  },
+  {
+   "source": "greeks-conventions-bumping",
+   "target": "price-reconciliation",
+   "type": "related"
+  },
+  {
+   "source": "greeks-conventions-bumping",
+   "target": "sticky-strike-vs-sticky-moneyness",
+   "type": "related"
+  },
+  {
+   "source": "greeks-conventions-bumping",
+   "target": "monte-carlo-pricing",
    "type": "related"
   },
   {

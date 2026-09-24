@@ -9,7 +9,7 @@ Organised by interview type:
 Home
 ├── Foundations → Prob & Stats · Stochastic calc & Finance basics
 ├── Buy-side    → Signal research · Portfolio construction
-└── Sell-side   → Pricing · Quant models · Risk management · Quant dev
+└── Sell-side   → Pricing · Black–Scholes · Quant models · Risk management · Quant dev
 ```
 
 Under each track: **chapters** (`topics/*.md`), each one complete document on a topic, split into sections you can link to and jump between. Interview questions are kept locally and are not part of this repository.

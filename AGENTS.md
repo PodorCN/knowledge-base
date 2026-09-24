@@ -41,7 +41,7 @@ Read this whole file before editing.
 home
 ├── Foundations  → prob-stats · stochastic-finance
 ├── Buy-side     → signal-research · portfolio-construction
-└── Sell-side    → pricing · quant-models · risk-management · quant-dev
+└── Sell-side    → pricing · black-scholes · quant-models · risk-management · quant-dev
 ```
 
 Levels: **Group → Track → Chapter → Section**.
@@ -49,7 +49,7 @@ Levels: **Group → Track → Chapter → Section**.
 | Level | Where it lives | Notes |
 |---|---|---|
 | Group | `maps/map-foundations.md`, `map-buyside.md`, `map-sellside.md` | fixed, 3 groups |
-| Track | `maps/map-<track>.md` | fixed, 8 tracks; lists its chapters in reading order |
+| Track | `maps/map-<track>.md` | fixed, 9 tracks; lists its chapters in reading order |
 | Chapter | `topics/<chapter-id>.md` | one complete document per topic |
 | Section | a block inside a chapter | one idea; has an anchor so `[[section-id]]` jumps to it |
 | Question | `## Q017:` block in `questions/qb-*.md` | links to the sections it tests; **local only** (git-ignored) |
@@ -70,9 +70,10 @@ Ask in this order:
 | `stochastic-finance` | Brownian motion, Itô, GBM, risk-neutral pricing, returns, no-arbitrage, forwards, bonds |
 | `signal-research` | regression, ML, time series, validation/leakage, signals, alpha, backtests, research process |
 | `portfolio-construction` | Sharpe, diversification, optimisation, risk contribution/budgeting, position sizing |
-| `pricing` | option payoffs, parity, Black–Scholes model and its Greeks, exotic options, structured products, delta one |
+| `pricing` | option payoffs, parity, replication, exotic options, structured products, delta one |
+| `black-scholes` | Black–Scholes PDE/formula, N(d1) vs N(d2), Black-76, American exercise; **Greeks** (own chapter) |
 | `quant-models` | implied vol, vol surface construction, local/stochastic vol, numerical methods |
-| `risk-management` | hedging, pin risk, scenarios, VaR/ES, model risk (Greeks themselves live in the Black–Scholes chapter) |
+| `risk-management` | hedging, pin risk, scenarios, VaR/ES, model risk (Greeks themselves live in the `black-scholes` track) |
 | `quant-dev` | OOP, design patterns, C#/.NET, pricing-app architecture, releases, reconciliation, coding questions |
 
 3. **Which chapter?** Pick the existing chapter below whose subject fits. Only create a new chapter for a
@@ -88,7 +89,8 @@ Current chapters and question banks:
 | `stochastic-finance` | `stochastic-calculus`, `no-arbitrage-finance-basics` | `qb-finance-foundations`, `qb-stochastic-calculus` |
 | `signal-research` | `linear-regression`, `ml-regularisation`, `time-series-validation`, `signals-research-process` | `qb-regression-ml`, `qb-research-judgment` |
 | `portfolio-construction` | `measuring-performance`, `portfolio-optimisation`, `risk-budgeting-position-sizing` | `qb-portfolio-performance` |
-| `pricing` | `no-arbitrage-parity`, `black-scholes`, `exotic-options`, `structured-products-delta-one` | `qb-exotics-structured`, `qb-options-bs-greeks` |
+| `pricing` | `no-arbitrage-parity`, `exotic-options`, `structured-products-delta-one` | `qb-exotics-structured` |
+| `black-scholes` | `black-scholes`, `greeks-sensitivities` | `qb-options-bs-greeks` |
 | `quant-models` | `implied-volatility-skew`, `vol-surface-construction-chapter`, `volatility-models`, `numerical-methods` | `qb-vol-surface` |
 | `risk-management` | `hedging`, `risk-control-governance` | `qb-risk-management` |
 | `quant-dev` | `oop-design`, `csharp-dotnet`, `production-coding` | `qb-quant-dev-engineering` |

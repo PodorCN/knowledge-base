@@ -12,6 +12,5 @@ Part of [[map-sellside]].
 ## Topics (in reading order)
 
 - [[no-arbitrage-parity]]
-- [[black-scholes]]
 - [[exotic-options]]
 - [[structured-products-delta-one]]
