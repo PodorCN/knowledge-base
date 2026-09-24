@@ -20,8 +20,20 @@ Read this whole file before editing.
 1. **Only put in what the user gives you.** Do not add explanations, intros, summaries, examples or
    "helpful" extra content beyond the user's material unless the user explicitly asks. Keep it concise.
    Reformatting for readability is fine; changing or adding content is not.
-2. **File everything into the existing structure.** Do not create new groups or tracks unless the user
-   asks. Prefer extending an existing chapter over creating a new one.
+2. **Read the whole library before adding anything, then add in the right place. Never start something new
+   alongside what exists.** New material almost always belongs inside an existing section; parallel
+   notes on the same idea make the library messy and hard to reorganise later. Concretely:
+   - Read `maps/` (all chapters), then read in full every chapter and section that touches the topic,
+     and `grep -ril` the key terms across `topics/` (and `questions/` for questions).
+   - **Extend an existing section** when the idea is already covered, even partially: add a `###`
+     sub-heading inside it, merge overlapping bullets instead of repeating them, and keep one version of
+     each formula.
+   - Add a **new section** to an existing chapter only if no section covers the idea; place it next to
+     the sections it depends on and update the chapter's `**Sections:**` line.
+   - Create a **new chapter** only when no chapter fits, and never a new group or track unless the user asks.
+   - Before editing, tell the user where each piece will go (which chapter / section, extend or new).
+3. **Everything is written in English**, even when the user's material is in Chinese: translate
+   faithfully, don't summarise or embellish. Keep the user's numbers, tables, references and **(自己推理)** marks.
 
 ## 1. Structure
 
@@ -154,8 +166,10 @@ One short note per document: title, file path, and the list of sections it fed. 
 
 1. Save the raw file in `sources/pdfs/` (or text in `inbox/`); these are git-ignored and never uploaded.
    Create `sources/src-<slug>.md`.
-2. Classify each piece (section 2), then extend an existing section or add a new one. Only the user's content.
-3. Add the questions to the track's question bank with `**Topics:**` links.
+2. Read the library (rule 2), classify each piece (section 2), then extend an existing section or add a new
+   one. Only the user's content, in English.
+3. Add the questions to the track's question bank with `**Topics:**` links and the next free number
+   (the build prints it). Check first that the question isn't already there.
 4. Build and check: `python3 scripts/build_graph.py --strict` must report **0 errors**.
 5. Commit the notes and the regenerated `docs/`.
 
