@@ -63,7 +63,8 @@ $$E[\Pi]=pg-(1-p)\ell-c$$
 - $\ell$ loss on loss
 - $c$ cost per trade
 
-90% win rate, +1 / −20 → $0.9-2=-1.1$ per trade. High win rate ≠ positive expectation (typical of short-option strategies).
+- 90% win rate, +1 / −20 → $0.9-2=-1.1$ per trade.
+- High win rate ≠ positive expectation (typical of short-option strategies).
 
 <a id="research-workflow"></a>
 
@@ -80,11 +81,20 @@ $$E[\Pi]=pg-(1-p)\ell-c$$
 
 ### One project at three depths
 
-**30 s:** problem, your contribution, result. **2 min:** data, baseline, method, validation, result, limitation. **10 min:** assumptions, features, model choice, failed experiments, uncertainty, debugging, improvements.
-Be ready to explain every technical noun on your résumé.
+- **30 s:** problem, your contribution, result.
+- **2 min:** data, baseline, method, validation, result, limitation.
+- **10 min:** assumptions, features, model choice, failed experiments, uncertainty, debugging, improvements.
+- Be ready to explain every technical noun on your résumé.
 
 ### Answering technique
-Clarify setup → define variables → name principle → write the first equation → solve & check a limiting case → interpret and state when it breaks. If stuck: say what you know, simplify (equal-vol case first).
+1. Clarify setup
+2. Define variables
+3. Name principle
+4. Write the first equation
+5. Solve & check a limiting case
+6. Interpret and state when it breaks
+
+If stuck: say what you know, simplify (equal-vol case first).
 
 <a id="backtest-pitfalls"></a>
 
@@ -97,7 +107,8 @@ Clarify setup → define variables → name principle → write the first equati
 3. **Research process:** selection across many trials ([[multiple-testing]]), out-of-sample evidence.
 4. **Is the loss surprising** given sample length, exposures, return distribution? Regime/liquidity/crowding change?
 
-Don't explain a bug as a regime change. A bad first week alone doesn't prove failure.
+- Don't explain a bug as a regime change.
+- A bad first week alone doesn't prove failure.
 
 ### Usual suspects
 Future information / leakage, bad corporate-action adjustment, unrealistic execution, duplicated rows, survivorship bias, strategy selection, stale prices, ignored costs.

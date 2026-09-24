@@ -31,6 +31,7 @@ $$x_{n+1}=x_n-\frac{f(x_n)}{f'(x_n)}\quad\text{(Newton)}$$
 <!-- section: pde-finite-difference | prerequisites: [black-scholes-pde] | related: [monte-carlo-pricing, barrier-options, american-early-exercise, local-volatility-dupire] | sources: [src-vol-surface-exotics-notes, src-rbc-quantdev-prep] | tags: [pde, grid, crank-nicolson] -->
 
 Solve the pricing PDE backward on a (S, t) grid.
+
 - Accurate, stable Greeks in 1–2 factors; natural for **American exercise** and **single-asset barriers** (barrier = boundary; align grid nodes with H).
 - Discrete dividends: jump conditions at ex-dates.
 - Curse of dimensionality → multi-asset goes to [[monte-carlo-pricing]].

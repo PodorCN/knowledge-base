@@ -14,7 +14,13 @@ sources: [src-rbc-quantdev-prep, src-squarepoint-dqa-workbook, src-vol-surface-e
 ## Scenario & Risk Grids
 <!-- section: scenario-risk-grids | prerequisites: [greeks] | related: [dotnet-concurrency-wpf, pricing-app-architecture] | sources: [src-rbc-quantdev-prep] | tags: [scenarios, stress] -->
 
-Spot ladder (±1%, ±5%, ±20%); vol bumps (parallel, skew tilt, term structure); spot × vol grid; time roll (tomorrow, next week); dividend & borrow bumps; correlation bumps for baskets.
+- Spot ladder (±1%, ±5%, ±20%)
+- Vol bumps (parallel, skew tilt, term structure)
+- Spot × vol grid
+- Time roll (tomorrow, next week)
+- Dividend & borrow bumps
+- Correlation bumps for baskets
+
 Full revaluation captures non-linearity that [[greeks]] miss.
 
 <a id="risk-measures"></a>
@@ -39,6 +45,7 @@ Sharpe only summarises mean & std; tails need these.
 <!-- section: model-risk-governance | prerequisites: [pricing-app-architecture] | related: [model-release-regression-testing, call-spread-overhedge, autocallables, vol-surface-construction] | sources: [src-rbc-quantdev-prep, src-vol-surface-exotics-notes] | tags: [model-risk, osfi-e23, ipv, reserves] -->
 
 **Model risk:** wrong model, wrong implementation, or use outside validated range.
+
 - Controls: only approved models per product; version tracking; input validation & warnings (arbitrage in surface, extrapolated vol); audit log; alignment with validation (Canada: **OSFI Guideline E-23**).
 - **Reserves:** model reserve, barrier/digital overhedges, correlation and dividend reserves.
 - **Independent price verification:** vs consensus (S&P Global **Totem**: 150+ contributors, 10th/90th percentiles for prudent valuation); daily P&L explain.

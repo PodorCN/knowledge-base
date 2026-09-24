@@ -25,6 +25,7 @@ $$\text{CoN}=e^{-rT}N(d_2),\qquad \text{AoN}=Se^{-qT}N(d_1),\qquad C_{vanilla}=\
 
 ### With a smile — chain rule
 Digital = limit of a tight call spread: $\frac{C(K-\varepsilon)-C(K+\varepsilon)}{2\varepsilon}\to-\frac{dC(K,\sigma(K))}{dK}$. Because σ depends on K:
+
 $$D(K)=-\frac{\partial C_{BS}}{\partial K}-\frac{\partial C_{BS}}{\partial\sigma}\frac{\partial\sigma}{\partial K}=\underbrace{e^{-rT}N(d_2)}_{\text{flat-vol}}\ \underbrace{-\ \mathcal V_{BS}(K)\,\frac{\partial\sigma}{\partial K}}_{\text{skew term}}$$
 
 **Variables:**
@@ -83,6 +84,7 @@ PDE with barrier as boundary (align nodes); MC with Brownian-bridge crossing pro
 <!-- section: asian-options | prerequisites: [black-scholes-formula] | related: [monte-carlo-pricing] | sources: [src-vol-surface-exotics-notes] | tags: [asian, averaging] -->
 
 Payoff on the average price → **averaging kills vol** → cheaper.
+
 - 3M ATM call, daily averaging, 16.49% vol, 200k paths: Asian 102.99 vs vanilla 178.98 (ratio 0.58).
 - Continuous averaging from inception: effective vol ≈ $\sigma/\sqrt3$ ($1/\sqrt3=0.577$) — geometric-average approximation (inferred in source).
 - Geometric Asian has closed form → MC **control variate** for arithmetic.
@@ -93,6 +95,7 @@ Payoff on the average price → **averaging kills vol** → cheaper.
 <!-- section: variance-swaps | prerequisites: [static-replication, otm-stitching] | related: [gamma-theta-pnl, volatility-skew, realized-volatility, jump-diffusion] | sources: [src-vol-surface-exotics-notes, src-rbc-quantdev-prep] | tags: [variance-swap, vix, replication] -->
 
 Payoff: notional × (realised variance − $K_{var}$).
+
 $$K_{var}^2=\frac{2}{TD}\Big[\int_0^F\frac{P(K)}{K^2}dK+\int_F^\infty\frac{C(K)}{K^2}dK\Big]$$
 
 **Variables:**
@@ -116,7 +119,8 @@ $$K_{var}^2=\frac{2}{TD}\Big[\int_0^F\frac{P(K)}{K^2}dK+\int_F^\infty\frac{C(K)}
 ## Cliquets & Forward-Start Options
 <!-- section: cliquets-forward-start | prerequisites: [forward-smile] | related: [heston-model, local-stochastic-volatility, vol-term-structure] | sources: [src-rbc-quantdev-prep, src-vol-surface-exotics-notes] | tags: [cliquet, forward-start] -->
 
-Cliquet = sum of capped/floored periodic returns; forward-start = option whose strike is set at a future date.
+- **Cliquet:** sum of capped/floored periodic returns.
+- **Forward-start:** option whose strike is set at a future date.
 - Value depends on the **forward smile** → local vol underprices; use SV / LSV.
 - "Model choice changes price materially".
 
@@ -126,6 +130,7 @@ Cliquet = sum of capped/floored periodic returns; forward-start = option whose s
 <!-- section: quanto-options | prerequisites: [risk-neutral-pricing] | related: [worst-of-correlation, pricing-app-architecture] | sources: [src-rbc-quantdev-prep] | tags: [quanto, fx, correlation] -->
 
 Payoff on a foreign underlying paid in domestic currency at a **fixed** FX rate.
+
 $$\text{drift adjustment}=-\rho\,\sigma_S\,\sigma_{FX}$$
 
 **Variables:**

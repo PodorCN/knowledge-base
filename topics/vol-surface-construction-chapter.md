@@ -33,6 +33,7 @@ $$\sigma_{imp}=f(K,T)$$
 | 1M | 14.98% | 25.84% | 11.34% | 14.5 pts |
 | 3M | 16.49% | 23.30% | 11.91% | 11.4 pts |
 | 6M | 17.48% | 22.43% | 13.45% | 9.0 pts |
+
 Typical: upward ATM term structure, skew flattening with maturity.
 
 ### Connections
@@ -102,10 +103,13 @@ Slope is fragile when strikes are close:
 | All 15 (OLS) | 0.99004 | 4.02% | 5031.29 |
 | Truth | 0.99008 | 4.00% | 5031.26 |
 
-**F** is robust (level of the line); **D** (slope) is not. Alternative for illiquid names: take $D$ from the curve, solve $F_i=K_i+(C_i-P_i)/D$ near ATM (VIX does a version at the strike with smallest $|C-P|$).
+- **F** is robust (level of the line); **D** (slope) is not.
+- Alternative for illiquid names: take $D$ from the curve, solve $F_i=K_i+(C_i-P_i)/D$ near ATM.
+- VIX does a version at the strike with smallest $|C-P|$.
 
 ### Interpretation
-Slope = **box-spread** discount factor: $[C-P](K_1)-[C-P](K_2)=D(K_2-K_1)$. Option-implied rates ≠ Treasuries — Treasuries yield ~40 bp less (convenience yield; van Binsbergen–Diamond–Grotteria).
+- Slope = **box-spread** discount factor: $[C-P](K_1)-[C-P](K_2)=D(K_2-K_1)$.
+- Option-implied rates ≠ Treasuries — Treasuries yield ~40 bp less (convenience yield; van Binsbergen–Diamond–Grotteria).
 
 ### Connections
 - **Uses:** [[put-call-parity]] + [[ols-regression]] — a nice cross-domain link (stats ↔ derivatives).

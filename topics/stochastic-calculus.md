@@ -15,6 +15,7 @@ sources: [src-squarepoint-dqa-workbook, src-rbc-quantdev-prep]
 <!-- section: brownian-motion | prerequisites: [normal-distribution] | related: [ito-lemma, martingales-ito-isometry] | sources: [src-squarepoint-dqa-workbook] | tags: [wiener-process] -->
 
 $W_0=0$, continuous paths, independent increments, $W_t-W_s\sim N(0,t-s)$.
+
 $$E[W_t]=0,\quad \mathrm{Var}(W_t)=t,\quad \mathrm{Cov}(W_s,W_t)=\min(s,t)$$
 
 **Variables:**

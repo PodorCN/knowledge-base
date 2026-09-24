@@ -48,7 +48,9 @@ $$RC_i(w)=w_i\frac{(\Sigma w)_i}{\sigma(w)}=TE_i\cdot\sigma(w)$$
 ### Key points
 - The paper takes $TE_i$ as given; [[signal-to-weight]] shows how to feed a signal into $TE_i$.
 
-Source: Bruder, B. & Roncalli, T. (2012), *Managing Risk Exposures Using the Risk Budgeting Approach*.
+**References:**
+
+- Bruder, B. & Roncalli, T. (2012), *Managing Risk Exposures Using the Risk Budgeting Approach*.
 
 ### Connections
 - **Builds on:** [[risk-contribution]] (turned around to solve for $w_i$).

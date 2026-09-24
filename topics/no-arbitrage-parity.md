@@ -39,7 +39,9 @@ $$\max(0,S_0-Ke^{-rT})\le C\le S_0,\qquad \max(0,Ke^{-rT}-S_0)\le P\le Ke^{-rT}$
 - $r$ rate
 - $T$ maturity
 
-Derived by state-by-state payoff comparison. Check quotes against bounds **before** inverting implied vol (else no solution). Revisit with dividends/American/negative rates.
+- Derived by state-by-state payoff comparison.
+- Check quotes against bounds **before** inverting implied vol (else no solution).
+- Revisit with dividends/American/negative rates.
 
 ### Connections
 - **Extended to strike-derivative bounds in:** [[surface-no-arbitrage]] ($-D\le\partial C/\partial K\le0$).
@@ -66,7 +68,8 @@ $$C(K,T)-P(K,T)=S_0e^{-qT}-Ke^{-rT}=D(T)\,[F(T)-K]$$
 | A: fiduciary call = call + ZCB paying K | $C+Ke^{-rT}$ | $S_T$ | $K$ |
 | B: protective put = put + $e^{-qT}$ shares | $P+S_0e^{-qT}$ | $S_T$ | $K$ |
 
-Both pay $\max(S_T,K)$ in every state ⇒ same price. Holds under GBM, stochastic vol, jumps — any model.
+- Both pay $\max(S_T,K)$ in every state ⇒ same price.
+- Holds under GBM, stochastic vol, jumps — any model.
 
 ### Four roles in vol-surface construction
 1. **Same IV for call & put** at $(K,T)$: $C_{BS}-P_{BS}$ doesn't depend on σ ⇒ one root σ fits both → [[implied-volatility]].
@@ -101,7 +104,11 @@ $$\Delta=\frac{V_u-V_d}{S_u-S_d},\quad B=\frac{V_d-\Delta S_d}{R},\quad V_0=\Del
 - $B$ bank amount
 - $q^*$ risk-neutral up-probability (in (0,1) iff $d<R<u$)
 
-**Example:** $S_0=100$, 120/80, $R=1$, $K=100$ call: $\Delta=0.5$, $B=-40$, $C=10$; $q^*=0.5$. Your 80% "real" up-probability is irrelevant (using it gives 16 — wrong). Put = 10 by parity.
+**Example:** $S_0=100$, 120/80, $R=1$, $K=100$ call.
+
+- $\Delta=0.5$, $B=-40$, $C=10$; $q^*=0.5$.
+- Your 80% "real" up-probability is irrelevant (using it gives 16 — wrong).
+- Put = 10 by parity.
 
 ### Connections
 - **Continuous-time limit:** [[black-scholes-pde]]; **abstraction:** [[risk-neutral-pricing]]; Δ here = [[delta-hedging]] ratio.

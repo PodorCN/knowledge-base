@@ -11,6 +11,5 @@ Part of [[map-sellside]].
 
 ## Topics (in reading order)
 
-- [[greeks-sensitivities]]
 - [[hedging]]
 - [[risk-control-governance]]

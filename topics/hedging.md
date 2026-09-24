@@ -43,7 +43,9 @@ $$\text{P\&L}_{\text{hedged}}\approx\tfrac12\Gamma S^2\big(\sigma_{\text{realise
 ### Why long gamma loses money on average
 Long gamma is paying an insurance premium for convexity, and that premium is usually priced rich. Running example: $S=100$, $\sigma_{imp}=20\%$, $\Gamma=0.0398$, $\Theta\approx-0.032$/day.
 
-**1. Theta is charged every day, so the price must move enough to break even.** Under BS ($r=0$) theta and gamma are tied together:
+#### 1. Theta is charged every day, so the price must move enough to break even
+
+Under BS ($r=0$) theta and gamma are tied together:
 
 $$\Theta=-\tfrac12\,\Gamma\,\sigma_{imp}^2\,S^2$$
 
@@ -63,21 +65,51 @@ $$|\Delta S^*|=\sigma_{imp}\,S\,\sqrt{\Delta t}$$
 - $\Delta S^*$ the price move whose gamma gain exactly offsets theta
 - $\Delta t$ time step, 1 day = 1/252
 
-With the numbers: $20\%\times100\times\sqrt{1/252}\approx1.26$ per day. If the price moves less than 1.26 a day on average, you lose. Equivalently, you only make money if realised vol > the implied vol you paid (BS result; Hull ch. 19 gives the Θ–Γ relation).
+- With the numbers: $20\%\times100\times\sqrt{1/252}\approx1.26$ per day.
+- If the price moves less than 1.26 a day on average, you lose.
+- Equivalently, you only make money if realised vol > the implied vol you paid (BS result; Hull ch. 19 gives the Θ–Γ relation).
 
-**2. Implied vol usually exceeds realised vol (variance risk premium).** Empirically, index-option implied variance is on average above the variance subsequently realised, so systematic long gamma / long vol has negative long-run returns ([[realized-volatility]]). This is also why short-gamma (option-selling) strategies usually collect steadily and lose big in one go in a crash.
+#### 2. Implied vol usually exceeds realised vol (variance risk premium)
 
-**3. Path dependence: when and where the move happens matters.** Gamma P&L ≈ ½Γ(ΔS)², but Γ itself changes with $S$ and time: largest ATM, near 0 deep ITM or OTM. A big move after the option is already deep OTM earns almost nothing, so P&L can be negative even if realised vol > implied over the whole period. Actual P&L is driven by **gamma-weighted realised variance** (自己推理; a common result in the vol-trading literature, e.g. Sinclair, *Volatility Trading*).
+- Empirically, index-option implied variance is on average above the variance subsequently realised.
+- So systematic long gamma / long vol has negative long-run returns ([[realized-volatility]]).
+- This is also why short-gamma (option-selling) strategies usually collect steadily and lose big in one go in a crash.
 
-**4. Usually also long vega: IV crush risk.** Buying options is usually long vega too. Typical case: buying a straddle before earnings; after the announcement implied vol drops sharply, and even if the stock moves, the vega loss can wipe out the gamma gain.
+#### 3. Path dependence: when and where the move happens matters
 
-**5. Transaction costs + discrete hedging.** The option bid–ask is often wide (entry cost). Gamma scalping re-hedges delta frequently, paying costs each time. Hedging too infrequently makes P&L very noisy (discrete-hedging error).
+- Gamma P&L ≈ ½Γ(ΔS)², but Γ itself changes with $S$ and time: largest ATM, near 0 deep ITM or OTM.
+- A big move after the option is already deep OTM earns almost nothing.
+- So P&L can be negative even if realised vol > implied over the whole period.
+- Actual P&L is driven by **gamma-weighted realised variance** (自己推理; a common result in the vol-trading literature, e.g. Sinclair, *Volatility Trading*).
 
-**6. Near expiry, gamma and theta both blow up.** ATM options near expiry have sharply rising Γ and equally rising Θ. Daily theta cost is high, and with $S$ near the strike delta flips between 0 and 1 (pin risk), making hedging hard ([[call-spread-overhedge]]).
+#### 4. Usually also long vega: IV crush risk
 
-**7. Negative carry: psychological and career pressure (自己推理).** Most of the time you lose a little; you make money only in a few big moves. Drawdowns can be long, testing PM evaluations and LP patience.
+- Buying options is usually long vega too.
+- Typical case: buying a straddle before earnings.
+- After the announcement implied vol drops sharply; even if the stock moves, the vega loss can wipe out the gamma gain.
 
-References: Hull, *Options, Futures, and Other Derivatives*, ch. 19; Carr & Wu (2009), "Variance Risk Premiums", *RFS*; Bakshi & Kapadia (2003), "Delta-Hedged Gains and the Negative Market Volatility Risk Premium", *RFS*.
+#### 5. Transaction costs + discrete hedging
+
+- The option bid–ask is often wide (entry cost).
+- Gamma scalping re-hedges delta frequently, paying costs each time.
+- Hedging too infrequently makes P&L very noisy (discrete-hedging error).
+
+#### 6. Near expiry, gamma and theta both blow up
+
+- ATM options near expiry have sharply rising Γ and equally rising Θ.
+- Daily theta cost is high.
+- With $S$ near the strike delta flips between 0 and 1 (pin risk), making hedging hard ([[call-spread-overhedge]]).
+
+#### 7. Negative carry: psychological and career pressure (自己推理)
+
+- Most of the time you lose a little; you make money only in a few big moves.
+- Drawdowns can be long, testing PM evaluations and LP patience.
+
+**References:**
+
+- Hull, *Options, Futures, and Other Derivatives*, ch. 19
+- Carr & Wu (2009), "Variance Risk Premiums", *RFS*
+- Bakshi & Kapadia (2003), "Delta-Hedged Gains and the Negative Market Volatility Risk Premium", *RFS*
 
 ### Connections
 - **From:** [[black-scholes-pde]] rearranged. **Compares:** [[realized-volatility]] vs [[implied-volatility]].
@@ -88,7 +120,11 @@ References: Hull, *Options, Futures, and Other Derivatives*, ch. 19; Carr & Wu (
 ## Delta-Gamma Hedging (is it cheaper?)
 <!-- section: delta-gamma-hedging | prerequisites: [delta-hedging, gamma-theta-pnl] | related: [greeks, vol-term-structure, volatility-skew] | sources: [src-chat-long-gamma] | tags: [gamma-neutral, speed, hedging-cost] -->
 
-Short answer: **not cheaper, it is a different position.** Hedging gamma also removes theta, so you stop paying for convexity and also stop receiving it. The real savings are in hedge execution, not in the price of convexity. (Numbers below computed with BS, flat vol 20%, $r=0$.)
+Short answer: **not cheaper, it is a different position.**
+
+- Hedging gamma also removes theta, so you stop paying for convexity and also stop receiving it.
+- The real savings are in hedge execution, not in the price of convexity.
+- (Numbers below computed with BS, flat vol 20%, $r=0$.)
 
 ### Why theta disappears with gamma
 For a delta-neutral book the BS PDE ($r=0$) reads
@@ -102,7 +138,9 @@ $$\Theta+\tfrac12\,\sigma^2S^2\,\Gamma=0$$
 - $S$ underlying price
 - $\Gamma$ book gamma
 
-So $\Gamma=0\Rightarrow\Theta\approx0$ (Hull ch. 19, "Relationship between delta, theta, and gamma"). The hedge option has to be **sold** (you were long gamma); the theta it earns offsets the theta you paid. The price of convexity doesn't change; you have just sold the insurance back.
+- So $\Gamma=0\Rightarrow\Theta\approx0$ (Hull ch. 19, "Relationship between delta, theta, and gamma").
+- The hedge option has to be **sold** (you were long gamma); the theta it earns offsets the theta you paid.
+- The price of convexity doesn't change; you have just sold the insurance back.
 
 ### Worked example: long 1 ATM call ($K=100$, 3 months)
 Original position: Γ = 0.0398, Θ = −0.0316/day, vega = 0.199.
@@ -127,11 +165,13 @@ P&L after an instantaneous jump:
 
 ### Where it actually saves / costs
 **Saves:**
+
 - Much smaller delta drift in big moves → rebalance less often → lower stock trading costs and discrete-hedging error.
 - Less gap risk (you can't re-hedge in the middle of a gap).
 - For a short-gamma dealer it is insurance: tail risk falls sharply.
 
 **Costs:**
+
 - Option bid–ask is far wider than stock → each round trip costs more.
 - The hedge option has a different IV (skew / term structure) → Θ is not exactly 0; you effectively hold a vol-spread position.
 - Residual risks: vega, speed, skew moves, model risk.
@@ -144,7 +184,9 @@ P&L after an instantaneous jump:
 | Dealer who sold options to clients, passively short gamma | Very valuable: locks in bid–ask profit, removes tail risk |
 | Just want a steadier delta hedge | Less frequent rebalancing and less gap risk, but you pay option bid–ask |
 
-References: Hull, *Options, Futures, and Other Derivatives*, ch. 19 "The Greek Letters" (gamma neutrality; delta–theta–gamma relation).
+**References:**
+
+- Hull, *Options, Futures, and Other Derivatives*, ch. 19 "The Greek Letters" (gamma neutrality; delta–theta–gamma relation)
 
 ### Connections
 - **Builds on:** [[delta-hedging]], [[gamma-theta-pnl]].
@@ -164,7 +206,9 @@ References: Hull, *Options, Futures, and Other Derivatives*, ch. 19 "The Greek L
 | Before | 16.92% | 152.26 | — | — |
 | Sticky strike | 16.92% | 202.20 | +49.9 | −0.452 |
 | Sticky moneyness | 15.52% | 188.76 | +36.5 | −0.315 |
-Hedge ratios differ by ~30%. With negative skew, sticky-moneyness call delta < sticky-strike delta.
+
+- Hedge ratios differ by ~30%.
+- With negative skew, sticky-moneyness call delta < sticky-strike delta.
 
 ### Regimes (Derman)
 Calm trending ≈ sticky strike; fearful ≈ **sticky implied tree** (ATM vol moves ~2× sticky-strike speed). A surface without stated dynamics gives unusable Greeks.
@@ -182,6 +226,7 @@ Payoff jumps 0 → 1 at $K$; as $t\to T$ near $K$, Δ → δ-function, Γ flips 
 
 ### The desk solution: left-shifted call spread
 Short a digital call at $K$ → buy $1/\varepsilon$ call spreads on $[K-\varepsilon,K]$:
+
 - $S_T\le K-\varepsilon$: both 0. $S_T\ge K$: both 1. In between: hedge pays > 0, digital pays 0 → **cushion** (super-replication).
 - Symmetric $[K-\varepsilon,K+\varepsilon]$ would be **under-hedged** on $(K,K+\varepsilon)$.
 - Example: $\varepsilon=1$ → $(C(99)-C(100))/1=0.4701$ vs flat digital 0.4602; desk books the conservative side.

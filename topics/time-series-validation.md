@@ -15,6 +15,7 @@ sources: [src-squarepoint-dqa-workbook]
 <!-- section: stationarity-ar1 | prerequisites: [variance-covariance-correlation] | related: [effective-sample-size, robust-standard-errors, sharpe-ratio, markov-chains] | sources: [src-squarepoint-dqa-workbook] | tags: [time-series, random-walk, spurious-regression] -->
 
 Weak stationarity: constant mean, finite constant variance, $\mathrm{Cov}(X_t,X_{t-k})=\gamma_k$ depends only on lag.
+
 $$X_t=c+\varphi X_{t-1}+\varepsilon_t,\ |\varphi|<1:\quad E=\frac{c}{1-\varphi},\ \mathrm{Var}=\frac{\sigma_\varepsilon^2}{1-\varphi^2},\ \rho_k=\varphi^k$$
 
 **Variables:**

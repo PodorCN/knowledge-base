@@ -14,7 +14,11 @@ sources: [src-vol-surface-exotics-notes, src-rbc-quantdev-prep]
 ## Autocallables (worst-of, RBC case study)
 <!-- section: autocallables | prerequisites: [digital-options, barrier-options, worst-of-correlation] | related: [local-stochastic-volatility, monte-carlo-pricing, reverse-convertible, delta-one-products, volatility-skew, model-risk-governance] | sources: [src-vol-surface-exotics-notes, src-rbc-quantdev-prep] | tags: [autocallable, structured-notes, dividends, rbc] -->
 
-**Structure:** coupon (often contingent, with memory) + **early redemption** if the (worst-of) underlying ≥ autocall level on an observation date; at maturity, if below the knock-in barrier, investor takes the equity loss.
+**Structure:**
+
+- Coupon (often contingent, with memory).
+- **Early redemption** if the (worst-of) underlying ≥ autocall level on an observation date.
+- At maturity, if below the knock-in barrier, investor takes the equity loss.
 
 **Decomposition:** bond + short down-and-in put + autocall digitals + coupon digitals.
 
@@ -30,6 +34,7 @@ Mark surfaces → calibrate LSV per underlier, mark correlations, imply dividend
 | Note value | 1007.7 | 958.5 |
 | P(autocall) | 67.8% | 64.3% |
 | P(principal loss) | 8.3% | 16.5% |
+
 Flat vol values the note **above par** — wrong: investor is short a deep OTM put priced in the steep skew ([[volatility-skew]]).
 
 ### Sensitivities → what the issuer holds
@@ -48,7 +53,10 @@ Issue price covers underwriting, hedging cost, structuring margin; value uses in
 ## Reverse Convertible
 <!-- section: reverse-convertible | prerequisites: [barrier-options] | related: [autocallables, principal-protected-note, worst-of-correlation] | sources: [src-rbc-quantdev-prep] | tags: [structured-notes, yield-enhancement] -->
 
-**= bond + short (down-and-in) put.** Investor sells the put and receives an enhanced coupon. Adding early-redemption digitals and contingent coupon digitals turns it into an [[autocallables]].
+**= bond + short (down-and-in) put.**
+
+- Investor sells the put and receives an enhanced coupon.
+- Adding early-redemption digitals and contingent coupon digitals turns it into an [[autocallables]].
 
 <a id="principal-protected-note"></a>
 
@@ -56,6 +64,7 @@ Issue price covers underwriting, hedging cost, structuring margin; value uses in
 <!-- section: principal-protected-note | prerequisites: [static-replication, discounting-compounding] | related: [reverse-convertible, digital-options] | sources: [src-rbc-quantdev-prep] | tags: [structured-notes, participation-rate] -->
 
 **= zero-coupon bond (guarantees principal) + call (or call spread) on the index.**
+
 $$\text{Participation}=\frac{\text{Note price}-\text{ZCB price}}{\text{Option price}}$$
 - Higher rates → cheaper ZCB → more budget → **higher** participation.
 - Higher vol → dearer option → **lower** participation.
@@ -67,6 +76,7 @@ $$\text{Participation}=\frac{\text{Note price}-\text{ZCB price}}{\text{Option pr
 <!-- section: worst-of-correlation | prerequisites: [portfolio-variance-diversification, barrier-options] | related: [autocallables, reverse-convertible, digital-options] | sources: [src-rbc-quantdev-prep, src-vol-surface-exotics-notes] | tags: [worst-of, correlation, dispersion] -->
 
 Payoff depends on the worst performer in a basket.
+
 - Investor **sells** the desk a worst-of down-and-in put and **receives** worst-of coupon/autocall digitals.
 - **Lower correlation** → more dispersion → worst is lower → put worth **more**, digitals worth **less** → low-correlation baskets pay higher headline coupons.
 - Desk is long the put, short the digitals; both lose value as ρ rises ⇒ **desk is short correlation** ("The dealer, conversely, is short correlation" — Risk.net). Hurt in Q1 2020 when markets moved in unison. (Long-put/short-digital breakdown is 自己推理; direction matches sources.)
@@ -101,7 +111,15 @@ $$PS=A\,[F\,N(d_1)-K\,N(d_2)],\qquad d_{1,2}=\frac{\ln(F/K)\pm\tfrac12\sigma^2T}
 ## Delta One Products (futures, TRS, dividend swaps)
 <!-- section: delta-one-products | prerequisites: [forward-pricing] | related: [implied-forward-regression, autocallables] | sources: [src-rbc-quantdev-prep] | tags: [delta-one, trs, dividend-swap, repo] -->
 
-**Products moving 1:1 with the underlying:** futures, forwards, total return swaps, ETFs, index arbitrage, dividend swaps/futures, stock loan/repo. Pricing is mostly **carry**: funding, dividends, borrow.
+**Products moving 1:1 with the underlying:**
+
+- Futures, forwards
+- Total return swaps
+- ETFs, index arbitrage
+- Dividend swaps/futures
+- Stock loan/repo
+
+Pricing is mostly **carry**: funding, dividends, borrow.
 
 - **TRS:** one leg pays total return (price + dividends), other pays funding (CORRA/SOFR + spread) → synthetic exposure.
 - **Implied dividends / borrow:** back out from futures or put–call parity; the desk marks them. Options and delta-one **must use the same forward** or you get parity breaks.

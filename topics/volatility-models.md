@@ -60,6 +60,7 @@ $$dS_t=(r-q)S_tdt+\sqrt{v_t}S_tdW^S_t,\qquad dv_t=\kappa(\theta-v_t)dt+\xi\sqrt{
 <!-- section: jump-diffusion | prerequisites: [geometric-brownian-motion, exponential-poisson-process] | related: [heston-model, volatility-skew, variance-swaps] | sources: [src-rbc-quantdev-prep] | tags: [jumps, short-dated-skew] -->
 
 GBM + Poisson-arriving jumps (Merton); + stochastic vol (Bates).
+
 - **Pro:** generates steep **short-dated skew** that pure diffusions can't.
 - **Con:** jumps can't be delta-hedged; more parameters.
 - Jumps also cause replication error in [[variance-swaps]].
@@ -94,7 +95,10 @@ $$\frac{dS_t}{S_t}=(r-q)dt+L(S_t,t)\sqrt{v_t}\,dW_t$$
 ## SABR & Normal (Bachelier) Vol
 <!-- section: sabr | prerequisites: [volatility-surface] | related: [svi, swaptions, fx-vol-conventions, black-76] | sources: [src-vol-surface-exotics-notes] | tags: [sabr, rates, normal-vol] -->
 
-Stochastic-vol smile model fitted **per expiry** (per expiry–tenor pair in rates); standard for rates and FX smiles. Since negative rates, rates vol quoted as **normal (Bachelier) vol in bp**, often with **shifted SABR**. (Hagan et al.)
+- Stochastic-vol smile model fitted **per expiry** (per expiry–tenor pair in rates).
+- Standard for rates and FX smiles.
+- Since negative rates, rates vol quoted as **normal (Bachelier) vol in bp**, often with **shifted SABR**.
+- (Hagan et al.)
 
 ### Connections
 - **Equity counterpart:** [[svi]]. **Used for:** [[swaptions]] cube, [[fx-vol-conventions]].
@@ -105,6 +109,7 @@ Stochastic-vol smile model fitted **per expiry** (per expiry–tenor pair in rat
 <!-- section: forward-smile | prerequisites: [vol-term-structure, local-volatility-dupire] | related: [cliquets-forward-start, heston-model, local-stochastic-volatility] | sources: [src-vol-surface-exotics-notes, src-rbc-quantdev-prep] | tags: [forward-skew, model-risk] -->
 
 The smile the model implies **at a future date**. Today's surface doesn't pin it down.
+
 - Local vol reproduces today's surface but flattens future smiles → **underprices forward skew**.
 - SV / LSV keep a realistic forward smile → needed for forward-starts, cliquets.
 - Classic example of "model choice changes price materially".

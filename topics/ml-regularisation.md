@@ -22,7 +22,8 @@ $$E[(Y-\hat f(x))^2]=\sigma^2+\mathrm{Bias}(\hat f(x))^2+\mathrm{Var}(\hat f(x))
 - $\sigma^2$ noise variance
 - $\hat f$ model fitted on a random training set
 
-More flexibility → less bias, more variance. It's about **test** error, not training fit.
+- More flexibility → less bias, more variance.
+- It's about **test** error, not training fit.
 
 ### Connections
 - **Levers:** [[ridge-regression]], [[lasso-elastic-net]]; **measured by:** [[cross-validation-leakage]]. Mirrors [[estimator-properties]] (MSE = Var + Bias²).
@@ -78,7 +79,8 @@ $$P(Y=1\mid x)=\frac{1}{1+e^{-x^\top\beta}},\qquad \log\frac{p}{1-p}=x^\top\beta
 - $\beta$ coefficients
 - $p_i$ predicted probability
 
-Models a probability (unlike OLS on 0/1). Under class imbalance, accuracy misleads — calibration & decision costs matter.
+- Models a probability (unlike OLS on 0/1).
+- Under class imbalance, accuracy misleads — calibration & decision costs matter.
 
 <a id="pca"></a>
 

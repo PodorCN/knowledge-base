@@ -17,6 +17,7 @@ sources: [src-squarepoint-dqa-workbook]
 ### Formulas
 $$E=1+(1-p)E\Rightarrow E=\tfrac1p\qquad\text{(first success)}$$
 Two consecutive heads (fair coin): $E_0=1+\tfrac12E_0+\tfrac12E_1,\ E_1=1+\tfrac12E_0\Rightarrow E_0=6$; general $E_0=\frac{1+p}{p^2}$.
+
 $$E[T_{\text{coupon}}]=n\sum_{j=1}^n\frac1j=nH_n$$
 
 **Variables:**

@@ -30,6 +30,7 @@ sources: [src-rbc-quantdev-prep]
 <!-- section: price-reconciliation | prerequisites: [pricing-app-architecture] | related: [greeks-conventions-bumping, model-release-regression-testing, forward-pricing, backtest-pitfalls] | sources: [src-rbc-quantdev-prep] | tags: [debugging, reconciliation] -->
 
 Isolate before touching model code — diff inputs **field by field**:
+
 1. Same trade terms?
 2. Same market-data snapshot (time, dividends, borrow, surface)?
 3. Same model and model version?
@@ -46,6 +47,7 @@ Isolate before touching model code — diff inputs **field by field**:
 ## Floyd's Cycle Detection (tortoise & hare)
 <!-- section: floyd-cycle-detection | prerequisites: [] | related: [] | sources: [src-rbc-quantdev-prep] | tags: [algorithms, linked-list] -->
 
-Slow pointer +1, fast +2; if they meet → cycle. **O(n) time, O(1) space.**
-Cycle start: reset one pointer to head, move both +1 until they meet.
-(Glassdoor-reported RBC quant-dev question alongside "explain basic OO concepts".)
+- Slow pointer +1, fast +2; if they meet → cycle.
+- **O(n) time, O(1) space.**
+- Cycle start: reset one pointer to head, move both +1 until they meet.
+- (Glassdoor-reported RBC quant-dev question alongside "explain basic OO concepts".)

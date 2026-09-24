@@ -91,6 +91,7 @@ $$g\ \text{convex}\Rightarrow g(E[X])\le E[g(X)];\qquad E[\log X]\le\log E[X]\ \
 $$E[X]=E\big[E[X\mid Y]\big],\qquad \mathrm{Var}(X)=E[\mathrm{Var}(X\mid Y)]+\mathrm{Var}(E[X\mid Y])$$
 $$\mathrm{Cov}(X,Z)=E[\mathrm{Cov}(X,Z\mid Y)]+\mathrm{Cov}(E[X\mid Y],E[Z\mid Y])$$
 **Random sum** $S=\sum_{i=1}^N X_i$ ($X_i$ iid mean $m$, variance $v$, $N$ independent):
+
 $$E[S]=E[N]m,\qquad \mathrm{Var}(S)=E[N]v+\mathrm{Var}(N)m^2$$
 
 **Variables:**
@@ -119,6 +120,7 @@ $$E[S]=E[N]m,\qquad \mathrm{Var}(S)=E[N]v+\mathrm{Var}(N)m^2$$
 ### Formulas
 $$E[(X-g(Y))^2]=E[\mathrm{Var}(X\mid Y)]+E[(E[X\mid Y]-g(Y))^2]$$
 Jointly normal:
+
 $$E[Y\mid X=x]=\mu_Y+\rho\frac{\sigma_Y}{\sigma_X}(x-\mu_X),\qquad \mathrm{Var}(Y\mid X=x)=\sigma_Y^2(1-\rho^2)$$
 
 **Variables:**

@@ -131,6 +131,7 @@ $$\mathrm{Var}(\hat\beta\mid X)=(X^\top X)^{-1}X^\top\Omega X(X^\top X)^{-1},\qq
 
 ### Formula
 True $Y=\beta_0+\beta_1X+\beta_2Z+\varepsilon$; regress $Y$ on $X$ only:
+
 $$\tilde\beta_1=\beta_1+\beta_2\frac{\mathrm{Cov}(X,Z)}{\mathrm{Var}(X)}$$
 
 **Variables:**
@@ -168,6 +169,7 @@ $$VIF_j=\frac{1}{1-R_j^2}$$
 
 ### Duplicate every row
 $X^\top X$, $X^\top y$ double → **coefficients unchanged**. SSE doubles; naive software uses $2n-p$ dof:
+
 $$\text{SE}_{new}=\text{SE}_{old}\sqrt{\frac{n-p}{2n-p}}\approx\frac{\text{SE}_{old}}{\sqrt2}$$
 The shrink is **fictitious** — no new information. (Ridge with fixed λ on an unnormalised SSE *does* change: effective λ halves.)
 

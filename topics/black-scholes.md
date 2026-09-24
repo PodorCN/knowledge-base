@@ -7,7 +7,7 @@ sources: [src-rbc-quantdev-prep, src-squarepoint-dqa-workbook, src-quant-study-n
 ---
 # Black–Scholes
 
-**Sections:** [[black-scholes-pde]] · [[black-scholes-formula]] · [[black-76]] · [[delta-vs-itm-probability]] · [[american-early-exercise]]
+**Sections:** [[black-scholes-pde]] · [[black-scholes-formula]] · [[greeks]] · [[second-order-greeks]] · [[greeks-conventions-bumping]] · [[delta-vs-itm-probability]] · [[black-76]] · [[american-early-exercise]]
 
 <a id="black-scholes-pde"></a>
 
@@ -66,6 +66,86 @@ GBM with constant σ, frictionless continuous hedging, constant r, no jumps, kno
 - **Derived from:** [[black-scholes-pde]] or [[risk-neutral-pricing]]. **Sensitivities:** [[greeks]]. **Forward form:** [[black-76]].
 - **Decomposition:** $C=\text{AoN}-K\cdot\text{CoN}$ → [[digital-options]].
 
+<a id="greeks"></a>
+
+## The Greeks (Δ, Γ, vega, Θ, ρ)
+<!-- section: greeks | prerequisites: [black-scholes-formula] | related: [delta-hedging, gamma-theta-pnl, second-order-greeks, greeks-conventions-bumping, delta-vs-itm-probability, sticky-strike-vs-sticky-moneyness] | sources: [src-rbc-quantdev-prep, src-squarepoint-dqa-workbook] | tags: [delta, gamma, vega, theta, rho] -->
+
+$$\Delta_C=e^{-q\tau}N(d_1),\quad \Delta_P=e^{-q\tau}(N(d_1)-1),\quad \Gamma=\frac{e^{-q\tau}n(d_1)}{S\sigma\sqrt\tau},\quad \mathcal V=Se^{-q\tau}n(d_1)\sqrt\tau$$
+$$\Theta_C=-\frac{Se^{-q\tau}n(d_1)\sigma}{2\sqrt\tau}+qSe^{-q\tau}N(d_1)-rKe^{-r\tau}N(d_2),\qquad \rho_C=\tau Ke^{-r\tau}N(d_2)$$
+
+**Variables:**
+
+- $n$ standard normal pdf
+- others as in [[black-scholes-formula]]. Γ and vega identical for call and put
+
+### Reference ($S=K=100,T=1,r=q=0,\sigma=20\%$)
+Δ = 0.54, Γ = 0.397/20 = 0.0199, vega = 39.7 per 100% vol = 0.397 per vol point.
+
+### Profiles
+- Γ peaks near ATM, grows as expiry approaches (ATM Γ ~ $1/\sqrt T$) → short-dated = gamma-heavy.
+- Vega peaks near ATM, grows with $\sqrt T$ → long-dated = vega-heavy.
+- Long vanilla: Γ, vega > 0; Θ usually < 0 (not always for puts/with dividends).
+
+### Local P&L
+$$\Delta V\approx\Delta\,\delta S+\tfrac12\Gamma(\delta S)^2+\mathcal V\,\delta\sigma+\Theta\,\delta t+\rho\,\delta r$$
+Δ = 0.5, Γ = 0.02, stock +2 → ≈ 1.04. A long call can lose while the stock rises (Θ, vol crush).
+
+### Connections
+- [[delta-hedging]], [[gamma-theta-pnl]], [[second-order-greeks]], units & bumps in [[greeks-conventions-bumping]].
+- **Surface-aware delta:** [[sticky-strike-vs-sticky-moneyness]].
+
+<a id="second-order-greeks"></a>
+
+## Vanna, Volga & Vanna–Volga
+<!-- section: second-order-greeks | prerequisites: [greeks] | related: [fx-vol-conventions, barrier-options, sticky-strike-vs-sticky-moneyness] | sources: [src-rbc-quantdev-prep] | tags: [vanna, volga, cross-greeks] -->
+
+$$\text{Vanna}=\frac{\partial\Delta}{\partial\sigma}=\frac{\partial\mathcal V}{\partial S},\qquad \text{Volga}=\frac{\partial\mathcal V}{\partial\sigma}$$
+
+**Variables:**
+
+- Δ delta
+- $\mathcal V$ vega
+- σ vol
+- $S$ spot
+
+- Matter when spot and vol move together (equities: spot ↓ vol ↑) and for exotic / barrier books.
+- **Vanna–volga**: quick smile-adjustment pricing method; FX market standard for interpolating across delta (not arbitrage-free).
+
+<a id="greeks-conventions-bumping"></a>
+
+## Greek Units, Conventions & Bump-and-Reprice
+<!-- section: greeks-conventions-bumping | prerequisites: [greeks] | related: [price-reconciliation, sticky-strike-vs-sticky-moneyness, monte-carlo-pricing] | sources: [src-rbc-quantdev-prep, src-squarepoint-dqa-workbook] | tags: [finite-difference, cash-greeks, conventions] -->
+
+### Units (be explicit in an app)
+- Delta in shares and **$ delta** $=\Delta S\cdot qty$; gamma as $ gamma per 1% move ($\tfrac12\Gamma S^2(1\%)^2$ or $\Gamma S\cdot qty$ per 1%).
+- Vega per 1 vol point (analytic vega × 0.01); theta per calendar or business day; rho per 1 bp.
+- Mismatched conventions between app and risk system = classic "numbers don't match" ticket.
+
+### Bump-and-reprice
+$$\Delta\approx\frac{V(S+h)-V(S-h)}{2h},\qquad \Gamma\approx\frac{V(S+h)-2V(S)+V(S-h)}{h^2}$$
+
+**Variables:** $h$ bump size (~1% of spot).
+
+- Too small → round-off / MC noise; too large → truncation error.
+- Desk "cash" Greeks bump the whole surface → must define sticky strike vs sticky delta.
+
+### Connections
+- [[price-reconciliation]], [[sticky-strike-vs-sticky-moneyness]], [[monte-carlo-pricing]] (AAD alternative).
+
+<a id="delta-vs-itm-probability"></a>
+
+## Delta vs Probability of Finishing ITM (N(d1) vs N(d2))
+<!-- section: delta-vs-itm-probability | prerequisites: [greeks, risk-neutral-pricing] | related: [digital-options, lognormal-distribution] | sources: [src-rbc-quantdev-prep, src-squarepoint-dqa-workbook] | tags: [delta, probability, measure] -->
+
+- $N(d_2)$ = **risk-neutral** probability $S_T>K$ (= undiscounted cash-or-nothing digital).
+- $N(d_1)$ = that probability under the **share measure** (stock as numeraire); call delta $=e^{-q\tau}N(d_1)$.
+- Neither is the physical probability. Close for short-dated ATM, diverge for long-dated / high vol.
+- **ATM-forward call delta > 0.5:** at $K=F$, $d_1=\tfrac12\sigma\sqrt T>0$. Lognormal is right-skewed: median < forward.
+
+### Connections
+- **Why it matters:** [[digital-options]] are priced off $N(d_2)$; skew adjusts it. Built on [[lognormal-distribution]].
+
 <a id="black-76"></a>
 
 ## Black-76 (forward-based Black formula)
@@ -83,19 +163,6 @@ $$C=D\,[F\,N(d_1)-K\,N(d_2)],\qquad d_{1,2}=\frac{\ln(F/K)\pm\tfrac12\sigma^2T}{
 
 - Surface practice: get $D,F$ from [[implied-forward-regression]], then invert Black-76 → no dividend/rate guesses needed.
 - Swaptions: replace $D$ by annuity $A$ and $F$ by forward swap rate → [[swaptions]]. Rates often quoted in **normal (Bachelier)** vol.
-
-<a id="delta-vs-itm-probability"></a>
-
-## Delta vs Probability of Finishing ITM (N(d1) vs N(d2))
-<!-- section: delta-vs-itm-probability | prerequisites: [greeks, risk-neutral-pricing] | related: [digital-options, lognormal-distribution] | sources: [src-rbc-quantdev-prep, src-squarepoint-dqa-workbook] | tags: [delta, probability, measure] -->
-
-- $N(d_2)$ = **risk-neutral** probability $S_T>K$ (= undiscounted cash-or-nothing digital).
-- $N(d_1)$ = that probability under the **share measure** (stock as numeraire); call delta $=e^{-q\tau}N(d_1)$.
-- Neither is the physical probability. Close for short-dated ATM, diverge for long-dated / high vol.
-- **ATM-forward call delta > 0.5:** at $K=F$, $d_1=\tfrac12\sigma\sqrt T>0$. Lognormal is right-skewed: median < forward.
-
-### Connections
-- **Why it matters:** [[digital-options]] are priced off $N(d_2)$; skew adjusts it. Built on [[lognormal-distribution]].
 
 <a id="american-early-exercise"></a>
 
