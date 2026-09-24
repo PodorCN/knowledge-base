@@ -300,7 +300,7 @@ for (const l of DATA.links) {
   adj.get(l.target).push({ other: l.source, type: l.type, dir: "in" });
 }
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const cleanTitle = t => t.replace(/^(Map|Source|Questions): /, "");
+const cleanTitle = t => t.replace(/^(Map|Source|Questions): /, "").replace(/`/g, "");
 const WIKI = /\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|([^\]]*))?\]\]/g;
 const pageOf = id => { const n = byId.get(id); return n && n.type === "concept" ? n.topic : n && n.type === "question" ? id.split("/")[0] : id; };
 
@@ -328,7 +328,9 @@ document.getElementById("count").textContent = `${counts.topic} chapters · ${co
 
 // ---- markdown ----
 function md(src, eq) {
-  const math = [];
+  const math = [], code = [];
+  // keep code spans/blocks away from math and wikilink parsing
+  src = src.replace(/```[\s\S]*?```|`[^`\n]+`/g, m => `@@CODE${code.push(m) - 1}@@`);
   src = src.replace(/\$\$([\s\S]+?)\$\$/g, (m, body) => {
     if (eq && !/\\tag/.test(body)) m = `$$${body}\\tag{${eq.prefix}.${++eq.n}}$$`;
     return `@@MATH${math.push(m) - 1}@@`;
@@ -339,6 +341,7 @@ function md(src, eq) {
     const text = esc(label || (n ? cleanTitle(n.title) : id));
     return n ? `<a class="wl" href="#${esc(id)}" data-id="${esc(id)}">${text}</a>` : `<a class="wl broken">${text}</a>`;
   });
+  src = src.replace(/@@CODE(\d+)@@/g, (m, i) => code[+i]);
   let html = marked.parse(src, { gfm: true });
   html = html.replace(/@@MATH(\d+)@@/g, (m, i) => esc(math[+i]));
   return html.replace(/<table>/g, '<div class="table-wrap"><table>').replace(/<\/table>/g, "</table></div>");
@@ -370,7 +373,7 @@ function header(n) { return kicker(n) + `<h1 class="title">${esc(cleanTitle(n.ti
 function topicList(ids) {
   return `<ul class="pagelist">${ids.map(id => {
     const n = byId.get(id), nq = n.type === "topic" ? topicQuestions(id) : n.type === "question-bank" ? questionsOf(id).length : 0;
-    const secs = n.type === "topic" ? `<span class="secs">${n.sections.map(s => `<a href="#${s}" data-id="${s}">${esc(byId.get(s).title)}</a>`).join("<span class='dot-sep'>·</span>")}</span>` : "";
+    const secs = n.type === "topic" ? `<span class="secs">${n.sections.map(s => `<a href="#${s}" data-id="${s}">${esc(cleanTitle(byId.get(s).title))}</a>`).join("<span class='dot-sep'>·</span>")}</span>` : "";
     return `<li><a class="t" href="#${id}" data-id="${id}">${esc(cleanTitle(n.title))}</a>${n.type === "topic" ? `<span class="s">${mdInline(n.summary || "")}</span>` : ""}${secs}${nq ? `<span class="qn">${nq} interview question${nq > 1 ? "s" : ""}</span>` : ""}</li>`;
   }).join("")}</ul>`;
 }
@@ -380,7 +383,7 @@ function trackCard(t) {
   return `<div class="card" style="--dcolor:var(--d-${t})">
     <h3><a href="#${tr.map.id}" data-id="${tr.map.id}">${esc(tr.name)}</a></h3>
     <span class="stat">${tr.topics.length} chapters${nq ? ` · ${nq} questions` : ""}</span>
-    <ul>${tr.topics.map(id => `<li><a href="#${id}" data-id="${id}">${esc(byId.get(id).title)}</a></li>`).join("")}</ul></div>`;
+    <ul>${tr.topics.map(id => `<li><a href="#${id}" data-id="${id}">${esc(cleanTitle(byId.get(id).title))}</a></li>`).join("")}</ul></div>`;
 }
 
 // ---- page renderers ----
@@ -393,7 +396,7 @@ function renderTopic(n) {
   let html = `<div class="kicker"><span class="swatch" style="background:var(--d-${n.domain})"></span>${esc(t.group.name)} · ${esc(t.name)}</div>
     <div class="chapno">Chapter ${k}</div><h1 class="title chapter">${esc(n.title)}</h1>`;
   if (intro) html += `<div class="prose intro">${md(intro, eq)}</div>`;
-  html += `<nav class="chapter-toc" aria-label="Contents"><span>Contents</span><ol>${n.sections.map(s => `<li><span class="num">${secNo(s)}</span><a href="#${s}" data-id="${s}">${esc(byId.get(s).title)}</a></li>`).join("")}</ol></nav>`;
+  html += `<nav class="chapter-toc" aria-label="Contents"><span>Contents</span><ol>${n.sections.map(s => `<li><span class="num">${secNo(s)}</span><a href="#${s}" data-id="${s}">${esc(cleanTitle(byId.get(s).title))}</a></li>`).join("")}</ol></nav>`;
   for (const sid of n.sections) {
     const s = byId.get(sid);
     const content = s.content.replace(/^## (.+)$/m, (m, title) => `## ${secNo(sid)}\u2003${title}`);
@@ -484,7 +487,7 @@ function railList(label, ids) {
 function renderRail(n) {
   let out = "";
   if (n.type === "topic") {
-    out += `<div><h4>On this page</h4><ul class="onpage">${n.sections.map(s => `<li><a href="#${s}" data-id="${s}" data-sec-link="${s}"><span class="num">${secNo(s)}</span><span>${esc(byId.get(s).title)}</span></a></li>`).join("")}</ul></div>`;
+    out += `<div><h4>On this page</h4><ul class="onpage">${n.sections.map(s => `<li><a href="#${s}" data-id="${s}" data-sec-link="${s}"><span class="num">${secNo(s)}</span><span>${esc(cleanTitle(byId.get(s).title))}</span></a></li>`).join("")}</ul></div>`;
     const mine = new Set(n.sections);
     const other = (type, dir) => {
       const set = new Set();
@@ -515,7 +518,7 @@ const toc = document.getElementById("toc");
       const nq = tr.banks.reduce((s, b) => s + questionsOf(b).length, 0);
       h += `<details class="track" data-track="${t}"><summary><span class="swatch" style="background:var(--d-${t})"></span>${esc(tr.name)}<span class="n">${tr.topics.length}</span></summary><div class="lvl">
         <a class="ov" href="#${tr.map.id}" data-id="${tr.map.id}">Overview</a>
-        ${tr.topics.map(id => `<a class="tp" href="#${id}" data-id="${id}"><span class="num">${CHAPTER_NO[id]}</span>${esc(byId.get(id).title)}</a><ul class="secs" data-secs="${id}" hidden>${byId.get(id).sections.map(s => `<li><a href="#${s}" data-id="${s}" data-sec-link="${s}"><span class="num">${secNo(s)}</span>${esc(byId.get(s).title)}</a></li>`).join("")}</ul>`).join("")}
+        ${tr.topics.map(id => `<a class="tp" href="#${id}" data-id="${id}"><span class="num">${CHAPTER_NO[id]}</span>${esc(cleanTitle(byId.get(id).title))}</a><ul class="secs" data-secs="${id}" hidden>${byId.get(id).sections.map(s => `<li><a href="#${s}" data-id="${s}" data-sec-link="${s}"><span class="num">${secNo(s)}</span>${esc(cleanTitle(byId.get(s).title))}</a></li>`).join("")}</ul>`).join("")}
         ${tr.banks.map(b => `<a class="qb" href="#${b}" data-id="${b}">Questions · ${esc(cleanTitle(byId.get(b).title).replace(/^Questions: /, ""))} <span class="n">${questionsOf(b).length}</span></a>`).join("")}
       </div></details>`;
     }

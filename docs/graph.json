@@ -293,6 +293,89 @@
    "degree": 10
   },
   {
+   "id": "csharp-abstract-classes",
+   "title": "Abstract Classes & Abstract Methods",
+   "type": "concept",
+   "domain": "quant-dev",
+   "tags": [
+    "csharp",
+    "abstract",
+    "polymorphism",
+    "override"
+   ],
+   "path": "topics/csharp-dotnet.md",
+   "content": "<a id=\"csharp-abstract-classes\"></a>\n\n## Abstract Classes & Abstract Methods\n<!-- section: csharp-abstract-classes | prerequisites: [oop-pillars] | related: [csharp-essentials, pricing-app-architecture, csharp-constructors-base] | tags: [csharp, abstract, polymorphism, override] -->\n\nExamples come from equity-derivative pricing class design (Payoff / Exercise / Option / PricingEngine).\n\n```csharp\npublic abstract class Instrument { public abstract double NPV(); }\n```\n\n| Part | Meaning |\n|---|---|\n| `abstract class` | Abstract class: you **cannot** `new Instrument()`; it can only be inherited |\n| `public abstract double NPV();` | Abstract method: declaration only, **no implementation** (no `{ }`) |\n| `NPV` | Net Present Value, the product's value today |\n\n**Rule:** a non-abstract subclass **must** implement every abstract method with `override`, otherwise it doesn't compile.\n\n```csharp\npublic abstract class Option : Instrument { ... }            // still abstract, may leave NPV unimplemented\n\npublic abstract class OneAssetOption<TSelf> : Option\n{\n    public override double NPV() => _engine.Calculate((TSelf)this);   // actually implemented here\n}\n```\n\n**Why this design:** one common interface, so different products can be handled polymorphically.\n\n```csharp\nvar portfolio = new List<Instrument> { euCall, amPut, asian /*, bond, swap */ };\ndouble total = 0;\nforeach (var inst in portfolio)\n    total += inst.NPV();      // no need to know the concrete product; each calls its own implementation\n```\n\n- Abstract class vs interface: see [[csharp-essentials]].\n\n### C++ equivalent\n\n```cpp\nclass Instrument {\npublic:\n    virtual ~Instrument() = default;   // a polymorphic base class must have a virtual destructor\n    virtual double NPV() const = 0;    // pure virtual function = C# abstract\n};\n```\n\n### Connections\n- **Builds on:** [[oop-pillars]] (abstraction, polymorphism).\n- **Used in:** [[pricing-app-architecture]].",
+   "summary": "<a id=\"csharp-abstract-classes\"></a>",
+   "topic": "csharp-dotnet",
+   "degree": 10
+  },
+  {
+   "id": "csharp-arrow-syntax",
+   "title": "The Two Uses of `=>`",
+   "type": "concept",
+   "domain": "quant-dev",
+   "tags": [
+    "csharp",
+    "lambda",
+    "expression-bodied",
+    "linq"
+   ],
+   "path": "topics/csharp-dotnet.md",
+   "content": "<a id=\"csharp-arrow-syntax\"></a>\n\n## The Two Uses of `=>`\n<!-- section: csharp-arrow-syntax | prerequisites: [csharp-abstract-classes] | related: [csharp-essentials, csharp-constructors-base] | tags: [csharp, lambda, expression-bodied, linq] -->\n\n### Use 1: expression-bodied member\n\n`=>` means **\"the method body is this one expression\"**.\n\n| Member's return type | `=> expression` is equivalent to |\n|---|---|\n| **Returns a value** (e.g. `double`) | `{ return expression; }` |\n| **No return value** (`void`, constructor) | `{ expression; }`: executes only, **no return** |\n\n**Returns a value, same as `return`:**\n\n```csharp\npublic override double Value(double s) => Math.Max(s - Strike, 0.0);\n// equivalent to\npublic override double Value(double s) { return Math.Max(s - Strike, 0.0); }\n```\n\n**No return value, executes only:**\n\n```csharp\npublic void SetPricingEngine(IPricingEngine<TSelf> engine) => _engine = engine;\n// equivalent to\npublic void SetPricingEngine(IPricingEngine<TSelf> engine) { _engine = engine; }\n```\n\n**Read-only property:**\n\n```csharp\npublic double Moneyness => Spot / Strike;   // same as get { return Spot / Strike; }\n```\n\n**Rules:**\n\n- Only **one expression** can follow `=>`.\n- An assignment `_cash = cash` is also an expression in C#, so it can follow `=>`.\n\n### Use 2: lambda expression (anonymous function)\n\nLeft of `=>` are the parameters, right of it is the function body.\n\n```csharp\nFunc<double, double> callPayoff = s => Math.Max(s - 100, 0);\ncallPayoff(120);                                     // 20\n\nvar itm   = portfolio.Where(opt => opt.NPV() > 1.0); // LINQ filter\nvar total = portfolio.Sum(inst => inst.NPV());       // aggregate\n```\n\n| Form | Meaning |\n|---|---|\n| `x => x * 2` | one parameter |\n| `(x, y) => x + y` | several parameters |\n| `() => 42` | no parameters |\n| `x => { var y = x * 2; return y + 1; }` | several statements need `{ }` and `return` |\n\n### Telling the two uses apart\n\n| Where `=>` appears | Which use |\n|---|---|\n| After the **declaration** of a method, property or constructor | expression-bodied member |\n| Passed as an **argument**, or assigned to a `Func` / `Action` | lambda |\n\n**Lambdas in other languages:**\n\n- Python: `lambda s: max(s - 100, 0)`\n- C++: `[](double s) { return std::max(s - 100.0, 0.0); }`\n\n### Connections\n- **Used with:** LINQ and `Func` in [[csharp-essentials]].\n- **In constructors:** [[csharp-constructors-base]].",
+   "summary": "<a id=\"csharp-arrow-syntax\"></a>",
+   "topic": "csharp-dotnet",
+   "degree": 7
+  },
+  {
+   "id": "csharp-constructors-base",
+   "title": "Constructors & `: base(...)`",
+   "type": "concept",
+   "domain": "quant-dev",
+   "tags": [
+    "csharp",
+    "constructor",
+    "inheritance",
+    "initialization-order"
+   ],
+   "path": "topics/csharp-dotnet.md",
+   "content": "<a id=\"csharp-constructors-base\"></a>\n\n## Constructors & `: base(...)`\n<!-- section: csharp-constructors-base | prerequisites: [csharp-abstract-classes, csharp-arrow-syntax] | related: [oop-pillars] | tags: [csharp, constructor, inheritance, initialization-order] -->\n\n```csharp\npublic CashOrNothingPayoff(OptionType type, double strike, double cash) : base(type, strike) => _cash = cash;\n//     ①                   ②                                            ③                      ④\n```\n\n| Part | Meaning |\n|---|---|\n| ① `public CashOrNothingPayoff` | Same name as the class, no return type → **constructor** (runs on `new`) |\n| ② `(OptionType type, double strike, double cash)` | Arguments passed when the object is created |\n| ③ `: base(type, strike)` | **First calls the base class** `StrikedPayoff` constructor, handing type and strike to the base class to store |\n| ④ `=> _cash = cash;` | Then runs its own code: stores `_cash`. A constructor has no return value, so this `=>` only executes, no return |\n\n### Full form (equivalent to the line above)\n\n```csharp\npublic CashOrNothingPayoff(OptionType type, double strike, double cash)\n    : base(type, strike)      // step 1: the base class stores Type and Strike\n{\n    _cash = cash;             // step 2: the subclass stores its own _cash\n}\n```\n\n### Why two steps\n\nEach class initialises only the data **it** defines:\n\n```\nStrikedPayoff (base)       defines Type, Strike  → base constructor assigns them\n  └─ CashOrNothingPayoff   defines _cash         → subclass assigns it itself\n```\n\n`Type` and `Strike` are read-only properties (`{ get; }`) of the base class. They can only be assigned in the base class's own constructor; the subclass cannot write `Strike = strike` directly.\n\n### Execution order\n\nFor `new CashOrNothingPayoff(OptionType.Call, 100, 1.0)`:\n\n1. Enter the subclass constructor and receive the arguments.\n2. Run `: base(type, strike)` → base class: `Type = Call; Strike = 100;`.\n3. Back in the subclass: `_cash = 1.0;`.\n4. Object creation complete.\n\n**Rule: the base class is constructed first, then the subclass.**\n\n### Comparison\n\n**Python:**\n\n```python\nclass CashOrNothingPayoff(StrikedPayoff):\n    def __init__(self, type, strike, cash):\n        super().__init__(type, strike)   # ← : base(type, strike)\n        self._cash = cash                # ← => _cash = cash\n```\n\n**C++:**\n\n```cpp\nCashOrNothingPayoff(OptionType t, double K, double cash)\n    : StrikedPayoff(t, K), cash_(cash) {}   // done in the initializer list\n```\n\n### Connections\n- **Builds on:** [[csharp-abstract-classes]], [[csharp-arrow-syntax]].",
+   "summary": "<a id=\"csharp-constructors-base\"></a>",
+   "topic": "csharp-dotnet",
+   "degree": 8
+  },
+  {
+   "id": "csharp-ternary-operator",
+   "title": "The Ternary Operator `? :`",
+   "type": "concept",
+   "domain": "quant-dev",
+   "tags": [
+    "csharp",
+    "operators",
+    "control-flow"
+   ],
+   "path": "topics/csharp-dotnet.md",
+   "content": "<a id=\"csharp-ternary-operator\"></a>\n\n## The Ternary Operator `? :`\n<!-- section: csharp-ternary-operator | prerequisites: [] | related: [csharp-constructors-base] | tags: [csharp, operators, control-flow] -->\n\n**Format:**\n\n```\ncondition ? value if true : value if false\n```\n\nIt compresses if-else into one line, to pick one of two values.\n\n```csharp\npublic override double Value(double s)\n{\n    bool itm = Type == OptionType.Call ? s > Strike : s < Strike;   // a call checks S>K, a put checks S<K\n    return itm ? _cash : 0.0;                                       // pays cash if in the money, else 0\n}\n```\n\n**`return itm ? _cash : 0.0;` is equivalent to:**\n\n```csharp\nif (itm)\n    return _cash;\nelse\n    return 0.0;\n```\n\n**Example:** call, Strike = 100, cash = 1.0:\n\n| Price at expiry s | itm | Returns |\n|---|---|---|\n| 120 | `120 > 100` → true | 1.0 |\n| 90 | `90 > 100` → false | 0.0 |\n\n**Other languages:**\n\n| Language | Syntax |\n|---|---|\n| C# / C++ / Java | `itm ? cash : 0.0` |\n| Python | `cash if itm else 0.0` (value first, condition in the middle) |\n\n- Once the logic gets complicated, switch to if-else for readability.\n\n### Connections\n- **Payoff example:** cash-or-nothing digital, see [[digital-options]].",
+   "summary": "<a id=\"csharp-ternary-operator\"></a>",
+   "topic": "csharp-dotnet",
+   "degree": 6
+  },
+  {
+   "id": "csharp-syntax-cheatsheet",
+   "title": "C# Syntax Cheat Sheet",
+   "type": "concept",
+   "domain": "quant-dev",
+   "tags": [
+    "csharp",
+    "syntax",
+    "reference"
+   ],
+   "path": "topics/csharp-dotnet.md",
+   "content": "<a id=\"csharp-syntax-cheatsheet\"></a>\n\n## C# Syntax Cheat Sheet\n<!-- section: csharp-syntax-cheatsheet | prerequisites: [csharp-abstract-classes] | related: [csharp-essentials, csharp-arrow-syntax, csharp-constructors-base] | tags: [csharp, syntax, reference] -->\n\n| Syntax | Example | Meaning |\n|---|---|---|\n| `: BaseClass` | `class PlainVanillaPayoff : StrikedPayoff` | inheritance |\n| `: Interface` | `class MCEuropeanEngine : IPricingEngine<VanillaOption>` | implements an interface |\n| `override` | `public override double Value(...)` | implements or overrides a base-class abstract / virtual method |\n| `sealed` | `public sealed class PlainVanillaPayoff` | cannot be inherited further |\n| `protected` | `protected StrikedPayoff(...)` | accessible only to the class itself and subclasses |\n| `internal` | `internal static class Normal` | visible only inside the current project (assembly) |\n| `static class` | `Normal.Cdf(x)` | cannot be `new`ed, all static methods, like a utility-function module |\n| `{ get; }` | `public double Strike { get; }` | read-only auto-property, assignable only in the constructor |\n| `readonly` | `private readonly double _cash;` | read-only field, assignable only in the constructor |\n| `enum` | `enum OptionType { Call, Put }` | a set of named constants, safer than strings |\n| generics `<T>` | `IPricingEngine<TOption>` | type parameter, specified when used |\n| `where T : X` | `where TOption : Option` | generic constraint: T must be X or a subclass of X |\n| `?` (after a type) | `IPricingEngine<TSelf>? _engine` | may be null |\n| `??` | `_engine ?? throw new ...` | use the left side if not null, otherwise evaluate the right side |\n| `throw` expression | `x ?? throw new InvalidOperationException(...)` | throw can appear inside an expression (C# 7+) |\n| `is not T x` | `if (opt.Payoff is not PlainVanillaPayoff pay) throw ...;` | pattern matching: checks the type, and casts and assigns to `pay` at the same time |\n| `(T)x` | `(TSelf)this` | explicit cast |\n| `record` | `record BlackScholesProcess(double Spot, ...)` | immutable data class; constructor, properties and equality generated automatically |\n| `with` | `process with { Spot = 101 }` | copies a record with some fields changed; the original is unchanged |\n| `var` | `var v = new double[n + 1];` | let the compiler infer the type |\n| optional parameter | `int seed = 42` | uses the default if not passed |\n| named argument | `new BlackScholesProcess(Spot: 100, ...)` | write parameter names at the call site for readability |\n| `$\"...\"` | `$\"NPV: {npv:F4}\"` | string interpolation; `:F4` means 4 decimal places |\n| `200_000` | `new MCEuropeanEngine(process, 200_000)` | digit separator, equals 200000 |\n| `*=` / `+=` | `s *= Math.Exp(...)` | `s = s * ...` / `s = s + ...` |\n| `try / catch` | `try { ... } catch (ArgumentException e) { ... }` | catch exceptions |\n\n*All of the above is standard C# / C++ syntax. The `Instrument` / `NPV()` / `PricingEngine` naming follows QuantLib conventions.*\n\n### Connections\n- **Details:** [[csharp-abstract-classes]], [[csharp-arrow-syntax]], [[csharp-constructors-base]], [[csharp-ternary-operator]]. **Records & `with`:** [[csharp-essentials]].",
+   "summary": "<a id=\"csharp-syntax-cheatsheet\"></a>",
+   "topic": "csharp-dotnet",
+   "degree": 7
+  },
+  {
    "id": "csharp-essentials",
    "title": "C# / .NET Essentials for Quant Dev",
    "type": "concept",
@@ -304,10 +387,10 @@
     "interop"
    ],
    "path": "topics/csharp-dotnet.md",
-   "content": "<a id=\"csharp-essentials\"></a>\n\n## C# / .NET Essentials for Quant Dev\n<!-- section: csharp-essentials | prerequisites: [oop-pillars] | related: [dotnet-concurrency-wpf, pricing-app-architecture, monte-carlo-pricing] | tags: [csharp, dotnet, gc, interop] -->\n\n- **Interface vs abstract class:** interface = contract, multiple implementation, no state (default methods since C# 8) → pluggable things (models, data sources). Abstract class = shared state + partial implementation, single inheritance → shared instrument behaviour.\n- **struct / class / record:** struct = value type, copied (small immutable data like a tenor); class = reference, identity; **record** = reference type with value equality + `with` → ideal for immutable trades / market snapshots.\n- **Immutability:** lock-free concurrent pricing, reproducible results, scenarios = `md with { Spot = 105 }`.\n- **GC:** generational (Gen 0/1/2, LOH > 85 KB). In MC hot loops reuse arrays, `Span<T>`, `ArrayPool<T>`. Unsubscribed event handlers leak memory in long-running desktop apps.\n- **Errors:** validate inputs up front (negative vol, past expiry, missing dividend); clear trader-readable error; never silently return 0/NaN; log trade ID + model version.\n- **Generics/LINQ:** `Dictionary<string, Func<Instrument, IPricingModel>>` registry; `trades.GroupBy(t => t.Underlying).Select(g => new { g.Key, Delta = g.Sum(t => t.Delta) })`.\n- **C++ interop:** P/Invoke to a C API, C++/CLI wrapper, COM, or out-of-process service (gRPC/REST). Watch marshalling cost, memory ownership, version pinning.\n- **Python → C#:** ABCs ≈ interfaces, dataclasses ≈ records; add static typing and explicit threading.",
+   "content": "<a id=\"csharp-essentials\"></a>\n\n## C# / .NET Essentials for Quant Dev\n<!-- section: csharp-essentials | prerequisites: [oop-pillars] | related: [dotnet-concurrency-wpf, pricing-app-architecture, monte-carlo-pricing, csharp-abstract-classes, csharp-syntax-cheatsheet] | tags: [csharp, dotnet, gc, interop] -->\n\n- **Interface vs abstract class:** interface = contract, multiple implementation, no state (default methods since C# 8) → pluggable things (models, data sources). Abstract class = shared state + partial implementation, single inheritance → shared instrument behaviour.\n\n| | `abstract class` | `interface` |\n|---|---|---|\n| Can it have implementation? | Can mix: some methods implemented, some abstract | Usually not (C# 8+ allows default implementations) |\n| Can it have fields? | Yes | No instance fields |\n| How many? | A class can inherit only **one** class | A class can implement **many** interfaces |\n\n- **struct / class / record:** struct = value type, copied (small immutable data like a tenor); class = reference, identity; **record** = reference type with value equality + `with` → ideal for immutable trades / market snapshots.\n- **Immutability:** lock-free concurrent pricing, reproducible results, scenarios = `md with { Spot = 105 }`.\n- **GC:** generational (Gen 0/1/2, LOH > 85 KB). In MC hot loops reuse arrays, `Span<T>`, `ArrayPool<T>`. Unsubscribed event handlers leak memory in long-running desktop apps.\n- **Errors:** validate inputs up front (negative vol, past expiry, missing dividend); clear trader-readable error; never silently return 0/NaN; log trade ID + model version.\n- **Generics/LINQ:** `Dictionary<string, Func<Instrument, IPricingModel>>` registry; `trades.GroupBy(t => t.Underlying).Select(g => new { g.Key, Delta = g.Sum(t => t.Delta) })`.\n- **C++ interop:** P/Invoke to a C API, C++/CLI wrapper, COM, or out-of-process service (gRPC/REST). Watch marshalling cost, memory ownership, version pinning.\n- **Python → C#:** ABCs ≈ interfaces, dataclasses ≈ records; add static typing and explicit threading.",
    "summary": "<a id=\"csharp-essentials\"></a>",
    "topic": "csharp-dotnet",
-   "degree": 10
+   "degree": 15
   },
   {
    "id": "dotnet-concurrency-wpf",
@@ -333,14 +416,19 @@
    "domain": "quant-dev",
    "tags": [],
    "path": "topics/csharp-dotnet.md",
-   "content": "# C# & .NET\n\n**Sections:** [[csharp-essentials]] · [[dotnet-concurrency-wpf]]\n\n<a id=\"csharp-essentials\"></a>\n\n## C# / .NET Essentials for Quant Dev\n<!-- section: csharp-essentials | prerequisites: [oop-pillars] | related: [dotnet-concurrency-wpf, pricing-app-architecture, monte-carlo-pricing] | tags: [csharp, dotnet, gc, interop] -->\n\n- **Interface vs abstract class:** interface = contract, multiple implementation, no state (default methods since C# 8) → pluggable things (models, data sources). Abstract class = shared state + partial implementation, single inheritance → shared instrument behaviour.\n- **struct / class / record:** struct = value type, copied (small immutable data like a tenor); class = reference, identity; **record** = reference type with value equality + `with` → ideal for immutable trades / market snapshots.\n- **Immutability:** lock-free concurrent pricing, reproducible results, scenarios = `md with { Spot = 105 }`.\n- **GC:** generational (Gen 0/1/2, LOH > 85 KB). In MC hot loops reuse arrays, `Span<T>`, `ArrayPool<T>`. Unsubscribed event handlers leak memory in long-running desktop apps.\n- **Errors:** validate inputs up front (negative vol, past expiry, missing dividend); clear trader-readable error; never silently return 0/NaN; log trade ID + model version.\n- **Generics/LINQ:** `Dictionary<string, Func<Instrument, IPricingModel>>` registry; `trades.GroupBy(t => t.Underlying).Select(g => new { g.Key, Delta = g.Sum(t => t.Delta) })`.\n- **C++ interop:** P/Invoke to a C API, C++/CLI wrapper, COM, or out-of-process service (gRPC/REST). Watch marshalling cost, memory ownership, version pinning.\n- **Python → C#:** ABCs ≈ interfaces, dataclasses ≈ records; add static typing and explicit threading.\n\n<a id=\"dotnet-concurrency-wpf\"></a>\n\n## .NET Concurrency, WPF & MVVM\n<!-- section: dotnet-concurrency-wpf | prerequisites: [csharp-essentials] | related: [pricing-app-architecture, scenario-risk-grids] | tags: [async, wpf, mvvm, threading] -->\n\n- **async/await** → I/O-bound (fetch market data, call a pricing service); frees the UI thread.\n- **Parallel.For / PLINQ / Task.Run** → CPU-bound (MC paths, scenario grids).\n- Never `.Result` / `.Wait()` on the UI thread → deadlock with WPF sync context.\n- **500 scenarios, responsive UI:** `await Task.Run(...)`, `IProgress<T>`, `CancellationToken`, batch `ObservableCollection` updates on the Dispatcher, virtualise grids.\n- **MVVM:** Model = domain (trades, pricers); View = XAML; ViewModel = state + commands (`INotifyPropertyChanged`, `ICommand`) → testable without UI. Toolkits: CommunityToolkit.Mvvm, Prism, ReactiveUI.",
+   "content": "# C# & .NET\n\n**Sections:** [[csharp-abstract-classes]] · [[csharp-arrow-syntax]] · [[csharp-constructors-base]] · [[csharp-ternary-operator]] · [[csharp-syntax-cheatsheet]] · [[csharp-essentials]] · [[dotnet-concurrency-wpf]]\n\n<a id=\"csharp-abstract-classes\"></a>\n\n## Abstract Classes & Abstract Methods\n<!-- section: csharp-abstract-classes | prerequisites: [oop-pillars] | related: [csharp-essentials, pricing-app-architecture, csharp-constructors-base] | tags: [csharp, abstract, polymorphism, override] -->\n\nExamples come from equity-derivative pricing class design (Payoff / Exercise / Option / PricingEngine).\n\n```csharp\npublic abstract class Instrument { public abstract double NPV(); }\n```\n\n| Part | Meaning |\n|---|---|\n| `abstract class` | Abstract class: you **cannot** `new Instrument()`; it can only be inherited |\n| `public abstract double NPV();` | Abstract method: declaration only, **no implementation** (no `{ }`) |\n| `NPV` | Net Present Value, the product's value today |\n\n**Rule:** a non-abstract subclass **must** implement every abstract method with `override`, otherwise it doesn't compile.\n\n```csharp\npublic abstract class Option : Instrument { ... }            // still abstract, may leave NPV unimplemented\n\npublic abstract class OneAssetOption<TSelf> : Option\n{\n    public override double NPV() => _engine.Calculate((TSelf)this);   // actually implemented here\n}\n```\n\n**Why this design:** one common interface, so different products can be handled polymorphically.\n\n```csharp\nvar portfolio = new List<Instrument> { euCall, amPut, asian /*, bond, swap */ };\ndouble total = 0;\nforeach (var inst in portfolio)\n    total += inst.NPV();      // no need to know the concrete product; each calls its own implementation\n```\n\n- Abstract class vs interface: see [[csharp-essentials]].\n\n### C++ equivalent\n\n```cpp\nclass Instrument {\npublic:\n    virtual ~Instrument() = default;   // a polymorphic base class must have a virtual destructor\n    virtual double NPV() const = 0;    // pure virtual function = C# abstract\n};\n```\n\n### Connections\n- **Builds on:** [[oop-pillars]] (abstraction, polymorphism).\n- **Used in:** [[pricing-app-architecture]].\n\n<a id=\"csharp-arrow-syntax\"></a>\n\n## The Two Uses of `=>`\n<!-- section: csharp-arrow-syntax | prerequisites: [csharp-abstract-classes] | related: [csharp-essentials, csharp-constructors-base] | tags: [csharp, lambda, expression-bodied, linq] -->\n\n### Use 1: expression-bodied member\n\n`=>` means **\"the method body is this one expression\"**.\n\n| Member's return type | `=> expression` is equivalent to |\n|---|---|\n| **Returns a value** (e.g. `double`) | `{ return expression; }` |\n| **No return value** (`void`, constructor) | `{ expression; }`: executes only, **no return** |\n\n**Returns a value, same as `return`:**\n\n```csharp\npublic override double Value(double s) => Math.Max(s - Strike, 0.0);\n// equivalent to\npublic override double Value(double s) { return Math.Max(s - Strike, 0.0); }\n```\n\n**No return value, executes only:**\n\n```csharp\npublic void SetPricingEngine(IPricingEngine<TSelf> engine) => _engine = engine;\n// equivalent to\npublic void SetPricingEngine(IPricingEngine<TSelf> engine) { _engine = engine; }\n```\n\n**Read-only property:**\n\n```csharp\npublic double Moneyness => Spot / Strike;   // same as get { return Spot / Strike; }\n```\n\n**Rules:**\n\n- Only **one expression** can follow `=>`.\n- An assignment `_cash = cash` is also an expression in C#, so it can follow `=>`.\n\n### Use 2: lambda expression (anonymous function)\n\nLeft of `=>` are the parameters, right of it is the function body.\n\n```csharp\nFunc<double, double> callPayoff = s => Math.Max(s - 100, 0);\ncallPayoff(120);                                     // 20\n\nvar itm   = portfolio.Where(opt => opt.NPV() > 1.0); // LINQ filter\nvar total = portfolio.Sum(inst => inst.NPV());       // aggregate\n```\n\n| Form | Meaning |\n|---|---|\n| `x => x * 2` | one parameter |\n| `(x, y) => x + y` | several parameters |\n| `() => 42` | no parameters |\n| `x => { var y = x * 2; return y + 1; }` | several statements need `{ }` and `return` |\n\n### Telling the two uses apart\n\n| Where `=>` appears | Which use |\n|---|---|\n| After the **declaration** of a method, property or constructor | expression-bodied member |\n| Passed as an **argument**, or assigned to a `Func` / `Action` | lambda |\n\n**Lambdas in other languages:**\n\n- Python: `lambda s: max(s - 100, 0)`\n- C++: `[](double s) { return std::max(s - 100.0, 0.0); }`\n\n### Connections\n- **Used with:** LINQ and `Func` in [[csharp-essentials]].\n- **In constructors:** [[csharp-constructors-base]].\n\n<a id=\"csharp-constructors-base\"></a>\n\n## Constructors & `: base(...)`\n<!-- section: csharp-constructors-base | prerequisites: [csharp-abstract-classes, csharp-arrow-syntax] | related: [oop-pillars] | tags: [csharp, constructor, inheritance, initialization-order] -->\n\n```csharp\npublic CashOrNothingPayoff(OptionType type, double strike, double cash) : base(type, strike) => _cash = cash;\n//     ①                   ②                                            ③                      ④\n```\n\n| Part | Meaning |\n|---|---|\n| ① `public CashOrNothingPayoff` | Same name as the class, no return type → **constructor** (runs on `new`) |\n| ② `(OptionType type, double strike, double cash)` | Arguments passed when the object is created |\n| ③ `: base(type, strike)` | **First calls the base class** `StrikedPayoff` constructor, handing type and strike to the base class to store |\n| ④ `=> _cash = cash;` | Then runs its own code: stores `_cash`. A constructor has no return value, so this `=>` only executes, no return |\n\n### Full form (equivalent to the line above)\n\n```csharp\npublic CashOrNothingPayoff(OptionType type, double strike, double cash)\n    : base(type, strike)      // step 1: the base class stores Type and Strike\n{\n    _cash = cash;             // step 2: the subclass stores its own _cash\n}\n```\n\n### Why two steps\n\nEach class initialises only the data **it** defines:\n\n```\nStrikedPayoff (base)       defines Type, Strike  → base constructor assigns them\n  └─ CashOrNothingPayoff   defines _cash         → subclass assigns it itself\n```\n\n`Type` and `Strike` are read-only properties (`{ get; }`) of the base class. They can only be assigned in the base class's own constructor; the subclass cannot write `Strike = strike` directly.\n\n### Execution order\n\nFor `new CashOrNothingPayoff(OptionType.Call, 100, 1.0)`:\n\n1. Enter the subclass constructor and receive the arguments.\n2. Run `: base(type, strike)` → base class: `Type = Call; Strike = 100;`.\n3. Back in the subclass: `_cash = 1.0;`.\n4. Object creation complete.\n\n**Rule: the base class is constructed first, then the subclass.**\n\n### Comparison\n\n**Python:**\n\n```python\nclass CashOrNothingPayoff(StrikedPayoff):\n    def __init__(self, type, strike, cash):\n        super().__init__(type, strike)   # ← : base(type, strike)\n        self._cash = cash                # ← => _cash = cash\n```\n\n**C++:**\n\n```cpp\nCashOrNothingPayoff(OptionType t, double K, double cash)\n    : StrikedPayoff(t, K), cash_(cash) {}   // done in the initializer list\n```\n\n### Connections\n- **Builds on:** [[csharp-abstract-classes]], [[csharp-arrow-syntax]].\n\n<a id=\"csharp-ternary-operator\"></a>\n\n## The Ternary Operator `? :`\n<!-- section: csharp-ternary-operator | prerequisites: [] | related: [csharp-constructors-base] | tags: [csharp, operators, control-flow] -->\n\n**Format:**\n\n```\ncondition ? value if true : value if false\n```\n\nIt compresses if-else into one line, to pick one of two values.\n\n```csharp\npublic override double Value(double s)\n{\n    bool itm = Type == OptionType.Call ? s > Strike : s < Strike;   // a call checks S>K, a put checks S<K\n    return itm ? _cash : 0.0;                                       // pays cash if in the money, else 0\n}\n```\n\n**`return itm ? _cash : 0.0;` is equivalent to:**\n\n```csharp\nif (itm)\n    return _cash;\nelse\n    return 0.0;\n```\n\n**Example:** call, Strike = 100, cash = 1.0:\n\n| Price at expiry s | itm | Returns |\n|---|---|---|\n| 120 | `120 > 100` → true | 1.0 |\n| 90 | `90 > 100` → false | 0.0 |\n\n**Other languages:**\n\n| Language | Syntax |\n|---|---|\n| C# / C++ / Java | `itm ? cash : 0.0` |\n| Python | `cash if itm else 0.0` (value first, condition in the middle) |\n\n- Once the logic gets complicated, switch to if-else for readability.\n\n### Connections\n- **Payoff example:** cash-or-nothing digital, see [[digital-options]].\n\n<a id=\"csharp-syntax-cheatsheet\"></a>\n\n## C# Syntax Cheat Sheet\n<!-- section: csharp-syntax-cheatsheet | prerequisites: [csharp-abstract-classes] | related: [csharp-essentials, csharp-arrow-syntax, csharp-constructors-base] | tags: [csharp, syntax, reference] -->\n\n| Syntax | Example | Meaning |\n|---|---|---|\n| `: BaseClass` | `class PlainVanillaPayoff : StrikedPayoff` | inheritance |\n| `: Interface` | `class MCEuropeanEngine : IPricingEngine<VanillaOption>` | implements an interface |\n| `override` | `public override double Value(...)` | implements or overrides a base-class abstract / virtual method |\n| `sealed` | `public sealed class PlainVanillaPayoff` | cannot be inherited further |\n| `protected` | `protected StrikedPayoff(...)` | accessible only to the class itself and subclasses |\n| `internal` | `internal static class Normal` | visible only inside the current project (assembly) |\n| `static class` | `Normal.Cdf(x)` | cannot be `new`ed, all static methods, like a utility-function module |\n| `{ get; }` | `public double Strike { get; }` | read-only auto-property, assignable only in the constructor |\n| `readonly` | `private readonly double _cash;` | read-only field, assignable only in the constructor |\n| `enum` | `enum OptionType { Call, Put }` | a set of named constants, safer than strings |\n| generics `<T>` | `IPricingEngine<TOption>` | type parameter, specified when used |\n| `where T : X` | `where TOption : Option` | generic constraint: T must be X or a subclass of X |\n| `?` (after a type) | `IPricingEngine<TSelf>? _engine` | may be null |\n| `??` | `_engine ?? throw new ...` | use the left side if not null, otherwise evaluate the right side |\n| `throw` expression | `x ?? throw new InvalidOperationException(...)` | throw can appear inside an expression (C# 7+) |\n| `is not T x` | `if (opt.Payoff is not PlainVanillaPayoff pay) throw ...;` | pattern matching: checks the type, and casts and assigns to `pay` at the same time |\n| `(T)x` | `(TSelf)this` | explicit cast |\n| `record` | `record BlackScholesProcess(double Spot, ...)` | immutable data class; constructor, properties and equality generated automatically |\n| `with` | `process with { Spot = 101 }` | copies a record with some fields changed; the original is unchanged |\n| `var` | `var v = new double[n + 1];` | let the compiler infer the type |\n| optional parameter | `int seed = 42` | uses the default if not passed |\n| named argument | `new BlackScholesProcess(Spot: 100, ...)` | write parameter names at the call site for readability |\n| `$\"...\"` | `$\"NPV: {npv:F4}\"` | string interpolation; `:F4` means 4 decimal places |\n| `200_000` | `new MCEuropeanEngine(process, 200_000)` | digit separator, equals 200000 |\n| `*=` / `+=` | `s *= Math.Exp(...)` | `s = s * ...` / `s = s + ...` |\n| `try / catch` | `try { ... } catch (ArgumentException e) { ... }` | catch exceptions |\n\n*All of the above is standard C# / C++ syntax. The `Instrument` / `NPV()` / `PricingEngine` naming follows QuantLib conventions.*\n\n### Connections\n- **Details:** [[csharp-abstract-classes]], [[csharp-arrow-syntax]], [[csharp-constructors-base]], [[csharp-ternary-operator]]. **Records & `with`:** [[csharp-essentials]].\n\n<a id=\"csharp-essentials\"></a>\n\n## C# / .NET Essentials for Quant Dev\n<!-- section: csharp-essentials | prerequisites: [oop-pillars] | related: [dotnet-concurrency-wpf, pricing-app-architecture, monte-carlo-pricing, csharp-abstract-classes, csharp-syntax-cheatsheet] | tags: [csharp, dotnet, gc, interop] -->\n\n- **Interface vs abstract class:** interface = contract, multiple implementation, no state (default methods since C# 8) → pluggable things (models, data sources). Abstract class = shared state + partial implementation, single inheritance → shared instrument behaviour.\n\n| | `abstract class` | `interface` |\n|---|---|---|\n| Can it have implementation? | Can mix: some methods implemented, some abstract | Usually not (C# 8+ allows default implementations) |\n| Can it have fields? | Yes | No instance fields |\n| How many? | A class can inherit only **one** class | A class can implement **many** interfaces |\n\n- **struct / class / record:** struct = value type, copied (small immutable data like a tenor); class = reference, identity; **record** = reference type with value equality + `with` → ideal for immutable trades / market snapshots.\n- **Immutability:** lock-free concurrent pricing, reproducible results, scenarios = `md with { Spot = 105 }`.\n- **GC:** generational (Gen 0/1/2, LOH > 85 KB). In MC hot loops reuse arrays, `Span<T>`, `ArrayPool<T>`. Unsubscribed event handlers leak memory in long-running desktop apps.\n- **Errors:** validate inputs up front (negative vol, past expiry, missing dividend); clear trader-readable error; never silently return 0/NaN; log trade ID + model version.\n- **Generics/LINQ:** `Dictionary<string, Func<Instrument, IPricingModel>>` registry; `trades.GroupBy(t => t.Underlying).Select(g => new { g.Key, Delta = g.Sum(t => t.Delta) })`.\n- **C++ interop:** P/Invoke to a C API, C++/CLI wrapper, COM, or out-of-process service (gRPC/REST). Watch marshalling cost, memory ownership, version pinning.\n- **Python → C#:** ABCs ≈ interfaces, dataclasses ≈ records; add static typing and explicit threading.\n\n<a id=\"dotnet-concurrency-wpf\"></a>\n\n## .NET Concurrency, WPF & MVVM\n<!-- section: dotnet-concurrency-wpf | prerequisites: [csharp-essentials] | related: [pricing-app-architecture, scenario-risk-grids] | tags: [async, wpf, mvvm, threading] -->\n\n- **async/await** → I/O-bound (fetch market data, call a pricing service); frees the UI thread.\n- **Parallel.For / PLINQ / Task.Run** → CPU-bound (MC paths, scenario grids).\n- Never `.Result` / `.Wait()` on the UI thread → deadlock with WPF sync context.\n- **500 scenarios, responsive UI:** `await Task.Run(...)`, `IProgress<T>`, `CancellationToken`, batch `ObservableCollection` updates on the Dispatcher, virtualise grids.\n- **MVVM:** Model = domain (trades, pricers); View = XAML; ViewModel = state + commands (`INotifyPropertyChanged`, `ICommand`) → testable without UI. Toolkits: CommunityToolkit.Mvvm, Prism, ReactiveUI.",
    "summary": "",
    "topic": "",
    "sections": [
+    "csharp-abstract-classes",
+    "csharp-arrow-syntax",
+    "csharp-constructors-base",
+    "csharp-ternary-operator",
+    "csharp-syntax-cheatsheet",
     "csharp-essentials",
     "dotnet-concurrency-wpf"
    ],
-   "degree": 4
+   "degree": 10
   },
   {
    "id": "distributions-reference",
@@ -565,7 +653,7 @@
    "content": "<a id=\"digital-options\"></a>\n\n## Digital (Binary) Options & the Skew Adjustment\n<!-- section: digital-options | prerequisites: [black-scholes-formula, breeden-litzenberger, volatility-skew] | related: [call-spread-overhedge, delta-vs-itm-probability, autocallables, static-replication] | tags: [digital, binary, skew-adjustment, chain-rule] -->\n\n### Flat-vol prices\n$$\\text{CoN}=e^{-rT}N(d_2),\\qquad \\text{AoN}=Se^{-qT}N(d_1),\\qquad C_{vanilla}=\\text{AoN}-K\\cdot\\text{CoN}$$\n\n**Variables:**\n\n- CoN pays 1 if $S_T>K$\n- AoN pays $S_T$ if $S_T>K$\n- others as in BS. Example $S=K=100,T=1,r=q=0,\\sigma=20\\%$: CoN $=N(-0.1)=0.4602$\n\n### With a smile — chain rule\nDigital = limit of a tight call spread: $\\frac{C(K-\\varepsilon)-C(K+\\varepsilon)}{2\\varepsilon}\\to-\\frac{dC(K,\\sigma(K))}{dK}$. Because σ depends on K:\n\n$$D(K)=-\\frac{\\partial C_{BS}}{\\partial K}-\\frac{\\partial C_{BS}}{\\partial\\sigma}\\frac{\\partial\\sigma}{\\partial K}=\\underbrace{e^{-rT}N(d_2)}_{\\text{flat-vol}}\\ \\underbrace{-\\ \\mathcal V_{BS}(K)\\,\\frac{\\partial\\sigma}{\\partial K}}_{\\text{skew term}}$$\n\n**Variables:**\n\n- $\\mathcal V_{BS}=S_0e^{-qT}\\sqrt T\\,n(d_1)>0$ vega at $K$\n- $\\partial\\sigma/\\partial K$ smile slope\n\n### Sign analysis (equity, $\\partial\\sigma/\\partial K<0$)\n- Skew term > 0 ⇒ **digital call dearer** than $e^{-rT}N(d_2)$; digital put $e^{-rT}N(-d_2)+\\mathcal V\\,\\partial\\sigma/\\partial K$ **cheaper**.\n- ATM example: flat 0.508 → surface 0.644 (+27%). Digitals trade off the **slope** of the smile, not its level.\n- **Call-spread intuition:** buy $K-\\varepsilon$ at higher IV, sell $K+\\varepsilon$ at lower IV → net cost inflated.\n\n### Structured payout ratio Q\nOption budget $C(K)$ funds $Q$ digitals: $Q=\\frac{C(K)}{D(K)}=\\frac{C_{BS}(K,\\sigma(K))}{e^{-rT}N(d_2)-\\mathcal V\\,\\partial\\sigma/\\partial K}<Q_{BS\\text{-flat}}$. Ignoring skew ⇒ over-promise $Q$ and lose at inception.\n\n**Three pricing tiers:** ① analytic skew-adjusted, ② discrete call spread with market vols at each strike, ③ dynamic smile model (Dupire, SABR/Heston) via PDE/MC.\n\n### Connections\n- **Derived from:** [[breeden-litzenberger]] + [[volatility-skew]]. **Hedged by:** [[call-spread-overhedge]].\n- **Inside:** [[autocallables]] (coupon & autocall digitals). **Probability link:** [[delta-vs-itm-probability]].",
    "summary": "<a id=\"digital-options\"></a>",
    "topic": "exotic-options",
-   "degree": 18
+   "degree": 19
   },
   {
    "id": "barrier-options",
@@ -1621,7 +1709,7 @@
    "content": "<a id=\"oop-pillars\"></a>\n\n## OOP Pillars (with a pricing example)\n<!-- section: oop-pillars | prerequisites: [] | related: [solid-principles, design-patterns-pricing, pricing-app-architecture, csharp-essentials] | tags: [oop, encapsulation, polymorphism] -->\n\n| Pillar | Meaning | Pricing example |\n|---|---|---|\n| Encapsulation | hide state, expose behaviour | `VolSurface` hides its grid, exposes `GetVol(K, T)` |\n| Abstraction | model the essential interface | `IPricingModel.Price(instrument, market)` |\n| Inheritance | reuse via \"is-a\" | `EuropeanCall : VanillaOption : Instrument` |\n| Polymorphism | same call, different behaviour | `model.Price(trade)` runs BS, MC or PDE |\n\n**Composition over inheritance:** a barrier option isn't \"a vanilla with a flag\" — compose `Option { Payoff, ExerciseSchedule, Barrier? }` to avoid fragile deep hierarchies as exotic variations multiply.",
    "summary": "<a id=\"oop-pillars\"></a>",
    "topic": "oop-design",
-   "degree": 9
+   "degree": 12
   },
   {
    "id": "solid-principles",
@@ -1669,7 +1757,7 @@
    "content": "<a id=\"pricing-app-architecture\"></a>\n\n## Pricing App Architecture (instrument / market data / model)\n<!-- section: pricing-app-architecture | prerequisites: [oop-pillars] | related: [csharp-essentials, design-patterns-pricing, forward-pricing, volatility-surface, scenario-risk-grids] | tags: [architecture, market-data, immutability] -->\n\n**Separate what (instrument, immutable) / with what (market-data snapshot) / how (model)** → swap models from the monthly library release without touching instruments or UI.\n\n```csharp\npublic interface IMarketData { double Spot(string ul); double Discount(DateTime t); double Vol(string ul, double k, DateTime t); }\npublic interface IPricingModel { bool Supports(Instrument i); PricingResult Price(Instrument i, IMarketData md, PricingSettings s); }\npublic record PricingResult(double Pv, IReadOnlyDictionary<string,double> Greeks, double? StdError);\n```\n\n### Market data an equity option needs\nSpot; discount curve per currency; dividend schedule (cash + yield, ex-dates); borrow/repo curve; implied vol surface (strike/delta × expiry); quantos: FX vol + correlation; baskets: correlation matrix; calendars, settlement conventions.\n\n### Product-thinking features (structured-products desk)\nTerm-sheet templates (autocall, RC, PPN); **solve-for** coupon/barrier/participation; scenario & Greek ladders; correlation & dividend sensitivity; lifecycle events (fixings, autocall triggers, knock-ins); pricing audit trail.\n\n### Connections\n- **Inputs explained in:** [[forward-pricing]], [[volatility-surface]]. **Language details:** [[csharp-essentials]].",
    "summary": "<a id=\"pricing-app-architecture\"></a>",
    "topic": "oop-design",
-   "degree": 18
+   "degree": 19
   },
   {
    "id": "oop-design",
@@ -3112,6 +3200,31 @@
   },
   {
    "source": "csharp-dotnet",
+   "target": "csharp-abstract-classes",
+   "type": "contains"
+  },
+  {
+   "source": "csharp-dotnet",
+   "target": "csharp-arrow-syntax",
+   "type": "contains"
+  },
+  {
+   "source": "csharp-dotnet",
+   "target": "csharp-constructors-base",
+   "type": "contains"
+  },
+  {
+   "source": "csharp-dotnet",
+   "target": "csharp-ternary-operator",
+   "type": "contains"
+  },
+  {
+   "source": "csharp-dotnet",
+   "target": "csharp-syntax-cheatsheet",
+   "type": "contains"
+  },
+  {
+   "source": "csharp-dotnet",
    "target": "csharp-essentials",
    "type": "contains"
   },
@@ -3119,6 +3232,81 @@
    "source": "csharp-dotnet",
    "target": "dotnet-concurrency-wpf",
    "type": "contains"
+  },
+  {
+   "source": "csharp-abstract-classes",
+   "target": "csharp-essentials",
+   "type": "related"
+  },
+  {
+   "source": "csharp-abstract-classes",
+   "target": "oop-pillars",
+   "type": "prerequisite"
+  },
+  {
+   "source": "csharp-abstract-classes",
+   "target": "pricing-app-architecture",
+   "type": "related"
+  },
+  {
+   "source": "csharp-constructors-base",
+   "target": "csharp-abstract-classes",
+   "type": "prerequisite"
+  },
+  {
+   "source": "csharp-arrow-syntax",
+   "target": "csharp-essentials",
+   "type": "related"
+  },
+  {
+   "source": "csharp-constructors-base",
+   "target": "csharp-arrow-syntax",
+   "type": "prerequisite"
+  },
+  {
+   "source": "csharp-arrow-syntax",
+   "target": "csharp-abstract-classes",
+   "type": "prerequisite"
+  },
+  {
+   "source": "csharp-constructors-base",
+   "target": "oop-pillars",
+   "type": "related"
+  },
+  {
+   "source": "csharp-ternary-operator",
+   "target": "digital-options",
+   "type": "mention"
+  },
+  {
+   "source": "csharp-ternary-operator",
+   "target": "csharp-constructors-base",
+   "type": "related"
+  },
+  {
+   "source": "csharp-syntax-cheatsheet",
+   "target": "csharp-abstract-classes",
+   "type": "prerequisite"
+  },
+  {
+   "source": "csharp-syntax-cheatsheet",
+   "target": "csharp-arrow-syntax",
+   "type": "related"
+  },
+  {
+   "source": "csharp-syntax-cheatsheet",
+   "target": "csharp-constructors-base",
+   "type": "related"
+  },
+  {
+   "source": "csharp-syntax-cheatsheet",
+   "target": "csharp-ternary-operator",
+   "type": "mention"
+  },
+  {
+   "source": "csharp-syntax-cheatsheet",
+   "target": "csharp-essentials",
+   "type": "related"
   },
   {
    "source": "csharp-essentials",
