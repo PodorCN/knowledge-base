@@ -12,4 +12,5 @@ Part of [[map-sellside]].
 ## Topics (in reading order)
 
 - [[black-scholes]]
+- [[black-scholes-call-derivation]]
 - [[greeks-sensitivities]]

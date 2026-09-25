@@ -90,7 +90,7 @@ Current chapters and question banks:
 | `signal-research` | `linear-regression`, `ml-regularisation`, `time-series-validation`, `signals-research-process` | `qb-regression-ml`, `qb-research-judgment` |
 | `portfolio-construction` | `measuring-performance`, `portfolio-optimisation`, `risk-budgeting-position-sizing` | `qb-portfolio-performance` |
 | `pricing` | `no-arbitrage-parity`, `exotic-options`, `structured-products-delta-one` | `qb-exotics-structured` |
-| `black-scholes` | `black-scholes`, `greeks-sensitivities` | `qb-options-bs-greeks` |
+| `black-scholes` | `black-scholes`, `black-scholes-call-derivation`, `greeks-sensitivities` | `qb-options-bs-greeks` |
 | `quant-models` | `implied-volatility-skew`, `vol-surface-construction-chapter`, `volatility-models`, `numerical-methods` | `qb-vol-surface` |
 | `risk-management` | `hedging`, `risk-control-governance` | `qb-risk-management` |
 | `quant-dev` | `oop-design`, `csharp-dotnet`, `production-coding` | `qb-quant-dev-engineering` |

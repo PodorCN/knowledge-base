@@ -24,10 +24,10 @@
     "track"
    ],
    "path": "maps/map-black-scholes.md",
-   "content": "# Black–Scholes\n\nPart of [[map-sellside]].\n\n## Topics (in reading order)\n\n- [[black-scholes]]\n- [[greeks-sensitivities]]",
+   "content": "# Black–Scholes\n\nPart of [[map-sellside]].\n\n## Topics (in reading order)\n\n- [[black-scholes]]\n- [[black-scholes-call-derivation]]\n- [[greeks-sensitivities]]",
    "summary": "Part of map-sellside.",
    "topic": "",
-   "degree": 4
+   "degree": 5
   },
   {
    "id": "map-buyside",
@@ -195,6 +195,157 @@
    "degree": 4
   },
   {
+   "id": "bs-call-setup-risk-neutral",
+   "title": "Setup and Risk-Neutral Pricing",
+   "type": "concept",
+   "domain": "black-scholes",
+   "tags": [
+    "black-scholes",
+    "risk-neutral",
+    "ftap"
+   ],
+   "path": "topics/black-scholes-call-derivation.md",
+   "content": "<a id=\"bs-call-setup-risk-neutral\"></a>\n\n## Setup and Risk-Neutral Pricing\n<!-- section: bs-call-setup-risk-neutral | prerequisites: [no-arbitrage, option-payoffs-moneyness] | related: [risk-neutral-pricing, black-scholes-formula] | tags: [black-scholes, risk-neutral, ftap] -->\n\n### Setup\n\n$$C_T=(S_T-K)^+=\\max(S_T-K,0)$$\n\n**Variables:**\n\n- $C_T$ call value at maturity\n- $S_T$ stock price at maturity\n- $K$ strike\n- $C_0$ today's call price\n\nGoal: find $C_0$, today's price.\n\n### Step 1 — Risk-neutral pricing formula\n\nThe fundamental theorem of asset pricing (FTAP) says that no arbitrage implies the existence of a measure $Q$, equivalent to the real-world measure $P$, under which the discounted price of every traded asset is a martingale:\n\n$$e^{-rt}S_t=E^Q\\!\\left[e^{-rT}S_T\\mid\\mathcal F_t\\right]$$\n\nFor any payoff $X_T$:\n\n$$V_0=e^{-rT}E^Q[X_T]$$\n\n**Variables:**\n\n- $r$ constant risk-free rate\n- $\\mathcal F_t$ information at time $t$\n- $V_0$ today's price\n- $Q$ risk-neutral measure\n- $P$ real-world measure\n- $X_T$ payoff at maturity\n\n**Martingale:** $E[X_T\\mid\\mathcal F_t]=X_t$ — the best forecast of the future is today's value.\n\nApplying this to $X_T=(S_T-K)^+$:\n\n$$C_0=e^{-rT}E^Q[(S_T-K)^+]$$\n\nThis is the only place $Q$ enters as a new assumption. Every step after this computes the same expectation.\n\n### Why $Q$ and not $P$?\n\nUnder $P$, the stock's expected return is $\\mu$, which is unobservable and subjective. The option price must be unique and objective, so it cannot depend on $\\mu$. $Q$ is constructed in Step 2 so that $\\mu$ cancels and only $r$ and $\\sigma$ remain.",
+   "summary": "<a id=\"bs-call-setup-risk-neutral\"></a>",
+   "topic": "black-scholes-call-derivation",
+   "degree": 6
+  },
+  {
+   "id": "girsanov-risk-neutral-dynamics",
+   "title": "Stock Dynamics under Q (Girsanov)",
+   "type": "concept",
+   "domain": "black-scholes",
+   "tags": [
+    "girsanov",
+    "risk-neutral",
+    "dynamics"
+   ],
+   "path": "topics/black-scholes-call-derivation.md",
+   "content": "<a id=\"girsanov-risk-neutral-dynamics\"></a>\n\n## Stock Dynamics under Q (Girsanov)\n<!-- section: girsanov-risk-neutral-dynamics | prerequisites: [risk-neutral-pricing, brownian-motion, ito-lemma] | related: [lognormal-under-q, geometric-brownian-motion] | tags: [girsanov, risk-neutral, dynamics] -->\n\n### Step 2 — Real-world GBM\n\n$$dS_t=\\mu S_t\\,dt+\\sigma S_t\\,dW_t^P$$\n\n**Variables:**\n\n- $\\mu$ real-world expected return\n- $\\sigma$ constant volatility\n- $W_t^P$ Brownian motion under $P$\n- $\\theta=(\\mu-r)/\\sigma$ market price of risk\n- $r$ risk-free rate\n\n### Girsanov change of measure\n\nDefine\n\n$$W_t^Q=W_t^P+\\theta t,\\qquad \\theta=\\frac{\\mu-r}{\\sigma}$$\n\nwhere $\\theta$ is the market price of risk. Then $W_t^Q$ is a standard Brownian motion under $Q$.\n\nA Brownian-motion identity is a property of a (process, measure) pair, not of the process alone:\n\n$$W_t^Q\\sim N(0,t)\\ \\text{under }Q,\\qquad W_t^Q\\sim N(\\theta t,t)\\ \\text{under }P$$\n\nSubstituting $dW_t^P=dW_t^Q-\\theta\\,dt$:\n\n$$\n\\begin{aligned}\ndS_t\n&=\\mu S_t\\,dt+\\sigma S_t\\left(dW_t^Q-\\frac{\\mu-r}{\\sigma}\\,dt\\right)\\\\\n&=rS_t\\,dt+\\sigma S_t\\,dW_t^Q\n\\end{aligned}\n$$\n\n$\\mu$ cancels; the drift becomes $r$. This is why the option price does not depend on $\\mu$.",
+   "summary": "<a id=\"girsanov-risk-neutral-dynamics\"></a>",
+   "topic": "black-scholes-call-derivation",
+   "degree": 8
+  },
+  {
+   "id": "lognormal-under-q",
+   "title": "Solving for the Terminal Stock Price with Itô's Lemma",
+   "type": "concept",
+   "domain": "black-scholes",
+   "tags": [
+    "ito",
+    "lognormal",
+    "risk-neutral"
+   ],
+   "path": "topics/black-scholes-call-derivation.md",
+   "content": "<a id=\"lognormal-under-q\"></a>\n\n## Solving for the Terminal Stock Price with Itô's Lemma\n<!-- section: lognormal-under-q | prerequisites: [girsanov-risk-neutral-dynamics, ito-lemma, normal-distribution] | related: [geometric-brownian-motion, lognormal-distribution, black-scholes-formula] | tags: [ito, lognormal, risk-neutral] -->\n\n### Step 3 — Itô's lemma\n\nIf $dS=a\\,dt+b\\,dW$ and $f(t,S)$ is smooth, then\n\n$$df=f_t\\,dt+f_S\\,dS+\\frac12 f_{SS}(dS)^2,\\qquad (dW)^2=dt$$\n\nApply this to $f=\\ln S$, with $f_t=0$, $f_S=1/S$, and $f_{SS}=-1/S^2$:\n\n$$d\\ln S_t=\\left(r-\\frac12\\sigma^2\\right)dt+\\sigma\\,dW_t^Q$$\n\nThe $-\\frac12\\sigma^2$ term is the Itô correction from the convexity of $\\ln S$ together with $(dW)^2=dt$.\n\nIntegrating from $0$ to $T$ and using $W_T^Q=\\sqrt{T}\\,Z$, where $Z\\sim N(0,1)$:\n\n$$\nS_T=S_0\\exp\\left[\\left(r-\\frac12\\sigma^2\\right)T+\\sigma\\sqrt{T}\\,Z\\right]\n$$\n\nThus $S_T$ is lognormal under $Q$.",
+   "summary": "<a id=\"lognormal-under-q\"></a>",
+   "topic": "black-scholes-call-derivation",
+   "degree": 10
+  },
+  {
+   "id": "payoff-indicator-split",
+   "title": "Splitting the Payoff with an Indicator",
+   "type": "concept",
+   "domain": "black-scholes",
+   "tags": [
+    "payoff",
+    "indicator",
+    "expectation"
+   ],
+   "path": "topics/black-scholes-call-derivation.md",
+   "content": "<a id=\"payoff-indicator-split\"></a>\n\n## Splitting the Payoff with an Indicator\n<!-- section: payoff-indicator-split | prerequisites: [option-payoffs-moneyness, normal-distribution] | related: [term-b-risk-neutral-probability, black-scholes-formula] | tags: [payoff, indicator, expectation] -->\n\n### Step 4 — Indicator decomposition\n\nDefine $\\mathbf 1_A=1$ if $A$ happens and $0$ otherwise. Then\n\n$$\n(S_T-K)^+=(S_T-K)\\mathbf 1_{\\{S_T>K\\}}\n=S_T\\mathbf 1_{\\{S_T>K\\}}-K\\mathbf 1_{\\{S_T>K\\}}\n$$\n\nBy linearity of expectation:\n\n$$C_0=e^{-rT}\\left(E^Q[S_T\\mathbf 1_{\\{S_T>K\\}}]-K E^Q[\\mathbf 1_{\\{S_T>K\\}}]\\right)$$\n\n- **Term A:** $E^Q[S_T\\mathbf 1_{\\{S_T>K\\}}]$\n- **Term B:** $K E^Q[\\mathbf 1_{\\{S_T>K\\}}]$",
+   "summary": "<a id=\"payoff-indicator-split\"></a>",
+   "topic": "black-scholes-call-derivation",
+   "degree": 6
+  },
+  {
+   "id": "term-b-risk-neutral-probability",
+   "title": "Term B and the Risk-Neutral Exercise Probability",
+   "type": "concept",
+   "domain": "black-scholes",
+   "tags": [
+    "d2",
+    "risk-neutral",
+    "probability"
+   ],
+   "path": "topics/black-scholes-call-derivation.md",
+   "content": "<a id=\"term-b-risk-neutral-probability\"></a>\n\n## Term B and the Risk-Neutral Exercise Probability\n<!-- section: term-b-risk-neutral-probability | prerequisites: [payoff-indicator-split, lognormal-under-q, normal-distribution] | related: [delta-vs-itm-probability, black-scholes-formula] | tags: [d2, risk-neutral, probability] -->\n\n### Step 5 — Term B = $N(d_2)$\n\nUse the identity $E[\\mathbf 1_A]=Q(A)$. From the lognormal expression for $S_T$,\n\n$$\nS_T>K\n\\iff\nZ>\\frac{-\\ln(S_0/K)+(r-\\frac12\\sigma^2)T}{\\sigma\\sqrt T}\n=-d_2\n$$\n\nBy normal-CDF symmetry, $Q(Z>-x)=N(x)$:\n\n$$\n\\text{Term B}=KQ(S_T>K)=KN(d_2)\n$$\n\n$N(d_2)$ is the risk-neutral probability that the call finishes in the money.",
+   "summary": "<a id=\"term-b-risk-neutral-probability\"></a>",
+   "topic": "black-scholes-call-derivation",
+   "degree": 9
+  },
+  {
+   "id": "term-a-direct-integration",
+   "title": "Term A by Direct Integration",
+   "type": "concept",
+   "domain": "black-scholes",
+   "tags": [
+    "integration",
+    "d1",
+    "black-scholes"
+   ],
+   "path": "topics/black-scholes-call-derivation.md",
+   "content": "<a id=\"term-a-direct-integration\"></a>\n\n## Term A by Direct Integration\n<!-- section: term-a-direct-integration | prerequisites: [term-b-risk-neutral-probability, normal-distribution] | related: [term-a-stock-numeraire, black-scholes-formula] | tags: [integration, d1, black-scholes] -->\n\n### Route A — Complete the square\n\nLet $\\phi(z)=\\frac{1}{\\sqrt{2\\pi}}e^{-z^2/2}$. Then\n\n$$\n\\text{Term A}\n=\\int_{-d_2}^{\\infty}S_0e^{(r-\\frac12\\sigma^2)T+\\sigma\\sqrt Tz}\\,\\phi(z)\\,dz\n$$\n\nComplete the square in the exponent:\n\n$$\n-\\frac12z^2+\\sigma\\sqrt Tz-\\frac12\\sigma^2T\n=-\\frac12(z-\\sigma\\sqrt T)^2\n$$\n\nTherefore,\n\n$$\n\\text{Term A}\n=S_0e^{rT}\\int_{-d_2}^{\\infty}\\phi(z-\\sigma\\sqrt T)\\,dz\n$$\n\nWith $y=z-\\sigma\\sqrt T$, the lower limit becomes $-d_2-\\sigma\\sqrt T=-d_1$:\n\n$$\n\\text{Term A}\n=S_0e^{rT}\\int_{-d_1}^{\\infty}\\phi(y)\\,dy\n=S_0e^{rT}N(d_1),\n\\qquad d_1=d_2+\\sigma\\sqrt T\n$$",
+   "summary": "<a id=\"term-a-direct-integration\"></a>",
+   "topic": "black-scholes-call-derivation",
+   "degree": 7
+  },
+  {
+   "id": "term-a-stock-numeraire",
+   "title": "Term A under the Stock Numeraire",
+   "type": "concept",
+   "domain": "black-scholes",
+   "tags": [
+    "numeraire",
+    "stock-numeraire",
+    "girsanov"
+   ],
+   "path": "topics/black-scholes-call-derivation.md",
+   "content": "<a id=\"term-a-stock-numeraire\"></a>\n\n## Term A under the Stock Numeraire\n<!-- section: term-a-stock-numeraire | prerequisites: [risk-neutral-pricing, normal-distribution] | related: [term-a-direct-integration, delta-vs-itm-probability] | tags: [numeraire, stock-numeraire, girsanov] -->\n\n### Route B — Change of numeraire\n\nA numeraire is any traded asset $N_t>0$ used as the unit of account. The Geman–El Karoui–Rochet theorem says that for a numeraire $N$, a measure $Q^N$ exists under which $V_t/N_t$ is a martingale:\n\n$$\\frac{dQ^N}{dQ}=\\frac{N_T}{B_T}\\frac{N_0}{B_0}$$\n\nApply this with $N=S$, $B_0=1$, and $B_T=e^{rT}$:\n\n$$\\frac{dQ^S}{dQ}=\\frac{S_Te^{-rT}}{S_0}$$\n\nThis reweights outcomes by $S_T$: paths with higher $S_T$ receive more weight under $Q^S$.\n\nThe stock-leg term becomes\n\n$$\n\\begin{aligned}\n\\text{Term A}\n&=S_0E^Q\\left[\\frac{S_Te^{-rT}}{S_0}\\mathbf 1_{\\{S_T>K\\}}\\right]\\\\\n&=S_0E^{Q^S}[\\mathbf 1_{\\{S_T>K\\}}]\n=S_0Q^S(S_T>K)\n\\end{aligned}\n$$\n\nThe $S_Te^{-rT}/S_0$ factor is absorbed by the measure change, so no integral remains.\n\n### Dynamics of $S$ under $Q^S$\n\nUsing $W^Q$ in the density,\n\n$$\\frac{dQ^S}{dQ}=\\exp\\left(\\sigma W_T^Q-\\frac12\\sigma^2T\\right)$$\n\nGirsanov with $\\theta=-\\sigma$ gives\n\n$$W_t^S=W_t^Q-\\sigma t$$\n\nas standard Brownian motion under $Q^S$. Substituting into $dS=rS\\,dt+\\sigma S\\,dW^Q$:\n\n$$dS_t=(r+\\sigma^2)S_t\\,dt+\\sigma S_t\\,dW_t^S$$\n\nItô's lemma on $\\ln S$ gives\n\n$$\n\\ln S_T=\\ln S_0+\\left(r+\\frac12\\sigma^2\\right)T+\\sigma\\sqrt T\\,Z,\n\\qquad Z\\sim N(0,1)\\ \\text{under }Q^S\n$$\n\nThe only difference from Step 3 is the drift $r+\\frac12\\sigma^2$ instead of $r-\\frac12\\sigma^2$.\n\nUsing the same probability template as Step 5:\n\n$$\nS_T>K\n\\iff\nZ>\\frac{-\\ln(S_0/K)+(r+\\frac12\\sigma^2)T}{\\sigma\\sqrt T}\n=-d_1\n$$\n\nThus\n\n$$Q^S(S_T>K)=N(d_1)$$\n\n**Intuition:** to value receiving an asset $X$ when an event happens, use $X$ as numeraire: value = (price of $X$ today) × (probability of the event under $X$'s measure).",
+   "summary": "<a id=\"term-a-stock-numeraire\"></a>",
+   "topic": "black-scholes-call-derivation",
+   "degree": 10
+  },
+  {
+   "id": "combine-call-price",
+   "title": "Combining the Terms: Black–Scholes Call Price",
+   "type": "concept",
+   "domain": "black-scholes",
+   "tags": [
+    "black-scholes",
+    "call-price",
+    "d1",
+    "d2"
+   ],
+   "path": "topics/black-scholes-call-derivation.md",
+   "content": "<a id=\"combine-call-price\"></a>\n\n## Combining the Terms: Black–Scholes Call Price\n<!-- section: combine-call-price | prerequisites: [term-a-direct-integration, term-a-stock-numeraire] | related: [black-scholes-formula, delta-vs-itm-probability, greeks] | tags: [black-scholes, call-price, d1, d2] -->\n\n### Step 7 — Combine\n\n$$\n\\begin{aligned}\nC_0\n&=e^{-rT}\\left(S_0e^{rT}N(d_1)-KN(d_2)\\right)\\\\\n&=S_0N(d_1)-Ke^{-rT}N(d_2)\n\\end{aligned}\n$$\n\n- $S_0N(d_1)$ is the present value of receiving the stock when exercise occurs.\n- $Ke^{-rT}N(d_2)$ is the present value of paying $K$ when exercise occurs.\n- $N(d_1)$ is also the call's delta, $\\partial C/\\partial S$.\n\n### Summary: $Q$ versus $Q^S$\n\n| Measure | $Q$ (money-market numeraire) | $Q^S$ (stock numeraire) |\n|---|---|---|\n| Brownian motion | $W^Q$, standard under $Q$ | $W^S=W^Q-\\sigma t$, standard under $Q^S$ |\n| Drift of $\\ln S_T$ | $r-\\frac12\\sigma^2$ | $r+\\frac12\\sigma^2$ |\n| Event $S_T>K$ | $Z>-d_2$ | $Z>-d_1$ |\n| Probability | $N(d_2)$ | $N(d_1)$ |\n| Pays for | Strike leg, $Ke^{-rT}N(d_2)$ | Stock leg, $S_0N(d_1)$ |\n\nWhat changes between $Q$ and $Q^S$ is not the sample space, $\\sigma$, or the shape of randomness; it is the probability weight assigned to each outcome (equivalently, the drift). $Q^S$ up-weights high-$S_T$ paths through $dQ^S/dQ\\propto S_T$.\n\n### Numerical check\n\nFor $S_0=100$, $K=100$, $r=5\\%$, $\\sigma=20\\%$, and $T=1$:\n\n$$\nd_1=\\frac{0+(0.05+0.02)\\cdot1}{0.2}=0.35,\n\\qquad N(d_1)=0.6368\n$$\n\n$$\nd_2=0.35-0.20=0.15,\n\\qquad N(d_2)=0.5596\n$$\n\n$$\nC_0=100(0.6368)-100e^{-0.05}(0.5596)\\approx10.45\n$$\n\n### Follow-up points\n\n- Girsanov replaces $\\mu$ with $r$ under $Q$; economically, the option is replicable and hedgeable, so its price cannot depend on the stock's subjective expected return.\n- $N(d_2)$ is the risk-neutral probability of exercise; $N(d_1)$ is the exercise probability under the stock measure and the call's delta.\n- The $-\\frac12\\sigma^2$ term is the Itô correction: convexity of $\\ln S$ plus $(dW)^2=dt$.\n- Change of numeraire values an asset received on an event by using that asset as the unit of account.\n\n### References\n\n- Hull, *Options, Futures, and Other Derivatives*, Ch. 15 appendix.\n- Shreve, *Stochastic Calculus for Finance II*, Ch. 5 (risk-neutral pricing, Girsanov) and Ch. 9 (change of numeraire).\n- Geman, El Karoui & Rochet (1995), *Journal of Applied Probability*.\n\nThe step breakdown, table, and intuition phrasing are the author's own synthesis (self-derived / not directly from a single source) built on these standard, verifiable results.",
+   "summary": "<a id=\"combine-call-price\"></a>",
+   "topic": "black-scholes-call-derivation",
+   "degree": 9
+  },
+  {
+   "id": "black-scholes-call-derivation",
+   "title": "Black–Scholes Call Price: Derivation Study Notes",
+   "type": "topic",
+   "domain": "black-scholes",
+   "tags": [],
+   "path": "topics/black-scholes-call-derivation.md",
+   "content": "# Black–Scholes Call Price: Derivation Study Notes\n\n*September 21, 2026*\n\nBig picture: price = discounted expectation of the payoff under the risk-neutral measure $Q$. Everything below either constructs $Q$ or computes that one expectation.\n\n**Sections:** [[bs-call-setup-risk-neutral]] · [[girsanov-risk-neutral-dynamics]] · [[lognormal-under-q]] · [[payoff-indicator-split]] · [[term-b-risk-neutral-probability]] · [[term-a-direct-integration]] · [[term-a-stock-numeraire]] · [[combine-call-price]]\n\n<a id=\"bs-call-setup-risk-neutral\"></a>\n\n## Setup and Risk-Neutral Pricing\n<!-- section: bs-call-setup-risk-neutral | prerequisites: [no-arbitrage, option-payoffs-moneyness] | related: [risk-neutral-pricing, black-scholes-formula] | tags: [black-scholes, risk-neutral, ftap] -->\n\n### Setup\n\n$$C_T=(S_T-K)^+=\\max(S_T-K,0)$$\n\n**Variables:**\n\n- $C_T$ call value at maturity\n- $S_T$ stock price at maturity\n- $K$ strike\n- $C_0$ today's call price\n\nGoal: find $C_0$, today's price.\n\n### Step 1 — Risk-neutral pricing formula\n\nThe fundamental theorem of asset pricing (FTAP) says that no arbitrage implies the existence of a measure $Q$, equivalent to the real-world measure $P$, under which the discounted price of every traded asset is a martingale:\n\n$$e^{-rt}S_t=E^Q\\!\\left[e^{-rT}S_T\\mid\\mathcal F_t\\right]$$\n\nFor any payoff $X_T$:\n\n$$V_0=e^{-rT}E^Q[X_T]$$\n\n**Variables:**\n\n- $r$ constant risk-free rate\n- $\\mathcal F_t$ information at time $t$\n- $V_0$ today's price\n- $Q$ risk-neutral measure\n- $P$ real-world measure\n- $X_T$ payoff at maturity\n\n**Martingale:** $E[X_T\\mid\\mathcal F_t]=X_t$ — the best forecast of the future is today's value.\n\nApplying this to $X_T=(S_T-K)^+$:\n\n$$C_0=e^{-rT}E^Q[(S_T-K)^+]$$\n\nThis is the only place $Q$ enters as a new assumption. Every step after this computes the same expectation.\n\n### Why $Q$ and not $P$?\n\nUnder $P$, the stock's expected return is $\\mu$, which is unobservable and subjective. The option price must be unique and objective, so it cannot depend on $\\mu$. $Q$ is constructed in Step 2 so that $\\mu$ cancels and only $r$ and $\\sigma$ remain.\n\n<a id=\"girsanov-risk-neutral-dynamics\"></a>\n\n## Stock Dynamics under Q (Girsanov)\n<!-- section: girsanov-risk-neutral-dynamics | prerequisites: [risk-neutral-pricing, brownian-motion, ito-lemma] | related: [lognormal-under-q, geometric-brownian-motion] | tags: [girsanov, risk-neutral, dynamics] -->\n\n### Step 2 — Real-world GBM\n\n$$dS_t=\\mu S_t\\,dt+\\sigma S_t\\,dW_t^P$$\n\n**Variables:**\n\n- $\\mu$ real-world expected return\n- $\\sigma$ constant volatility\n- $W_t^P$ Brownian motion under $P$\n- $\\theta=(\\mu-r)/\\sigma$ market price of risk\n- $r$ risk-free rate\n\n### Girsanov change of measure\n\nDefine\n\n$$W_t^Q=W_t^P+\\theta t,\\qquad \\theta=\\frac{\\mu-r}{\\sigma}$$\n\nwhere $\\theta$ is the market price of risk. Then $W_t^Q$ is a standard Brownian motion under $Q$.\n\nA Brownian-motion identity is a property of a (process, measure) pair, not of the process alone:\n\n$$W_t^Q\\sim N(0,t)\\ \\text{under }Q,\\qquad W_t^Q\\sim N(\\theta t,t)\\ \\text{under }P$$\n\nSubstituting $dW_t^P=dW_t^Q-\\theta\\,dt$:\n\n$$\n\\begin{aligned}\ndS_t\n&=\\mu S_t\\,dt+\\sigma S_t\\left(dW_t^Q-\\frac{\\mu-r}{\\sigma}\\,dt\\right)\\\\\n&=rS_t\\,dt+\\sigma S_t\\,dW_t^Q\n\\end{aligned}\n$$\n\n$\\mu$ cancels; the drift becomes $r$. This is why the option price does not depend on $\\mu$.\n\n<a id=\"lognormal-under-q\"></a>\n\n## Solving for the Terminal Stock Price with Itô's Lemma\n<!-- section: lognormal-under-q | prerequisites: [girsanov-risk-neutral-dynamics, ito-lemma, normal-distribution] | related: [geometric-brownian-motion, lognormal-distribution, black-scholes-formula] | tags: [ito, lognormal, risk-neutral] -->\n\n### Step 3 — Itô's lemma\n\nIf $dS=a\\,dt+b\\,dW$ and $f(t,S)$ is smooth, then\n\n$$df=f_t\\,dt+f_S\\,dS+\\frac12 f_{SS}(dS)^2,\\qquad (dW)^2=dt$$\n\nApply this to $f=\\ln S$, with $f_t=0$, $f_S=1/S$, and $f_{SS}=-1/S^2$:\n\n$$d\\ln S_t=\\left(r-\\frac12\\sigma^2\\right)dt+\\sigma\\,dW_t^Q$$\n\nThe $-\\frac12\\sigma^2$ term is the Itô correction from the convexity of $\\ln S$ together with $(dW)^2=dt$.\n\nIntegrating from $0$ to $T$ and using $W_T^Q=\\sqrt{T}\\,Z$, where $Z\\sim N(0,1)$:\n\n$$\nS_T=S_0\\exp\\left[\\left(r-\\frac12\\sigma^2\\right)T+\\sigma\\sqrt{T}\\,Z\\right]\n$$\n\nThus $S_T$ is lognormal under $Q$.\n\n<a id=\"payoff-indicator-split\"></a>\n\n## Splitting the Payoff with an Indicator\n<!-- section: payoff-indicator-split | prerequisites: [option-payoffs-moneyness, normal-distribution] | related: [term-b-risk-neutral-probability, black-scholes-formula] | tags: [payoff, indicator, expectation] -->\n\n### Step 4 — Indicator decomposition\n\nDefine $\\mathbf 1_A=1$ if $A$ happens and $0$ otherwise. Then\n\n$$\n(S_T-K)^+=(S_T-K)\\mathbf 1_{\\{S_T>K\\}}\n=S_T\\mathbf 1_{\\{S_T>K\\}}-K\\mathbf 1_{\\{S_T>K\\}}\n$$\n\nBy linearity of expectation:\n\n$$C_0=e^{-rT}\\left(E^Q[S_T\\mathbf 1_{\\{S_T>K\\}}]-K E^Q[\\mathbf 1_{\\{S_T>K\\}}]\\right)$$\n\n- **Term A:** $E^Q[S_T\\mathbf 1_{\\{S_T>K\\}}]$\n- **Term B:** $K E^Q[\\mathbf 1_{\\{S_T>K\\}}]$\n\n<a id=\"term-b-risk-neutral-probability\"></a>\n\n## Term B and the Risk-Neutral Exercise Probability\n<!-- section: term-b-risk-neutral-probability | prerequisites: [payoff-indicator-split, lognormal-under-q, normal-distribution] | related: [delta-vs-itm-probability, black-scholes-formula] | tags: [d2, risk-neutral, probability] -->\n\n### Step 5 — Term B = $N(d_2)$\n\nUse the identity $E[\\mathbf 1_A]=Q(A)$. From the lognormal expression for $S_T$,\n\n$$\nS_T>K\n\\iff\nZ>\\frac{-\\ln(S_0/K)+(r-\\frac12\\sigma^2)T}{\\sigma\\sqrt T}\n=-d_2\n$$\n\nBy normal-CDF symmetry, $Q(Z>-x)=N(x)$:\n\n$$\n\\text{Term B}=KQ(S_T>K)=KN(d_2)\n$$\n\n$N(d_2)$ is the risk-neutral probability that the call finishes in the money.\n\n<a id=\"term-a-direct-integration\"></a>\n\n## Term A by Direct Integration\n<!-- section: term-a-direct-integration | prerequisites: [term-b-risk-neutral-probability, normal-distribution] | related: [term-a-stock-numeraire, black-scholes-formula] | tags: [integration, d1, black-scholes] -->\n\n### Route A — Complete the square\n\nLet $\\phi(z)=\\frac{1}{\\sqrt{2\\pi}}e^{-z^2/2}$. Then\n\n$$\n\\text{Term A}\n=\\int_{-d_2}^{\\infty}S_0e^{(r-\\frac12\\sigma^2)T+\\sigma\\sqrt Tz}\\,\\phi(z)\\,dz\n$$\n\nComplete the square in the exponent:\n\n$$\n-\\frac12z^2+\\sigma\\sqrt Tz-\\frac12\\sigma^2T\n=-\\frac12(z-\\sigma\\sqrt T)^2\n$$\n\nTherefore,\n\n$$\n\\text{Term A}\n=S_0e^{rT}\\int_{-d_2}^{\\infty}\\phi(z-\\sigma\\sqrt T)\\,dz\n$$\n\nWith $y=z-\\sigma\\sqrt T$, the lower limit becomes $-d_2-\\sigma\\sqrt T=-d_1$:\n\n$$\n\\text{Term A}\n=S_0e^{rT}\\int_{-d_1}^{\\infty}\\phi(y)\\,dy\n=S_0e^{rT}N(d_1),\n\\qquad d_1=d_2+\\sigma\\sqrt T\n$$\n\n<a id=\"term-a-stock-numeraire\"></a>\n\n## Term A under the Stock Numeraire\n<!-- section: term-a-stock-numeraire | prerequisites: [risk-neutral-pricing, normal-distribution] | related: [term-a-direct-integration, delta-vs-itm-probability] | tags: [numeraire, stock-numeraire, girsanov] -->\n\n### Route B — Change of numeraire\n\nA numeraire is any traded asset $N_t>0$ used as the unit of account. The Geman–El Karoui–Rochet theorem says that for a numeraire $N$, a measure $Q^N$ exists under which $V_t/N_t$ is a martingale:\n\n$$\\frac{dQ^N}{dQ}=\\frac{N_T}{B_T}\\frac{N_0}{B_0}$$\n\nApply this with $N=S$, $B_0=1$, and $B_T=e^{rT}$:\n\n$$\\frac{dQ^S}{dQ}=\\frac{S_Te^{-rT}}{S_0}$$\n\nThis reweights outcomes by $S_T$: paths with higher $S_T$ receive more weight under $Q^S$.\n\nThe stock-leg term becomes\n\n$$\n\\begin{aligned}\n\\text{Term A}\n&=S_0E^Q\\left[\\frac{S_Te^{-rT}}{S_0}\\mathbf 1_{\\{S_T>K\\}}\\right]\\\\\n&=S_0E^{Q^S}[\\mathbf 1_{\\{S_T>K\\}}]\n=S_0Q^S(S_T>K)\n\\end{aligned}\n$$\n\nThe $S_Te^{-rT}/S_0$ factor is absorbed by the measure change, so no integral remains.\n\n### Dynamics of $S$ under $Q^S$\n\nUsing $W^Q$ in the density,\n\n$$\\frac{dQ^S}{dQ}=\\exp\\left(\\sigma W_T^Q-\\frac12\\sigma^2T\\right)$$\n\nGirsanov with $\\theta=-\\sigma$ gives\n\n$$W_t^S=W_t^Q-\\sigma t$$\n\nas standard Brownian motion under $Q^S$. Substituting into $dS=rS\\,dt+\\sigma S\\,dW^Q$:\n\n$$dS_t=(r+\\sigma^2)S_t\\,dt+\\sigma S_t\\,dW_t^S$$\n\nItô's lemma on $\\ln S$ gives\n\n$$\n\\ln S_T=\\ln S_0+\\left(r+\\frac12\\sigma^2\\right)T+\\sigma\\sqrt T\\,Z,\n\\qquad Z\\sim N(0,1)\\ \\text{under }Q^S\n$$\n\nThe only difference from Step 3 is the drift $r+\\frac12\\sigma^2$ instead of $r-\\frac12\\sigma^2$.\n\nUsing the same probability template as Step 5:\n\n$$\nS_T>K\n\\iff\nZ>\\frac{-\\ln(S_0/K)+(r+\\frac12\\sigma^2)T}{\\sigma\\sqrt T}\n=-d_1\n$$\n\nThus\n\n$$Q^S(S_T>K)=N(d_1)$$\n\n**Intuition:** to value receiving an asset $X$ when an event happens, use $X$ as numeraire: value = (price of $X$ today) × (probability of the event under $X$'s measure).\n\n<a id=\"combine-call-price\"></a>\n\n## Combining the Terms: Black–Scholes Call Price\n<!-- section: combine-call-price | prerequisites: [term-a-direct-integration, term-a-stock-numeraire] | related: [black-scholes-formula, delta-vs-itm-probability, greeks] | tags: [black-scholes, call-price, d1, d2] -->\n\n### Step 7 — Combine\n\n$$\n\\begin{aligned}\nC_0\n&=e^{-rT}\\left(S_0e^{rT}N(d_1)-KN(d_2)\\right)\\\\\n&=S_0N(d_1)-Ke^{-rT}N(d_2)\n\\end{aligned}\n$$\n\n- $S_0N(d_1)$ is the present value of receiving the stock when exercise occurs.\n- $Ke^{-rT}N(d_2)$ is the present value of paying $K$ when exercise occurs.\n- $N(d_1)$ is also the call's delta, $\\partial C/\\partial S$.\n\n### Summary: $Q$ versus $Q^S$\n\n| Measure | $Q$ (money-market numeraire) | $Q^S$ (stock numeraire) |\n|---|---|---|\n| Brownian motion | $W^Q$, standard under $Q$ | $W^S=W^Q-\\sigma t$, standard under $Q^S$ |\n| Drift of $\\ln S_T$ | $r-\\frac12\\sigma^2$ | $r+\\frac12\\sigma^2$ |\n| Event $S_T>K$ | $Z>-d_2$ | $Z>-d_1$ |\n| Probability | $N(d_2)$ | $N(d_1)$ |\n| Pays for | Strike leg, $Ke^{-rT}N(d_2)$ | Stock leg, $S_0N(d_1)$ |\n\nWhat changes between $Q$ and $Q^S$ is not the sample space, $\\sigma$, or the shape of randomness; it is the probability weight assigned to each outcome (equivalently, the drift). $Q^S$ up-weights high-$S_T$ paths through $dQ^S/dQ\\propto S_T$.\n\n### Numerical check\n\nFor $S_0=100$, $K=100$, $r=5\\%$, $\\sigma=20\\%$, and $T=1$:\n\n$$\nd_1=\\frac{0+(0.05+0.02)\\cdot1}{0.2}=0.35,\n\\qquad N(d_1)=0.6368\n$$\n\n$$\nd_2=0.35-0.20=0.15,\n\\qquad N(d_2)=0.5596\n$$\n\n$$\nC_0=100(0.6368)-100e^{-0.05}(0.5596)\\approx10.45\n$$\n\n### Follow-up points\n\n- Girsanov replaces $\\mu$ with $r$ under $Q$; economically, the option is replicable and hedgeable, so its price cannot depend on the stock's subjective expected return.\n- $N(d_2)$ is the risk-neutral probability of exercise; $N(d_1)$ is the exercise probability under the stock measure and the call's delta.\n- The $-\\frac12\\sigma^2$ term is the Itô correction: convexity of $\\ln S$ plus $(dW)^2=dt$.\n- Change of numeraire values an asset received on an event by using that asset as the unit of account.\n\n### References\n\n- Hull, *Options, Futures, and Other Derivatives*, Ch. 15 appendix.\n- Shreve, *Stochastic Calculus for Finance II*, Ch. 5 (risk-neutral pricing, Girsanov) and Ch. 9 (change of numeraire).\n- Geman, El Karoui & Rochet (1995), *Journal of Applied Probability*.\n\nThe step breakdown, table, and intuition phrasing are the author's own synthesis (self-derived / not directly from a single source) built on these standard, verifiable results.",
+   "summary": "Big picture: price = discounted expectation of the payoff under the risk-neutral measure $Q$. Everything below either constructs $Q$ or computes that one expectation.",
+   "topic": "",
+   "sections": [
+    "bs-call-setup-risk-neutral",
+    "girsanov-risk-neutral-dynamics",
+    "lognormal-under-q",
+    "payoff-indicator-split",
+    "term-b-risk-neutral-probability",
+    "term-a-direct-integration",
+    "term-a-stock-numeraire",
+    "combine-call-price"
+   ],
+   "degree": 10
+  },
+  {
    "id": "black-scholes-pde",
    "title": "Black–Scholes PDE (derivation)",
    "type": "concept",
@@ -223,7 +374,7 @@
    "content": "<a id=\"black-scholes-formula\"></a>\n\n## Black–Scholes Formula\n<!-- section: black-scholes-formula | prerequisites: [geometric-brownian-motion, risk-neutral-pricing] | related: [black-scholes-pde, greeks, implied-volatility, black-76, put-call-parity, delta-vs-itm-probability] | tags: [black-scholes, bsm] -->\n\n$$C=Se^{-q\\tau}N(d_1)-Ke^{-r\\tau}N(d_2),\\qquad P=Ke^{-r\\tau}N(-d_2)-Se^{-q\\tau}N(-d_1)$$\n$$d_1=\\frac{\\ln(S/K)+(r-q+\\tfrac12\\sigma^2)\\tau}{\\sigma\\sqrt\\tau},\\qquad d_2=d_1-\\sigma\\sqrt\\tau$$\n\n**Variables:**\n\n- $S$ spot\n- $K$ strike\n- $\\tau=T-t$ years to expiry\n- $r$ rate\n- $q$ dividend yield (or borrow-adjusted carry)\n- $\\sigma$ volatility\n- $N$ standard normal CDF\n\n### Reference numbers\n$S=K=100,T=1,r=q=0,\\sigma=20\\%$: $d_1=0.1,d_2=-0.1$, $C=100(0.5398-0.4602)=7.97$.\n\n**ATM shortcut:** $C_{ATM}\\approx0.4\\,S\\sigma\\sqrt T$ ($0.4\\approx1/\\sqrt{2\\pi}$) → 8.0.\n\n### Assumptions and where they break (equities)\nGBM with constant σ, frictionless continuous hedging, constant r, no jumps, known dividends → broken by skew, jumps/gaps, discrete dividends, borrow, costs. BS survives as a **quoting language** ([[implied-volatility]]).\n\n### Connections\n- **Derived from:** [[black-scholes-pde]] or [[risk-neutral-pricing]]. **Sensitivities:** [[greeks]]. **Forward form:** [[black-76]].\n- **Decomposition:** $C=\\text{AoN}-K\\cdot\\text{CoN}$ → [[digital-options]].",
    "summary": "<a id=\"black-scholes-formula\"></a>",
    "topic": "black-scholes",
-   "degree": 15
+   "degree": 21
   },
   {
    "id": "delta-vs-itm-probability",
@@ -239,7 +390,7 @@
    "content": "<a id=\"delta-vs-itm-probability\"></a>\n\n## Delta vs Probability of Finishing ITM (N(d1) vs N(d2))\n<!-- section: delta-vs-itm-probability | prerequisites: [greeks, risk-neutral-pricing] | related: [digital-options, lognormal-distribution] | tags: [delta, probability, measure] -->\n\n- $N(d_2)$ = **risk-neutral** probability $S_T>K$ (= undiscounted cash-or-nothing digital).\n- $N(d_1)$ = that probability under the **share measure** (stock as numeraire); call delta $=e^{-q\\tau}N(d_1)$.\n- Neither is the physical probability. Close for short-dated ATM, diverge for long-dated / high vol.\n- **ATM-forward call delta > 0.5:** at $K=F$, $d_1=\\tfrac12\\sigma\\sqrt T>0$. Lognormal is right-skewed: median < forward.\n\n### Connections\n- **Why it matters:** [[digital-options]] are priced off $N(d_2)$; skew adjusts it. Built on [[lognormal-distribution]].",
    "summary": "<a id=\"delta-vs-itm-probability\"></a>",
    "topic": "black-scholes",
-   "degree": 6
+   "degree": 9
   },
   {
    "id": "black-76",
@@ -478,7 +629,7 @@
    "content": "<a id=\"normal-distribution\"></a>\n\n## Normal Distribution & Friends (χ², t, F)\n<!-- section: normal-distribution | prerequisites: [distributions-reference] | related: [lln-clt, hypothesis-testing, lognormal-distribution, brownian-motion] | tags: [normal, chi-square, t-distribution] -->\n\n### Formulas\n$$Z=\\frac{X-\\mu}{\\sigma}\\sim N(0,1);\\quad \\sum_{i=1}^{\\nu}Z_i^2\\sim\\chi^2_\\nu;\\quad \\frac{Z}{\\sqrt{U/\\nu}}\\sim t_\\nu;\\quad \\frac{U/a}{V/b}\\sim F_{a,b}$$\n\n**Variables:**\n\n- $\\mu,\\sigma$ mean and std dev\n- $Z_i$ iid standard normals\n- $U\\sim\\chi^2_\\nu$, $V\\sim\\chi^2_b$ independent\n- $\\nu,a,b$ degrees of freedom\n\n### Key points\n- 68 / 95 / 99.7% within 1/2/3 σ; central 95% uses 1.96.\n- Linear combos of **jointly** normal variables are normal; normal marginals alone are not enough.\n- $t$ has heavier tails, → normal as $\\nu\\to\\infty$. $\\chi^2_\\nu$ has mean $\\nu$, variance $2\\nu$.\n- $E[X^4]=3$ for standard normal (used in $\\mathrm{Var}(X^2)=2$).\n\n### Connections\n- **Used by:** [[hypothesis-testing]] (t and F tests), [[confidence-intervals]], [[brownian-motion]] (normal increments), [[black-scholes-formula]] ($N(d_1), N(d_2)$).",
    "summary": "<a id=\"normal-distribution\"></a>",
    "topic": "distributions",
-   "degree": 10
+   "degree": 15
   },
   {
    "id": "lognormal-distribution",
@@ -492,7 +643,7 @@
    "content": "<a id=\"lognormal-distribution\"></a>\n\n## Lognormal Distribution\n<!-- section: lognormal-distribution | prerequisites: [normal-distribution] | related: [geometric-brownian-motion, black-scholes-formula, jensens-inequality] | tags: [lognormal] -->\n\n### Formula\n$$\\log X\\sim N(m,s^2)\\Rightarrow E[X]=e^{m+s^2/2},\\quad \\mathrm{Var}(X)=(e^{s^2}-1)e^{2m+s^2}$$\n\n**Variables:** $m,s^2$ mean and variance of $\\log X$.\n\n### Key points\n- Right-skewed: median $e^m$ < mean $e^{m+s^2/2}$ — why ATM-forward call delta > 0.5 ([[delta-vs-itm-probability]]).\n- The $s^2/2$ term is [[jensens-inequality]] in action.\n\n### Connections\n- **Is the terminal law of:** [[geometric-brownian-motion]]; the BS assumption whose failure creates the [[volatility-skew]].",
    "summary": "<a id=\"lognormal-distribution\"></a>",
    "topic": "distributions",
-   "degree": 8
+   "degree": 9
   },
   {
    "id": "exponential-poisson-process",
@@ -789,7 +940,7 @@
    "content": "<a id=\"greeks\"></a>\n\n## The Greeks (Δ, Γ, vega, Θ, ρ)\n<!-- section: greeks | prerequisites: [black-scholes-formula] | related: [delta-hedging, gamma-theta-pnl, second-order-greeks, greeks-conventions-bumping, delta-vs-itm-probability, sticky-strike-vs-sticky-moneyness] | tags: [delta, gamma, vega, theta, rho] -->\n\n$$\\Delta_C=e^{-q\\tau}N(d_1),\\quad \\Delta_P=e^{-q\\tau}(N(d_1)-1),\\quad \\Gamma=\\frac{e^{-q\\tau}n(d_1)}{S\\sigma\\sqrt\\tau},\\quad \\mathcal V=Se^{-q\\tau}n(d_1)\\sqrt\\tau$$\n$$\\Theta_C=-\\frac{Se^{-q\\tau}n(d_1)\\sigma}{2\\sqrt\\tau}+qSe^{-q\\tau}N(d_1)-rKe^{-r\\tau}N(d_2),\\qquad \\rho_C=\\tau Ke^{-r\\tau}N(d_2)$$\n\n**Variables:**\n\n- $n$ standard normal pdf\n- others as in [[black-scholes-formula]]. Γ and vega identical for call and put\n\n### Reference ($S=K=100,T=1,r=q=0,\\sigma=20\\%$)\nΔ = 0.54, Γ = 0.397/20 = 0.0199, vega = 39.7 per 100% vol = 0.397 per vol point.\n\n### Profiles\n- Γ peaks near ATM, grows as expiry approaches (ATM Γ ~ $1/\\sqrt T$) → short-dated = gamma-heavy.\n- Vega peaks near ATM, grows with $\\sqrt T$ → long-dated = vega-heavy.\n- Long vanilla: Γ, vega > 0; Θ usually < 0 (not always for puts/with dividends).\n\n### Local P&L\n$$\\Delta V\\approx\\Delta\\,\\delta S+\\tfrac12\\Gamma(\\delta S)^2+\\mathcal V\\,\\delta\\sigma+\\Theta\\,\\delta t+\\rho\\,\\delta r$$\nΔ = 0.5, Γ = 0.02, stock +2 → ≈ 1.04. A long call can lose while the stock rises (Θ, vol crush).\n\n### Connections\n- [[delta-hedging]], [[gamma-theta-pnl]], [[second-order-greeks]], units & bumps in [[greeks-conventions-bumping]].\n- **Surface-aware delta:** [[sticky-strike-vs-sticky-moneyness]].",
    "summary": "<a id=\"greeks\"></a>",
    "topic": "greeks-sensitivities",
-   "degree": 10
+   "degree": 11
   },
   {
    "id": "second-order-greeks",
@@ -1481,7 +1632,7 @@
    "content": "<a id=\"no-arbitrage\"></a>\n\n## No-Arbitrage & the Law of One Price\n<!-- section: no-arbitrage | prerequisites: [] | related: [put-call-parity, forward-pricing, binomial-replication, static-replication, surface-no-arbitrage] | tags: [arbitrage, replication] -->\n\n**Arbitrage:** cost ≤ 0 today, payoff ≥ 0 in every state, > 0 in some state (or positive cash today).\n\n**Law of one price:** identical future cash flows in every state ⇒ same price today (else buy cheap, sell rich).\n\n### Connections\n- **The root of the whole pricing tree:**\n  - [[forward-pricing]] — replicate by buying the stock with borrowed money.\n  - [[put-call-parity]] — fiduciary call ≡ protective put.\n  - [[binomial-replication]] → [[black-scholes-pde]] — dynamic replication.\n  - [[static-replication]] — build exotic payoffs from vanillas.\n  - [[surface-no-arbitrage]] — calendar / butterfly constraints on the vol surface.",
    "summary": "<a id=\"no-arbitrage\"></a>",
    "topic": "no-arbitrage-finance-basics",
-   "degree": 8
+   "degree": 9
   },
   {
    "id": "discounting-compounding",
@@ -1565,7 +1716,7 @@
    "content": "<a id=\"option-payoffs-moneyness\"></a>\n\n## Option Payoffs, Exercise Style & Moneyness\n<!-- section: option-payoffs-moneyness | prerequisites: [] | related: [put-call-parity, option-price-bounds, american-early-exercise] | tags: [call, put, itm, otm] -->\n\n$$\\text{Call}=(S_T-K)^+,\\qquad \\text{Put}=(K-S_T)^+,\\qquad x^+=\\max(x,0)$$\n\n**Variables:**\n\n- $S_T$ underlying at expiry\n- $K$ strike\n\n- European: exercise at expiry; American: any time up to expiry.\n- **Payoff ≠ profit** (premium, financing).\n- Call ITM if $S>K$; put ITM if $S<K$. ATM may mean spot- or **forward**-moneyness — state which. Surfaces use $k=\\ln(K/F)$.",
    "summary": "<a id=\"option-payoffs-moneyness\"></a>",
    "topic": "no-arbitrage-parity",
-   "degree": 5
+   "degree": 7
   },
   {
    "id": "option-price-bounds",
@@ -2291,7 +2442,7 @@
    "content": "<a id=\"brownian-motion\"></a>\n\n## Brownian Motion\n<!-- section: brownian-motion | prerequisites: [normal-distribution] | related: [ito-lemma, martingales-ito-isometry] | tags: [wiener-process] -->\n\n$W_0=0$, continuous paths, independent increments, $W_t-W_s\\sim N(0,t-s)$.\n\n$$E[W_t]=0,\\quad \\mathrm{Var}(W_t)=t,\\quad \\mathrm{Cov}(W_s,W_t)=\\min(s,t)$$\n\n**Variables:**\n\n- $W_t$ Brownian motion at time $t$\n- $s<t$\n\n- $\\mathrm{Cov}(W_2,W_5)=2$, $\\mathrm{Corr}=\\sqrt{2/5}\\approx0.632$.\n- Paths continuous, nowhere differentiable; increments over $dt$ are $O(\\sqrt{dt})$ → quadratic variation $t$.\n\n### Connections\n- **Next:** [[ito-lemma]] ($(dW)^2=dt$), [[martingales-ito-isometry]], [[geometric-brownian-motion]].",
    "summary": "<a id=\"brownian-motion\"></a>",
    "topic": "stochastic-calculus",
-   "degree": 5
+   "degree": 6
   },
   {
    "id": "ito-lemma",
@@ -2306,7 +2457,7 @@
    "content": "<a id=\"ito-lemma\"></a>\n\n## Itô's Lemma\n<!-- section: ito-lemma | prerequisites: [brownian-motion] | related: [geometric-brownian-motion, black-scholes-pde, martingales-ito-isometry] | tags: [ito, quadratic-variation] -->\n\n$$dX=a\\,dt+b\\,dW\\ \\Rightarrow\\ df(t,X)=\\Big(f_t+af_x+\\tfrac12b^2f_{xx}\\Big)dt+bf_x\\,dW;\\qquad (dW)^2=dt,\\ dt\\,dW=0,\\ (dt)^2=0$$\n\n**Variables:**\n\n- $a$ drift\n- $b$ diffusion coefficient\n- $f$ smooth function\n- subscripts = partial derivatives\n\n### Quick examples\n- $f=\\log S$ under GBM → $d\\log S=(\\mu-\\tfrac12\\sigma^2)dt+\\sigma dW$.\n- $d(S^2)=(2\\mu+\\sigma^2)S^2dt+2\\sigma S^2dW$.\n- $d(W^2)=dt+2W\\,dW$ ⇒ $\\int_0^TW\\,dW=(W_T^2-T)/2$ (mean 0, var $T^2/2$).\n\nThe extra $\\tfrac12 f_{xx}$ term exists because $(dW)^2$ is order $dt$ — convexity again ([[jensens-inequality]]).\n\n### Connections\n- **Used by:** [[geometric-brownian-motion]], [[black-scholes-pde]] (Itô on $V(S,t)$), [[gamma-theta-pnl]] (the ½ΓS²σ² term).",
    "summary": "<a id=\"ito-lemma\"></a>",
    "topic": "stochastic-calculus",
-   "degree": 8
+   "degree": 10
   },
   {
    "id": "geometric-brownian-motion",
@@ -2321,7 +2472,7 @@
    "content": "<a id=\"geometric-brownian-motion\"></a>\n\n## Geometric Brownian Motion (GBM)\n<!-- section: geometric-brownian-motion | prerequisites: [ito-lemma, lognormal-distribution] | related: [black-scholes-formula, jensens-inequality, risk-neutral-pricing, monte-carlo-pricing] | tags: [gbm, lognormal] -->\n\n$$dS=\\mu S\\,dt+\\sigma S\\,dW\\ \\Rightarrow\\ S_t=S_0\\exp\\big[(\\mu-\\tfrac12\\sigma^2)t+\\sigma W_t\\big]$$\n$$E[S_t]=S_0e^{\\mu t},\\quad \\mathrm{Var}(S_t)=S_0^2e^{2\\mu t}(e^{\\sigma^2t}-1),\\quad E[\\log(S_t/S_0)]=(\\mu-\\tfrac12\\sigma^2)t$$\n\n**Variables:**\n\n- $\\mu$ drift\n- $\\sigma$ volatility\n- $W_t$ Brownian motion\n\n- μ = 8%, σ = 20% → expected log return 6%; expected simple return $e^{0.08}-1\\approx8.33\\%$.\n- The Black–Scholes assumption. Real markets break it (jumps, skew) → [[volatility-skew]].\n\n### Connections\n- **Under Q:** $\\mu\\to r-q$ ([[risk-neutral-pricing]]) ⇒ [[black-scholes-formula]]. **Simulated in:** [[monte-carlo-pricing]].",
    "summary": "<a id=\"geometric-brownian-motion\"></a>",
    "topic": "stochastic-calculus",
-   "degree": 12
+   "degree": 14
   },
   {
    "id": "martingales-ito-isometry",
@@ -2352,7 +2503,7 @@
    "content": "<a id=\"risk-neutral-pricing\"></a>\n\n## Risk-Neutral Pricing (Q vs P)\n<!-- section: risk-neutral-pricing | prerequisites: [martingales-ito-isometry, binomial-replication] | related: [black-scholes-formula, delta-vs-itm-probability, realized-volatility, breeden-litzenberger] | tags: [risk-neutral, measure, numeraire] -->\n\n$$dS=(r-q)S\\,dt+\\sigma S\\,dW^Q,\\qquad V_t=e^{-r(T-t)}E^Q[h(S_T)\\mid\\mathcal F_t]$$\n\n**Variables:**\n\n- $Q$ risk-neutral measure\n- $r$ rate\n- $q$ dividend yield\n- $h$ payoff\n- $W^Q$ Q-Brownian motion\n\n### Key points\n- Price of a replicable payoff = cost of replication; Q-expectation is a **representation** of that, not a claim investors are risk-neutral.\n- Physical drift μ drops out → BS price independent of μ.\n- Incomplete markets: no unique Q / price.\n- **P vs Q:** historical/realised vol is a P-number (risk, forecasting); implied vol is a Q-number (pricing). Gap = variance risk premium.\n\n### Connections\n- **Discrete version:** [[binomial-replication]] ($q^*$). **Leads to:** [[black-scholes-formula]]; $N(d_2)$ = Q-prob of finishing ITM ([[delta-vs-itm-probability]]).\n- **Density from prices:** [[breeden-litzenberger]].",
    "summary": "<a id=\"risk-neutral-pricing\"></a>",
    "topic": "stochastic-calculus",
-   "degree": 10
+   "degree": 13
   },
   {
    "id": "stochastic-calculus",
@@ -2874,6 +3025,11 @@
   },
   {
    "source": "map-black-scholes",
+   "target": "black-scholes-call-derivation",
+   "type": "mention"
+  },
+  {
+   "source": "map-black-scholes",
    "target": "greeks-sensitivities",
    "type": "mention"
   },
@@ -3046,6 +3202,216 @@
    "source": "map-stochastic-finance",
    "target": "no-arbitrage-finance-basics",
    "type": "mention"
+  },
+  {
+   "source": "black-scholes-call-derivation",
+   "target": "bs-call-setup-risk-neutral",
+   "type": "contains"
+  },
+  {
+   "source": "black-scholes-call-derivation",
+   "target": "girsanov-risk-neutral-dynamics",
+   "type": "contains"
+  },
+  {
+   "source": "black-scholes-call-derivation",
+   "target": "lognormal-under-q",
+   "type": "contains"
+  },
+  {
+   "source": "black-scholes-call-derivation",
+   "target": "payoff-indicator-split",
+   "type": "contains"
+  },
+  {
+   "source": "black-scholes-call-derivation",
+   "target": "term-b-risk-neutral-probability",
+   "type": "contains"
+  },
+  {
+   "source": "black-scholes-call-derivation",
+   "target": "term-a-direct-integration",
+   "type": "contains"
+  },
+  {
+   "source": "black-scholes-call-derivation",
+   "target": "term-a-stock-numeraire",
+   "type": "contains"
+  },
+  {
+   "source": "black-scholes-call-derivation",
+   "target": "combine-call-price",
+   "type": "contains"
+  },
+  {
+   "source": "bs-call-setup-risk-neutral",
+   "target": "no-arbitrage",
+   "type": "prerequisite"
+  },
+  {
+   "source": "bs-call-setup-risk-neutral",
+   "target": "option-payoffs-moneyness",
+   "type": "prerequisite"
+  },
+  {
+   "source": "bs-call-setup-risk-neutral",
+   "target": "risk-neutral-pricing",
+   "type": "related"
+  },
+  {
+   "source": "bs-call-setup-risk-neutral",
+   "target": "black-scholes-formula",
+   "type": "related"
+  },
+  {
+   "source": "girsanov-risk-neutral-dynamics",
+   "target": "risk-neutral-pricing",
+   "type": "prerequisite"
+  },
+  {
+   "source": "girsanov-risk-neutral-dynamics",
+   "target": "brownian-motion",
+   "type": "prerequisite"
+  },
+  {
+   "source": "girsanov-risk-neutral-dynamics",
+   "target": "ito-lemma",
+   "type": "prerequisite"
+  },
+  {
+   "source": "lognormal-under-q",
+   "target": "girsanov-risk-neutral-dynamics",
+   "type": "prerequisite"
+  },
+  {
+   "source": "girsanov-risk-neutral-dynamics",
+   "target": "geometric-brownian-motion",
+   "type": "related"
+  },
+  {
+   "source": "lognormal-under-q",
+   "target": "ito-lemma",
+   "type": "prerequisite"
+  },
+  {
+   "source": "lognormal-under-q",
+   "target": "normal-distribution",
+   "type": "prerequisite"
+  },
+  {
+   "source": "lognormal-under-q",
+   "target": "geometric-brownian-motion",
+   "type": "related"
+  },
+  {
+   "source": "lognormal-under-q",
+   "target": "lognormal-distribution",
+   "type": "related"
+  },
+  {
+   "source": "lognormal-under-q",
+   "target": "black-scholes-formula",
+   "type": "related"
+  },
+  {
+   "source": "payoff-indicator-split",
+   "target": "option-payoffs-moneyness",
+   "type": "prerequisite"
+  },
+  {
+   "source": "payoff-indicator-split",
+   "target": "normal-distribution",
+   "type": "prerequisite"
+  },
+  {
+   "source": "term-b-risk-neutral-probability",
+   "target": "payoff-indicator-split",
+   "type": "prerequisite"
+  },
+  {
+   "source": "payoff-indicator-split",
+   "target": "black-scholes-formula",
+   "type": "related"
+  },
+  {
+   "source": "term-b-risk-neutral-probability",
+   "target": "lognormal-under-q",
+   "type": "prerequisite"
+  },
+  {
+   "source": "term-b-risk-neutral-probability",
+   "target": "normal-distribution",
+   "type": "prerequisite"
+  },
+  {
+   "source": "term-b-risk-neutral-probability",
+   "target": "delta-vs-itm-probability",
+   "type": "related"
+  },
+  {
+   "source": "term-b-risk-neutral-probability",
+   "target": "black-scholes-formula",
+   "type": "related"
+  },
+  {
+   "source": "term-a-direct-integration",
+   "target": "term-b-risk-neutral-probability",
+   "type": "prerequisite"
+  },
+  {
+   "source": "term-a-direct-integration",
+   "target": "normal-distribution",
+   "type": "prerequisite"
+  },
+  {
+   "source": "term-a-direct-integration",
+   "target": "term-a-stock-numeraire",
+   "type": "related"
+  },
+  {
+   "source": "term-a-direct-integration",
+   "target": "black-scholes-formula",
+   "type": "related"
+  },
+  {
+   "source": "term-a-stock-numeraire",
+   "target": "risk-neutral-pricing",
+   "type": "prerequisite"
+  },
+  {
+   "source": "term-a-stock-numeraire",
+   "target": "normal-distribution",
+   "type": "prerequisite"
+  },
+  {
+   "source": "term-a-stock-numeraire",
+   "target": "delta-vs-itm-probability",
+   "type": "related"
+  },
+  {
+   "source": "combine-call-price",
+   "target": "term-a-direct-integration",
+   "type": "prerequisite"
+  },
+  {
+   "source": "combine-call-price",
+   "target": "term-a-stock-numeraire",
+   "type": "prerequisite"
+  },
+  {
+   "source": "combine-call-price",
+   "target": "black-scholes-formula",
+   "type": "related"
+  },
+  {
+   "source": "combine-call-price",
+   "target": "delta-vs-itm-probability",
+   "type": "related"
+  },
+  {
+   "source": "combine-call-price",
+   "target": "greeks",
+   "type": "related"
   },
   {
    "source": "black-scholes",
