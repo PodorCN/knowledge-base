@@ -32,6 +32,7 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 NOTE_DIRS = ["maps", "topics", "questions", "sources"]
 TEMPLATE = ROOT / "scripts" / "viewer_template.html"
+VERSION_FILE = ROOT / "VERSION"
 OUT_DIR = ROOT / "docs"      # uploaded: no sources, no questions
 LOCAL_DIR = ROOT / "local"   # git-ignored: includes interview questions
 
@@ -124,8 +125,13 @@ def write_site(graph: dict, out_dir: Path) -> None:
     out_dir.mkdir(exist_ok=True)
     (out_dir / "graph.json").write_text(json.dumps(graph, ensure_ascii=False, indent=1), encoding="utf-8")
     if TEMPLATE.exists():
+        version = VERSION_FILE.read_text(encoding="utf-8").strip()
+        if not re.fullmatch(r"\d+\.\d+", version):
+            raise ValueError(f"VERSION must look like MAJOR.MINOR, got {version!r}")
         payload = json.dumps(graph, ensure_ascii=False).replace("</", "<\\/")
-        html = TEMPLATE.read_text(encoding="utf-8").replace("/*__GRAPH_DATA__*/null", payload)
+        html = (TEMPLATE.read_text(encoding="utf-8")
+                .replace("__KB_VERSION__", version)
+                .replace("/*__GRAPH_DATA__*/null", payload))
         head = ('<!doctype html>\n<html lang="en">\n<meta charset="utf-8">\n'
                 '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n')
         (out_dir / "index.html").write_text(head + html, encoding="utf-8")
