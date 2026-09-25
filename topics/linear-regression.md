@@ -55,6 +55,57 @@ $$X^\top X\hat\beta=X^\top y\ \Rightarrow\ \hat\beta=(X^\top X)^{-1}X^\top y,\qq
 ### Formulas
 $$R^2=1-\frac{SSE}{SST},\qquad \bar R^2=1-\frac{SSE/(n-p)}{SST/(n-1)}$$
 
+### SST versus SSE
+
+<figure class="r2-figure">
+  <svg viewBox="0 0 720 420" role="img" aria-labelledby="r2-svg-title r2-svg-desc">
+    <title id="r2-svg-title">SST and SSE in linear regression</title>
+    <desc id="r2-svg-desc">A scatter plot with a fitted regression line and a mean line. For one highlighted point, the distance to the mean line is an SST component and the distance to the fitted line is an SSE residual component.</desc>
+    <defs>
+      <marker id="r2-arrow-total" viewBox="0 0 8 8" refX="4" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path class="r2-total-head" d="M0 0 L8 4 L0 8 z"></path>
+      </marker>
+      <marker id="r2-arrow-residual" viewBox="0 0 8 8" refX="4" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path class="r2-residual-head" d="M0 0 L8 4 L0 8 z"></path>
+      </marker>
+    </defs>
+    <g class="r2-grid">
+      <line x1="70" y1="110" x2="680" y2="110"></line>
+      <line x1="70" y1="170" x2="680" y2="170"></line>
+      <line x1="70" y1="235" x2="680" y2="235"></line>
+      <line x1="70" y1="290" x2="680" y2="290"></line>
+      <line x1="70" y1="350" x2="680" y2="350"></line>
+    </g>
+    <line class="r2-axis" x1="70" y1="70" x2="70" y2="350"></line>
+    <line class="r2-axis" x1="70" y1="350" x2="680" y2="350"></line>
+    <text class="r2-axis-label" x="675" y="375" text-anchor="end">x</text>
+    <text class="r2-axis-label" x="52" y="78">y</text>
+    <line class="r2-mean" x1="90" y1="235" x2="650" y2="235"></line>
+    <text class="r2-muted" x="94" y="226">mean ȳ</text>
+    <line class="r2-fit" x1="90" y1="330" x2="650" y2="140"></line>
+    <text class="r2-muted" x="555" y="130">fitted line ŷ</text>
+    <g aria-label="observations">
+      <circle class="r2-point" cx="125" cy="300" r="5"></circle>
+      <circle class="r2-point" cx="180" cy="275" r="5"></circle>
+      <circle class="r2-point" cx="235" cy="305" r="5"></circle>
+      <circle class="r2-point" cx="300" cy="245" r="5"></circle>
+      <circle class="r2-point" cx="360" cy="265" r="5"></circle>
+      <circle class="r2-point" cx="420" cy="215" r="5"></circle>
+      <circle class="r2-point-focus" cx="490" cy="150" r="7"></circle>
+      <circle class="r2-point" cx="550" cy="185" r="5"></circle>
+      <circle class="r2-point" cx="610" cy="130" r="5"></circle>
+    </g>
+    <line class="r2-guide" x1="490" y1="150" x2="520" y2="150"></line>
+    <line class="r2-guide" x1="490" y1="195" x2="540" y2="195"></line>
+    <line class="r2-total" x1="520" y1="150" x2="520" y2="235" marker-start="url(#r2-arrow-total)" marker-end="url(#r2-arrow-total)"></line>
+    <line class="r2-residual" x1="540" y1="150" x2="540" y2="195" marker-start="url(#r2-arrow-residual)" marker-end="url(#r2-arrow-residual)"></line>
+    <text class="r2-label" x="532" y="220">SST</text>
+    <text class="r2-label" x="552" y="178">SSE</text>
+    <text class="r2-muted" x="505" y="315">highlighted observation yᵢ</text>
+  </svg>
+  <figcaption><strong>Reading the diagram.</strong> The dashed horizontal line is the mean response ȳ. The solid diagonal line is the fitted regression. For the highlighted point, the vertical distance to the mean line is one component of <strong>SST</strong>; the vertical distance to the fitted line is its <strong>SSE</strong> residual component. The totals sum these squared vertical distances over all observations: SST is variation around the mean, while SSE is variation left after fitting.</figcaption>
+</figure>
+
 **Variables:**
 
 - $SSE=\sum e_i^2$
