@@ -102,6 +102,7 @@ $$t_j=\frac{\hat\beta_j-b_0}{SE(\hat\beta_j)}\sim t_{n-p},\qquad F=\frac{(SSE_R-
 
 ### Connections
 - **Violations:** [[robust-standard-errors]] (heteroskedasticity / autocorrelation), [[omitted-variable-bias]] (endogeneity), [[multicollinearity]].
+- **Probability/statistics view:** [[linear-regression-assumptions]].
 
 <a id="robust-standard-errors"></a>
 

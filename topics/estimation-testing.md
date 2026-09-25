@@ -7,7 +7,7 @@ sources: [src-squarepoint-dqa-workbook]
 ---
 # Estimation & Hypothesis Testing
 
-**Sections:** [[estimator-properties]] · [[lln-clt]] · [[maximum-likelihood]] · [[confidence-intervals]] · [[hypothesis-testing]] · [[multiple-testing]] · [[bootstrap]]
+**Sections:** [[estimator-properties]] · [[linear-regression-assumptions]] · [[lln-clt]] · [[maximum-likelihood]] · [[confidence-intervals]] · [[hypothesis-testing]] · [[multiple-testing]] · [[bootstrap]]
 
 <a id="estimator-properties"></a>
 
@@ -35,6 +35,44 @@ $$s^2=\frac{1}{n-1}\sum_i(X_i-\bar X)^2\ \ \text{(unbiased)},\qquad \mathrm{Var}
 ### Connections
 - **Motivates:** [[ridge-regression]] (accept bias to cut variance), [[bias-variance-tradeoff]].
 - **Related:** [[maximum-likelihood]], [[lln-clt]].
+
+<a id="linear-regression-assumptions"></a>
+
+## Linear Regression: Assumptions & Violations
+<!-- section: linear-regression-assumptions | prerequisites: [ols-regression, estimator-properties, hypothesis-testing] | related: [gauss-markov-assumptions, robust-standard-errors, omitted-variable-bias, multicollinearity, regression-invariances, stationarity-ar1, effective-sample-size] | sources: [src-squarepoint-dqa-workbook] | tags: [linear-regression, assumptions, gauss-markov, violations] -->
+
+For the linear model
+
+$$Y=X\beta+\varepsilon,\qquad \hat\beta=\beta+(X^\top X)^{-1}X^\top\varepsilon$$
+
+### Assumption map
+
+| Assumption | What it supports | If it is violated |
+|---|---|---|
+| **Correct linear mean / functional form** | $\beta_j$ is the conditional change in $Y$ for a one-unit change in $X_j$ | Misspecified fit; coefficients can be biased or lose their economic interpretation, and out-of-sample prediction can fail. |
+| **Zero conditional mean / exogeneity:** $E[\varepsilon\mid X]=0$ | OLS is unbiased and consistent under the linear model | Omitted variables, reverse causality, selection, or measurement error correlated with $X$ bias $\hat\beta$ and can make it inconsistent. Robust SEs do not fix this. |
+| **Full column rank** | A unique coefficient vector exists | Perfect collinearity makes coefficients non-unique; near-collinearity makes them unstable and high-variance. |
+| **Homoskedasticity:** $\mathrm{Var}(\varepsilon\mid X)=\sigma^2I$ | Classical standard errors and t/F inference | Coefficients can remain unbiased if exogeneity holds, but classical SEs, p-values, and confidence intervals are wrong; use heteroskedasticity-robust or clustered SEs. |
+| **Independent errors** | Classical iid standard errors and inference | Serial correlation, clustering, or duplicated rows make SEs unreliable and reduce the effective sample size; use HAC/clustered SEs and account for dependence. |
+| **Normal errors** | Exact finite-sample t/F tests and normal-theory intervals | Non-normal errors can make finite-sample p-values and intervals inaccurate; unbiasedness does not require normality. Large samples or robust/asymptotic methods are alternatives. |
+| **No influential outliers / leverage points** | A stable fitted line and stable inference | A small number of points can move coefficients, fitted values, and SEs; inspect diagnostics and decide whether the data or model needs attention. |
+
+### Finance and time-series failure modes
+
+- **Autocorrelated or duplicated rows:** the apparent sample size is too large; naive annualisation and standard errors overstate precision. See [[effective-sample-size]] and [[regression-invariances]].
+- **Non-stationary levels:** a regression can be highly significant but spurious; stationarity must be checked before interpreting the slope. See [[stationarity-ar1]].
+- **Look-ahead or post-decision data:** OLS can fit an impossible information set and produce an inflated fit or backtest; this is a data-construction failure, not something robust SEs repair. See [[cross-validation-leakage]].
+
+### Quick diagnosis
+
+- **Coefficients biased or unstable:** inspect functional form, omitted variables, endogeneity, and multicollinearity.
+- **Coefficients stable but p-values wrong:** inspect heteroskedasticity, serial correlation, clustering, and influential points.
+- **A clean-looking fit but bad out-of-sample behaviour:** check leakage, time ordering, and whether the model is being evaluated on data unavailable at decision time.
+
+### Connections
+- **Detailed OLS view:** [[ols-regression]]; **Gauss–Markov conditions:** [[gauss-markov-assumptions]].
+- **Bias:** [[omitted-variable-bias]]; **variance:** [[robust-standard-errors]], [[multicollinearity]].
+- **Signal-research implementation:** [[linear-regression]], [[regression-invariances]], [[cross-validation-leakage]].
 
 <a id="lln-clt"></a>
 
