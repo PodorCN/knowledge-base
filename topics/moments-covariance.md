@@ -64,7 +64,7 @@ $$\mathrm{Var}\Big(\sum_{i=1}^n X_i\Big)=n\sigma^2+n(n-1)\rho\sigma^2\ \ \text{(
 <a id="jensens-inequality"></a>
 
 ## Jensen's Inequality
-<!-- section: jensens-inequality | prerequisites: [expectation-linearity-indicators] | related: [geometric-brownian-motion, returns-simple-log, gamma-theta-pnl] | sources: [src-squarepoint-dqa-workbook] | tags: [convexity] -->
+<!-- section: jensens-inequality | prerequisites: [expectation-linearity-indicators] | related: [geometric-brownian-motion, returns-simple-log, gamma-theta-pnl, taylor-expansions] | sources: [src-squarepoint-dqa-workbook] | tags: [convexity] -->
 
 ### Formula
 $$g\ \text{convex}\Rightarrow g(E[X])\le E[g(X)];\qquad E[\log X]\le\log E[X]\ \ (X>0)$$

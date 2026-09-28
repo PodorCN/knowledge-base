@@ -3,7 +3,7 @@ id: exotic-options
 title: "Exotic Options"
 type: topic
 domain: pricing
-sources: [src-quant-study-notes-pcp-skew, src-vol-surface-exotics-notes, src-rbc-quantdev-prep]
+sources: [src-quant-study-notes-pcp-skew, src-vol-surface-exotics-notes, src-rbc-quantdev-prep, src-quant-finance-study-notes]
 ---
 # Exotic Options
 
@@ -12,7 +12,7 @@ sources: [src-quant-study-notes-pcp-skew, src-vol-surface-exotics-notes, src-rbc
 <a id="digital-options"></a>
 
 ## Digital (Binary) Options & the Skew Adjustment
-<!-- section: digital-options | prerequisites: [black-scholes-formula, breeden-litzenberger, volatility-skew] | related: [call-spread-overhedge, delta-vs-itm-probability, autocallables, static-replication] | sources: [src-quant-study-notes-pcp-skew, src-vol-surface-exotics-notes, src-rbc-quantdev-prep] | tags: [digital, binary, skew-adjustment, chain-rule] -->
+<!-- section: digital-options | prerequisites: [black-scholes-formula, breeden-litzenberger, volatility-skew] | related: [call-spread-overhedge, delta-vs-itm-probability, autocallables, static-replication, sticky-strike-vs-sticky-moneyness] | sources: [src-quant-study-notes-pcp-skew, src-vol-surface-exotics-notes, src-rbc-quantdev-prep, src-quant-finance-study-notes] | tags: [digital, binary, skew-adjustment, chain-rule] -->
 
 ### Flat-vol prices
 $$\text{CoN}=e^{-rT}N(d_2),\qquad \text{AoN}=Se^{-qT}N(d_1),\qquad C_{vanilla}=\text{AoN}-K\cdot\text{CoN}$$
@@ -22,6 +22,22 @@ $$\text{CoN}=e^{-rT}N(d_2),\qquad \text{AoN}=Se^{-qT}N(d_1),\qquad C_{vanilla}=\
 - CoN pays 1 if $S_T>K$
 - AoN pays $S_T$ if $S_T>K$
 - others as in BS. Example $S=K=100,T=1,r=q=0,\sigma=20\%$: CoN $=N(-0.1)=0.4602$
+
+### Call-spread replication
+Buy $\tfrac1\varepsilon$ calls at $K$, sell $\tfrac1\varepsilon$ calls at $K+\varepsilon$:
+
+| $S_T$ | Payoff |
+|---|---|
+| $\le K$ | 0 |
+| $K$ to $K+\varepsilon$ | $(S_T-K)/\varepsilon$ |
+| $\ge K+\varepsilon$ | 1 |
+
+$$C_{dig}(K)=\lim_{\varepsilon\to0}\frac{C(K)-C(K+\varepsilon)}{\varepsilon}=-\frac{dC_{mkt}}{dK}$$
+
+**Variables:**
+
+- $\varepsilon$ spread width
+- $C_{mkt}(K)$ market vanilla call price at $K$
 
 ### With a smile — chain rule
 Digital = limit of a tight call spread: $\frac{C(K-\varepsilon)-C(K+\varepsilon)}{2\varepsilon}\to-\frac{dC(K,\sigma(K))}{dK}$. Because σ depends on K:
@@ -33,10 +49,77 @@ $$D(K)=-\frac{\partial C_{BS}}{\partial K}-\frac{\partial C_{BS}}{\partial\sigma
 - $\mathcal V_{BS}=S_0e^{-qT}\sqrt T\,n(d_1)>0$ vega at $K$
 - $\partial\sigma/\partial K$ smile slope
 
+### Forward-form derivation ($\partial C_{BS}/\partial K$ at fixed σ)
+$$\frac{\partial C_{BS}}{\partial K}=D\Big[F\phi(d_1)\tfrac{\partial d_1}{\partial K}-N(d_2)-K\phi(d_2)\tfrac{\partial d_2}{\partial K}\Big],\qquad \tfrac{\partial d_1}{\partial K}=\tfrac{\partial d_2}{\partial K}=-\tfrac{1}{K\sigma\sqrt T}$$
+
+**Key identity** $F\phi(d_1)=K\phi(d_2)$:
+
+$$\frac{\phi(d_2)}{\phi(d_1)}=e^{(d_1^2-d_2^2)/2}=e^{d_1\sigma\sqrt T-\sigma^2T/2}=e^{\ln(F/K)}=\frac FK$$
+
+→ the first and third terms cancel: $\dfrac{\partial C_{BS}}{\partial K}=-D\,N(d_2)$, so
+
+$$C_{dig}(K)=D\,N(d_2)-\text{Vega}(K)\cdot\frac{d\sigma}{dK},\qquad \text{Vega}=DF\phi(d_1)\sqrt T$$
+
+**Variables:**
+
+- $D$ discount factor, $F$ forward
+- $D\,N(d_2)$ flat-vol BS digital
+- $d\sigma/dK$ smile slope at $K$
+- $\phi$ standard normal pdf
+
 ### Sign analysis (equity, $\partial\sigma/\partial K<0$)
 - Skew term > 0 ⇒ **digital call dearer** than $e^{-rT}N(d_2)$; digital put $e^{-rT}N(-d_2)+\mathcal V\,\partial\sigma/\partial K$ **cheaper**.
 - ATM example: flat 0.508 → surface 0.644 (+27%). Digitals trade off the **slope** of the smile, not its level.
 - **Call-spread intuition:** buy $K-\varepsilon$ at higher IV, sell $K+\varepsilon$ at lower IV → net cost inflated.
+
+| Skew | $d\sigma/dK$ | Digital call | Digital put |
+|---|---|---|---|
+| Equity put skew | < 0 | **More expensive** than BS | Cheaper |
+| Upside skew (some commodities) | > 0 | Cheaper | More expensive |
+
+(Digital call + digital put $=D$ → adjustments are equal and opposite.)
+
+### Numbers (computed)
+$D=0.96,F=102,T=1,K=100,\sigma=20.73\%,d\sigma/dK=-0.001$; $d_1=0.1992,\ d_2=-0.0081$; check $F\phi(d_1)=39.893=K\phi(d_2)$ ✅
+
+| Term | Value |
+|---|---|
+| $D\,N(d_2)=0.96\times0.4968$ | 0.4769 |
+| $-\text{Vega}\cdot d\sigma/dK=-38.30\times(-0.001)$ | +0.0383 |
+| **Digital price** | **0.5152** |
+
+Check with a 99/101 call spread ÷ 2:
+
+| Strike | σ (skew) | Call (skew) | Call (flat 20.73%) |
+|---|---|---|---|
+| 99 | 20.83% | 9.5247 | 9.4868 |
+| 101 | 20.63% | 8.4944 | 8.5330 |
+| **(C₉₉−C₁₀₁)/2** | | **0.5152** | **0.4769** |
+
+A skew of 1 vol point per 10 strikes adds ~8% to the digital: the **slope is a first-order input**.
+
+### Why vanillas have no such adjustment
+1. **IV is defined to price that vanilla correctly**: nothing left to correct.
+2. **What each product needs from the smile:**
+
+| Product | Relation to vanilla prices | Needs from smile |
+|---|---|---|
+| Vanilla $C(K)$ | price itself | **level** $\sigma(K)$ |
+| Digital $-\partial C/\partial K$ | 1st derivative | level + **slope** $\sigma'(K)$ |
+| Butterfly / density $\partial^2C/\partial K^2$ | 2nd derivative | level + slope + **curvature** $\sigma''(K)$ |
+
+3. $D\,N(d_2)$ silently assumes a flat smile (自己推理 framing).
+4. For a vanilla the smile effect shows up in **delta**: $\Delta_{total}=\Delta_{BS}+\text{Vega}\cdot\partial\sigma/\partial S$ (smile-adjusted delta; sticky-strike vs sticky-delta, [[sticky-strike-vs-sticky-moneyness]]) (自己推理 link).
+
+### Link to distribution skewness
+$C_{dig}(K)=D\cdot\mathbb Q(S_T>K)$ ($\mathbb Q$: risk-neutral measure): a point on the risk-neutral **CDF**; one more derivative gives the density ([[breeden-litzenberger]]). Equity put skew ↔ negative risk-neutral skewness (fat left tail) → near ATM, $\mathbb Q(S_T>K)$ is higher than $N(d_2)$.
+
+### Trading points
+- Hedge with a call spread, **overhedged** (always pays ≥ 1); the width is a risk choice ([[call-spread-overhedge]]).
+- **Pin risk:** delta/gamma blow up near $K$ at expiry.
+- The price depends on **smile interpolation**: two surfaces fitting vanillas equally well can give different digital prices (Wystup & Van Mulken, *Slope Matters*).
+
+**One-liner:** "A digital is −dC/dK, and C = C_BS(K, σ(K)) depends on K through σ too, so the chain rule adds −Vega·σ′(K). A vanilla uses its own strike's IV, defined to fit its price, so it needs only the level, not the slope."
 
 ### Structured payout ratio Q
 Option budget $C(K)$ funds $Q$ digitals: $Q=\frac{C(K)}{D(K)}=\frac{C_{BS}(K,\sigma(K))}{e^{-rT}N(d_2)-\mathcal V\,\partial\sigma/\partial K}<Q_{BS\text{-flat}}$. Ignoring skew ⇒ over-promise $Q$ and lose at inception.

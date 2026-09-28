@@ -15,3 +15,4 @@ Part of [[map-buyside]].
 - [[ml-regularisation]]
 - [[time-series-validation]]
 - [[signals-research-process]]
+- [[multi-asset-signals]]

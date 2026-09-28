@@ -15,4 +15,5 @@ Part of [[map-foundations]].
 - [[distributions]]
 - [[moments-covariance]]
 - [[puzzles-markov]]
+- [[calculus-mental-math]]
 - [[estimation-testing]]

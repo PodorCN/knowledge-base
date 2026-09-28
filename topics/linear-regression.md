@@ -3,7 +3,7 @@ id: linear-regression
 title: "Linear Regression"
 type: topic
 domain: signal-research
-sources: [src-squarepoint-dqa-workbook]
+sources: [src-squarepoint-dqa-workbook, src-quant-finance-study-notes]
 ---
 # Linear Regression
 
@@ -199,20 +199,47 @@ $$\tilde\beta_1=\beta_1+\beta_2\frac{\mathrm{Cov}(X,Z)}{\mathrm{Var}(X)}$$
 <a id="multicollinearity"></a>
 
 ## Multicollinearity & VIF
-<!-- section: multicollinearity | prerequisites: [ols-regression, eigen-svd-psd] | related: [ridge-regression, pca, regression-invariances] | sources: [src-squarepoint-dqa-workbook] | tags: [vif, ill-conditioning] -->
+<!-- section: multicollinearity | prerequisites: [ols-regression, eigen-svd-psd] | related: [ridge-regression, pca, regression-invariances, information-coefficient] | sources: [src-squarepoint-dqa-workbook, src-quant-finance-study-notes] | tags: [vif, ill-conditioning, factor-redundancy] -->
 
 ### Formula
-$$VIF_j=\frac{1}{1-R_j^2}$$
+$$\text{VIF}_j=\frac{1}{1-R_j^2},\qquad F_j=\alpha+\sum_{k\ne j}\beta_kF_k+\varepsilon,\qquad \mathrm{Var}(\hat\beta_j)=\frac{\sigma^2}{(N-1)\,\mathrm{Var}(F_j)}\cdot\text{VIF}_j$$
 
-**Variables:** $R_j^2$ from regressing regressor $j$ on the other regressors.
+**Variables:**
+
+- $R_j^2$ $R^2$ of the auxiliary regression of regressor (factor) $j$ on all the other regressors
+- $F_j,F_k$ factor $j$ and the other factors
+- $\sigma^2$ residual variance of the main regression
+- $N$ observations
+
+VIF = 5 → SE ×$\sqrt5\approx2.24$ → t-stat ÷2.24. Tolerance $=1/\text{VIF}$.
+
+### Factor example
+
+| Factor | Aux $R^2$ | VIF |
+|---|---|---|
+| Value | 0.15 | 1.18 |
+| Quality | 0.82 | 5.56 |
+| Profitability | 0.79 | 4.76 |
+| Momentum | 0.08 | 1.09 |
+
+→ Quality & Profitability double-count "company quality".
+
+| VIF | Meaning |
+|---|---|
+| 1–2 | Fine |
+| 2–5 | Moderate (common in factor work) |
+| 5–10 | Unreliable |
+| > 10 | Severe; drop or combine |
 
 ### Key points
 - Perfect collinearity → coefficients non-unique (fitted values still unique = projection).
 - Near-collinearity → small singular values → coefficients unstable; prediction may still be fine.
-- Remedies: drop/combine variables, more data, [[ridge-regression]], [[pca]] regression — choose by goal.
+- **Consequences:** inflated SEs, unstable/sign-flipping betas, confounded attribution. **Not biased**: overall $R^2$ and joint F-test unaffected.
+- **Remedies:** drop · composite · residualise (changes meaning) · PCA · ridge/LASSO · more data; choose by goal.
+- **Subtleties:** unit-free; misses nonlinear redundancy; a within-model property; catches multi-way collinearity that pairwise correlations miss; condition number > 30 is an alternative; correlated factors reduce effective **breadth** ([[information-coefficient]]).
 
 ### Connections
-- **Diagnosed by:** [[eigen-svd-psd]] (small eigenvalues of $X^\top X$). **Fixed by:** [[ridge-regression]].
+- **Diagnosed by:** [[eigen-svd-psd]] (small eigenvalues of $X^\top X$). **Fixed by:** [[ridge-regression]], [[pca]].
 
 <a id="regression-invariances"></a>
 

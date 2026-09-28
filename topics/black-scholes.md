@@ -3,7 +3,7 @@ id: black-scholes
 title: "Black–Scholes Model"
 type: topic
 domain: black-scholes
-sources: [src-rbc-quantdev-prep, src-squarepoint-dqa-workbook, src-quant-study-notes-pcp-skew, src-vol-surface-exotics-notes]
+sources: [src-rbc-quantdev-prep, src-squarepoint-dqa-workbook, src-quant-study-notes-pcp-skew, src-vol-surface-exotics-notes, src-quant-finance-study-notes]
 ---
 # Black–Scholes Model
 
@@ -82,9 +82,9 @@ GBM with constant σ, frictionless continuous hedging, constant r, no jumps, kno
 <a id="black-76"></a>
 
 ## Black-76 (forward-based Black formula)
-<!-- section: black-76 | prerequisites: [black-scholes-formula, forward-pricing] | related: [implied-forward-regression, swaptions, sabr] | sources: [src-quant-study-notes-pcp-skew, src-rbc-quantdev-prep] | tags: [black-76, forward, swaption] -->
+<!-- section: black-76 | prerequisites: [black-scholes-formula, forward-pricing] | related: [implied-forward-regression, swaptions, sabr] | sources: [src-quant-study-notes-pcp-skew, src-rbc-quantdev-prep, src-quant-finance-study-notes] | tags: [black-76, forward, swaption] -->
 
-$$C=D\,[F\,N(d_1)-K\,N(d_2)],\qquad d_{1,2}=\frac{\ln(F/K)\pm\tfrac12\sigma^2T}{\sigma\sqrt T}$$
+$$C=D\,[F\,N(d_1)-K\,N(d_2)],\qquad P=D\,[K\,N(-d_2)-F\,N(-d_1)],\qquad d_{1,2}=\frac{\ln(F/K)\pm\tfrac12\sigma^2T}{\sigma\sqrt T}$$
 
 **Variables:**
 
