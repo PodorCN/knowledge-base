@@ -66,9 +66,9 @@ Ask in this order:
 
 | Track | Put here |
 |---|---|
-| `prob-stats` | probability, distributions, expectation/variance, puzzles, estimation, hypothesis tests, linear algebra |
+| `prob-stats` | probability, distributions, expectation/variance, puzzles, estimation, hypothesis tests, linear algebra, calculus / Taylor / mental math |
 | `stochastic-finance` | Brownian motion, Itô, GBM, risk-neutral pricing, returns, no-arbitrage, forwards, bonds |
-| `signal-research` | regression, ML, time series, validation/leakage, signals, alpha, backtests, research process |
+| `signal-research` | regression, ML, time series, validation/leakage, signals, IC / alpha, backtests, research process, multi-asset risk premia & macro signals |
 | `portfolio-construction` | Sharpe, diversification, optimisation, risk contribution/budgeting, position sizing |
 | `pricing` | option payoffs, parity, replication, exotic options, structured products, delta one |
 | `black-scholes` | Black–Scholes PDE/formula, N(d1) vs N(d2), Black-76, American exercise; **Greeks** (own chapter) |
@@ -85,9 +85,9 @@ Current chapters and question banks:
 
 | Track | Chapters (reading order) | Question banks |
 |---|---|---|
-| `prob-stats` | `probability-bayes`, `distributions`, `moments-covariance`, `puzzles-markov`, `estimation-testing` | `qb-probability`, `qb-statistics-inference` |
+| `prob-stats` | `probability-bayes`, `distributions`, `moments-covariance`, `puzzles-markov`, `calculus-mental-math`, `estimation-testing` | `qb-probability`, `qb-statistics-inference` |
 | `stochastic-finance` | `stochastic-calculus`, `no-arbitrage-finance-basics` | `qb-finance-foundations`, `qb-stochastic-calculus` |
-| `signal-research` | `linear-regression`, `ml-regularisation`, `time-series-validation`, `signals-research-process` | `qb-regression-ml`, `qb-research-judgment` |
+| `signal-research` | `linear-regression`, `ml-regularisation`, `time-series-validation`, `signals-research-process`, `multi-asset-signals` | `qb-regression-ml`, `qb-research-judgment` |
 | `portfolio-construction` | `measuring-performance`, `portfolio-optimisation`, `risk-budgeting-position-sizing` | `qb-portfolio-performance` |
 | `pricing` | `no-arbitrage-parity`, `exotic-options`, `structured-products-delta-one` | `qb-exotics-structured` |
 | `black-scholes` | `black-scholes`, `black-scholes-call-derivation`, `greeks-sensitivities` | `qb-options-bs-greeks` |
