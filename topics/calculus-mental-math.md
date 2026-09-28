@@ -11,7 +11,7 @@ sources: [src-quant-finance-study-notes]
 
 <a id="complex-exponent-i-i"></a>
 
-## Computing $i^i$ (Euler's formula, complex logarithm)
+## Computing iⁱ (Euler's formula, complex logarithm)
 <!-- section: complex-exponent-i-i | prerequisites: [] | related: [power-estimation, mental-math-techniques] | sources: [src-quant-finance-study-notes] | tags: [complex-numbers, euler, complex-log, multi-valued] -->
 
 ### Formula
@@ -50,7 +50,7 @@ $$i=e^{i(\pi/2+2\pi k)}\Rightarrow i^i=e^{-\pi/2-2\pi k},\qquad z^w=e^{w\ln z},\
 
 <a id="power-estimation"></a>
 
-## Estimating "Weird Powers" ($0.99^{100}$, $1.1^{10}$, $e^\pi$ vs $\pi^e$)
+## Estimating "Weird Powers" (0.99¹⁰⁰, 1.1¹⁰, e^π vs π^e)
 <!-- section: power-estimation | prerequisites: [taylor-expansions] | related: [limit-definition-e, mental-math-techniques, returns-simple-log, jensens-inequality] | sources: [src-quant-finance-study-notes] | tags: [mental-math, logarithm, compounding] -->
 
 ### One trick for all
@@ -102,7 +102,7 @@ $f$ peaks at $x=e$ → $f(e)>f(\pi)$ → **$e^\pi>\pi^e$**.
 
 <a id="limit-definition-e"></a>
 
-## Limit Definition of $e^x$ & Continuous Compounding
+## Limit Definition of eˣ & Continuous Compounding
 <!-- section: limit-definition-e | prerequisites: [] | related: [discounting-compounding, power-estimation, taylor-expansions] | sources: [src-quant-finance-study-notes] | tags: [limits, e, continuous-compounding] -->
 
 ### Formula
@@ -130,7 +130,7 @@ $$\lim_{n\to\infty}\Big(1+\frac rn\Big)^{nT}=e^{rT}$$
 - $n$ compounding periods per year
 - $T$ years
 
-| Frequency | n | \$1 after r = 10%, T = 1 |
+| Frequency | n | $1 after r = 10%, T = 1 |
 |---|---|---|
 | Annual | 1 | 1.1000 |
 | Quarterly | 4 | 1.1038 |

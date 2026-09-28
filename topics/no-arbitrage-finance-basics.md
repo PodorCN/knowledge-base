@@ -308,9 +308,9 @@ $$AI=\frac{C_{\text{annual}}}{m}\times\frac{\text{days accrued}}{\text{days in p
 | ACT/360 | Actual / 360 | Money market, some floaters |
 | ACT/365 | Actual / 365 | UK gilts |
 
-- Corporate, 30/360: 6% semi (\$30), last coupon Mar 15, today Jul 20 → 125/180 → $AI=20.83$; clean 985 → dirty **1005.83**.
-- Treasury, ACT/ACT: 4% semi (\$20), Feb 28 → Apr 16 = 47 days of 181 → $AI=5.19$.
-- Day after coupon: \$30 × 1/180 = 0.17; day before next coupon: \$30 × 179/180 = 29.83.
+- Corporate, 30/360: 6% semi ($30), last coupon Mar 15, today Jul 20 → 125/180 → $AI=20.83$; clean 985 → dirty **1005.83**.
+- Treasury, ACT/ACT: 4% semi ($20), Feb 28 → Apr 16 = 47 days of 181 → $AI=5.19$.
+- Day after coupon: $30 × 1/180 = 0.17; day before next coupon: $30 × 179/180 = 29.83.
 - Excel: `ACCRINT()`.
 
 ### Daily bond return

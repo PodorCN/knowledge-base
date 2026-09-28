@@ -421,7 +421,7 @@ function md(src, eq) {
   // keep code spans/blocks away from math and wikilink parsing
   src = src.replace(/```[\s\S]*?```|`[^`\n]+`/g, m => `@@CODE${code.push(m) - 1}@@`);
   // protect currency amounts such as $6.25 and $1,000 from inline-math pairing
-  src = src.replace(/(?<!\\)\$\d+(?:,\d{3})*(?:\.\d{1,2})?(?!\$)/g, m => `@@CURRENCY${currency.push(m) - 1}@@`);
+  src = src.replace(/(?<!\\)\$\d+(?:,\d{3})*(?:\.\d{1,2})?(?![\w$^_{}\\=+\-*/(|<>]|\.\d)/g, m => `@@CURRENCY${currency.push(m) - 1}@@`);
   src = src.replace(/\$\$([\s\S]+?)\$\$/g, (m, body) => {
     if (eq && !/\\tag/.test(body)) m = `$$${body}\\tag{${eq.prefix}.${++eq.n}}$$`;
     return `@@MATH${math.push(m) - 1}@@`;
@@ -580,7 +580,11 @@ function enhance(root) {
         const symbol = short[1], first = symbol[0];
         const symbolLike = /[\p{Script=Greek}\p{N}]/u.test(first) || /[A-Z]/.test(first) || symbol.length === 1 || /[(),+\-/^_]/.test(symbol);
         const wordLike = /^[A-Z][a-z]{2,}/.test(symbol) || (/^[a-z]/.test(first) && symbol.length > 1 && !/[(),+\-/^_]/.test(symbol));
-        if (symbolLike && !wordLike) return { symbol: esc(symbol), description: esc(short[2]) };
+        if (symbolLike && !wordLike) {
+          // keep inline math in the description (e.g. "$k$ any integer; $k=0$ → …") for MathJax
+          const html = source && /^\s*\$[^$]+\$/.test(source.innerHTML) ? source.innerHTML.replace(/^\s*\$[^$]+\$\s*/, "").trim() : null;
+          return { symbol: esc(symbol), description: html || esc(short[2]) };
+        }
       }
       const only = text.match(/^([A-Za-zΑ-Ωα-ω\p{N}][A-Za-zΑ-Ωα-ω0-9_(),+\-/^]{0,11})$/u);
       if (only && (/[\p{Script=Greek}\p{N}]/u.test(only[1][0]) || /[A-Z]/.test(only[1][0]) || only[1].length === 1 || /[(),+\-/^_]/.test(only[1]))) return { symbol: esc(only[1]), description: "" };
