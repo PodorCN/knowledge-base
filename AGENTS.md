@@ -63,19 +63,19 @@ Levels: **Group → Track → Chapter → Section**.
 
 Ask in this order:
 
-1. **Which interview is it for?** Asked in any quant interview (probability, statistics, stochastic
-   calculus, basic finance) → **Foundations**. Finding signals or building portfolios → **Buy-side**.
-   Pricing, modelling, hedging or building derivatives systems → **Sell-side**.
+1. **Which interview is it for?** Asked in any quant interview (probability, statistics, basic
+   finance) → **Foundations**. Finding signals or building portfolios → **Buy-side**.
+   Stochastic calculus, pricing, modelling, hedging or building derivatives systems → **Sell-side**.
 2. **Which track?**
 
 | Track | Put here |
 |---|---|
 | `prob-stats` | probability, distributions, expectation/variance, puzzles, estimation, hypothesis tests, linear algebra, calculus / Taylor / mental math |
-| `stochastic-finance` | returns, no-arbitrage, forwards, bonds, option payoffs / bounds / put–call parity / binomial & static replication, Brownian motion, Itô, GBM, risk-neutral pricing |
+| `stochastic-finance` | returns, no-arbitrage, forwards, bonds, option payoffs / bounds / put–call parity / binomial & static replication (track title: "Finance Foundations") |
 | `signal-research` | regression, ML, time series, validation/leakage, signals, IC / alpha, multi-asset risk premia & macro signals, research process & backtests |
 | `portfolio-construction` | Sharpe, win rate / expectancy, exposure, diversification, optimisation, risk contribution/budgeting, position sizing |
 | `pricing` | exotic options, structured products, delta one (track title: "Exotics & Structured Products") |
-| `black-scholes` | Black–Scholes PDE/formula, N(d1) vs N(d2), Black-76, American exercise; **Greeks** (own chapter) |
+| `black-scholes` | Brownian motion, Itô, GBM, martingales, risk-neutral pricing; Black–Scholes PDE/formula, N(d1) vs N(d2), Black-76, American exercise; **Greeks** (own chapter) (track title: "Stochastic Calculus & Black–Scholes") |
 | `quant-models` | implied vol, vol surface construction, local/stochastic vol, numerical methods |
 | `risk-management` | hedging, pin risk, scenarios, VaR/ES, model risk (Greeks themselves live in the `black-scholes` track) |
 | `quant-dev` | OOP, design patterns, C#/.NET, pricing-app architecture, releases, reconciliation, coding questions |
@@ -90,10 +90,10 @@ Current chapters and question banks:
 | Track | Chapters (reading order) | Question banks |
 |---|---|---|
 | `prob-stats` | `calculus-mental-math`, `probability-bayes`, `distributions`, `moments-covariance`, `puzzles-markov`, `estimation-testing`, `statistical-testing` | `qb-probability`, `qb-statistics-inference` |
-| `stochastic-finance` | `no-arbitrage-finance-basics`, `fixed-income-bonds`, `no-arbitrage-parity`, `stochastic-calculus` | `qb-finance-foundations`, `qb-stochastic-calculus` |
+| `stochastic-finance` | `no-arbitrage-finance-basics`, `fixed-income-bonds`, `no-arbitrage-parity` | `qb-finance-foundations` |
 | `signal-research` | `linear-regression`, `ml-regularisation`, `time-series-validation`, `signals-research-process`, `multi-asset-signals`, `research-backtesting` | `qb-regression-ml`, `qb-research-judgment` |
 | `portfolio-construction` | `measuring-performance`, `portfolio-optimisation`, `risk-budgeting-position-sizing` | `qb-portfolio-performance` |
-| `black-scholes` | `black-scholes`, `black-scholes-call-derivation`, `greeks-sensitivities` | `qb-options-bs-greeks` |
+| `black-scholes` | `stochastic-calculus`, `black-scholes`, `black-scholes-call-derivation`, `greeks-sensitivities` | `qb-stochastic-calculus`, `qb-options-bs-greeks` |
 | `quant-models` | `numerical-methods`, `implied-volatility-skew`, `vol-surface-construction-chapter`, `volatility-models` | `qb-vol-surface` |
 | `pricing` | `exotic-options`, `structured-products-delta-one` | `qb-exotics-structured` |
 | `risk-management` | `hedging`, `risk-control-governance` | `qb-risk-management` |

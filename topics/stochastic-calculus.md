@@ -2,7 +2,7 @@
 id: stochastic-calculus
 title: "Stochastic Calculus & Risk-Neutral Pricing"
 type: topic
-domain: stochastic-finance
+domain: black-scholes
 sources: [src-squarepoint-dqa-workbook, src-rbc-quantdev-prep]
 ---
 # Stochastic Calculus & Risk-Neutral Pricing

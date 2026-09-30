@@ -16,7 +16,7 @@
   },
   {
    "id": "map-black-scholes",
-   "title": "Black–Scholes",
+   "title": "Stochastic Calculus & Black–Scholes",
    "type": "map",
    "domain": "black-scholes",
    "tags": [
@@ -24,10 +24,10 @@
     "track"
    ],
    "path": "maps/map-black-scholes.md",
-   "content": "# Black–Scholes\n\nPart of [[map-sellside]]. The Black–Scholes model: the PDE and formula, the risk-neutral derivation of the call price, and the Greeks.\n\n## Topics (in reading order)\n\n- [[black-scholes]]\n- [[black-scholes-call-derivation]]\n- [[greeks-sensitivities]]",
-   "summary": "Part of map-sellside. The Black–Scholes model: the PDE and formula, the risk-neutral derivation of the call price, and the Greeks.",
+   "content": "# Stochastic Calculus & Black–Scholes\n\nPart of [[map-sellside]]. The continuous-time pricing machinery and the model built on it: Brownian motion, Itô's lemma and risk-neutral pricing, then the Black–Scholes PDE and formula, the risk-neutral derivation of the call price, and the Greeks.\n\n## Topics (in reading order)\n\n- [[stochastic-calculus]]\n- [[black-scholes]]\n- [[black-scholes-call-derivation]]\n- [[greeks-sensitivities]]",
+   "summary": "Part of map-sellside. The continuous-time pricing machinery and the model built on it: Brownian motion, Itô's lemma and risk-neutral pricing, then the Black–Scholes PDE and formul…",
    "topic": "",
-   "degree": 5
+   "degree": 7
   },
   {
    "id": "map-buyside",
@@ -181,7 +181,7 @@
   },
   {
    "id": "map-stochastic-finance",
-   "title": "Finance Foundations & Stochastic Calculus",
+   "title": "Finance Foundations",
    "type": "map",
    "domain": "stochastic-finance",
    "tags": [
@@ -189,8 +189,8 @@
     "track"
    ],
    "path": "maps/map-stochastic-finance.md",
-   "content": "# Finance Foundations & Stochastic Calculus\n\nPart of [[map-foundations]]. Basic finance and the continuous-time machinery of pricing: returns, no-arbitrage and forwards, bonds, model-free option relations and one-period replication, then Brownian motion, Itô's lemma and risk-neutral pricing.\n\n## Topics (in reading order)\n\n- [[no-arbitrage-finance-basics]]\n- [[fixed-income-bonds]]\n- [[no-arbitrage-parity]]\n- [[stochastic-calculus]]",
-   "summary": "Part of map-foundations. Basic finance and the continuous-time machinery of pricing: returns, no-arbitrage and forwards, bonds, model-free option relations and one-period replicat…",
+   "content": "# Finance Foundations\n\nPart of [[map-foundations]]. Basic finance asked on both sides: returns, no-arbitrage and forwards, bonds, and model-free option relations with one-period replication. Continuous-time pricing (stochastic calculus) continues in [[map-black-scholes]].\n\n## Topics (in reading order)\n\n- [[no-arbitrage-finance-basics]]\n- [[fixed-income-bonds]]\n- [[no-arbitrage-parity]]",
+   "summary": "Part of map-foundations. Basic finance asked on both sides: returns, no-arbitrage and forwards, bonds, and model-free option relations with one-period replication. Continuous-time…",
    "topic": "",
    "degree": 6
   },
@@ -2911,7 +2911,7 @@
    "id": "brownian-motion",
    "title": "Brownian Motion",
    "type": "concept",
-   "domain": "stochastic-finance",
+   "domain": "black-scholes",
    "tags": [
     "wiener-process"
    ],
@@ -2925,7 +2925,7 @@
    "id": "ito-lemma",
    "title": "Itô's Lemma",
    "type": "concept",
-   "domain": "stochastic-finance",
+   "domain": "black-scholes",
    "tags": [
     "ito",
     "quadratic-variation"
@@ -2940,7 +2940,7 @@
    "id": "geometric-brownian-motion",
    "title": "Geometric Brownian Motion (GBM)",
    "type": "concept",
-   "domain": "stochastic-finance",
+   "domain": "black-scholes",
    "tags": [
     "gbm",
     "lognormal"
@@ -2955,7 +2955,7 @@
    "id": "martingales-ito-isometry",
    "title": "Martingales & Itô Isometry",
    "type": "concept",
-   "domain": "stochastic-finance",
+   "domain": "black-scholes",
    "tags": [
     "martingale",
     "isometry"
@@ -2970,7 +2970,7 @@
    "id": "risk-neutral-pricing",
    "title": "Risk-Neutral Pricing (ℚ vs ℙ)",
    "type": "concept",
-   "domain": "stochastic-finance",
+   "domain": "black-scholes",
    "tags": [
     "risk-neutral",
     "measure",
@@ -2986,7 +2986,7 @@
    "id": "stochastic-calculus",
    "title": "Stochastic Calculus & Risk-Neutral Pricing",
    "type": "topic",
-   "domain": "stochastic-finance",
+   "domain": "black-scholes",
    "tags": [],
    "path": "topics/stochastic-calculus.md",
    "content": "# Stochastic Calculus & Risk-Neutral Pricing\n\nThis chapter moves from one-period replication to continuous time. It introduces Brownian motion, Itô's lemma (the chain rule with a second-order correction), geometric Brownian motion as the stock model, martingales, and finally the risk-neutral pricing formula that the Black–Scholes chapters evaluate.\n\n**Prerequisites:** [[normal-distribution]], [[lognormal-distribution]], [[taylor-expansions]], [[binomial-replication]].\n\n**Leads to:** [[black-scholes-pde]], [[black-scholes-formula]], [[girsanov-risk-neutral-dynamics]], [[monte-carlo-pricing]].\n\n**Sections:** [[brownian-motion]] · [[ito-lemma]] · [[geometric-brownian-motion]] · [[martingales-ito-isometry]] · [[risk-neutral-pricing]]\n\n<a id=\"brownian-motion\"></a>\n\n## Brownian Motion\n<!-- section: brownian-motion | prerequisites: [normal-distribution] | related: [ito-lemma, martingales-ito-isometry] | tags: [wiener-process] -->\n\nBrownian motion is the continuous-time random walk: it starts at zero, has continuous paths and independent normal increments whose variance equals elapsed time.\n\n### Definition\n$W_0=0$; paths are continuous; increments over disjoint intervals are independent; $W_t-W_s\\sim N(0,t-s)$ for $s<t$. Hence\n\n$$E[W_t]=0,\\qquad \\mathrm{Var}(W_t)=t,\\qquad \\mathrm{Cov}(W_s,W_t)=\\min(s,t)$$\n\n**Variables:**\n\n- $W_t$ Brownian motion at time $t$\n- $s,t$ times with $s<t$\n\n### Worked example\n$\\mathrm{Cov}(W_2,W_5)=2$, $\\mathrm{Corr}(W_2,W_5)=2/\\sqrt{2\\cdot5}=\\sqrt{2/5}\\approx0.632$.\n\n### Key points\n- Paths are continuous but nowhere differentiable; increments over $dt$ are of size $O(\\sqrt{dt})$, so the quadratic variation over $[0,t]$ is $t$.\n\n### Connections\n- **Builds on:** [[normal-distribution]].\n- **Next:** [[ito-lemma]] ($(dW)^2=dt$), [[martingales-ito-isometry]], [[geometric-brownian-motion]].\n\n<a id=\"ito-lemma\"></a>\n\n## Itô's Lemma\n<!-- section: ito-lemma | prerequisites: [brownian-motion, taylor-expansions] | related: [geometric-brownian-motion, black-scholes-pde, martingales-ito-isometry, jensens-inequality] | tags: [ito, quadratic-variation] -->\n\nItô's lemma is the chain rule for functions of a diffusion. It is a second-order Taylor expansion in which $(dW)^2=dt$ is kept, because it is of the same order as $dt$.\n\n### Formula\n$$dX=a\\,dt+b\\,dW\\ \\Rightarrow\\ df(t,X)=\\Big(f_t+a\\,f_x+\\tfrac12b^2f_{xx}\\Big)dt+b\\,f_x\\,dW$$\n$$(dW)^2=dt,\\qquad dt\\,dW=0,\\qquad (dt)^2=0$$\n\n**Variables:**\n\n- $X_t$ Itô process\n- $a$ drift of $X$\n- $b$ diffusion coefficient of $X$\n- $W$ Brownian motion\n- $f(t,x)$ smooth function; subscripts denote partial derivatives ($f_t=\\partial f/\\partial t$, $f_x$, $f_{xx}$)\n\n### Worked examples\n- $f=\\ln S$ under GBM ($a=\\mu S$, $b=\\sigma S$) → $d\\ln S=(\\mu-\\tfrac12\\sigma^2)dt+\\sigma dW$.\n- $d(S^2)=(2\\mu+\\sigma^2)S^2dt+2\\sigma S^2dW$.\n- $d(W^2)=dt+2W\\,dW$ ⇒ $\\int_0^TW\\,dW=(W_T^2-T)/2$ (mean 0, variance $T^2/2$).\n\n### Key points\n- The extra $\\tfrac12 b^2f_{xx}$ term exists because $(dW)^2$ is of order $dt$ — convexity again ([[jensens-inequality]]).\n\n### Connections\n- **Builds on:** [[brownian-motion]], [[taylor-expansions]].\n- **Used by:** [[geometric-brownian-motion]], [[black-scholes-pde]] (Itô on $V(S,t)$), [[gamma-theta-pnl]] (the $\\tfrac12\\Gamma S^2\\sigma^2$ term), [[lognormal-under-q]].\n\n<a id=\"geometric-brownian-motion\"></a>\n\n## Geometric Brownian Motion (GBM)\n<!-- section: geometric-brownian-motion | prerequisites: [ito-lemma, lognormal-distribution] | related: [black-scholes-formula, jensens-inequality, risk-neutral-pricing, monte-carlo-pricing] | tags: [gbm, lognormal] -->\n\nGBM is the Black–Scholes model of a stock: returns over short intervals are normal with constant drift and volatility, so the price itself is lognormal.\n\n### Formulas\n$$dS_t=\\mu S_t\\,dt+\\sigma S_t\\,dW_t\\ \\Rightarrow\\ S_t=S_0\\exp\\big[(\\mu-\\tfrac12\\sigma^2)t+\\sigma W_t\\big]$$\n$$E[S_t]=S_0e^{\\mu t},\\qquad \\mathrm{Var}(S_t)=S_0^2e^{2\\mu t}(e^{\\sigma^2t}-1),\\qquad E[\\ln(S_t/S_0)]=(\\mu-\\tfrac12\\sigma^2)t$$\n\n**Variables:**\n\n- $S_t$ stock price at $t$ ($S_0$ today)\n- $\\mu$ real-world drift (expected return)\n- $\\sigma$ volatility\n- $W_t$ Brownian motion\n\nThe solution follows from Itô on $\\ln S$ ([[ito-lemma]]); the moments from [[lognormal-distribution]] with $m=\\ln S_0+(\\mu-\\tfrac12\\sigma^2)t$, $s^2=\\sigma^2t$.\n\n### Worked example\n$\\mu$ = 8%, $\\sigma$ = 20% → expected log return $8\\%-2\\%=6\\%$ per year; expected simple return $e^{0.08}-1\\approx8.33\\%$.\n\n### Key points\n- GBM is the Black–Scholes assumption. Real markets break it (jumps, skew) → [[volatility-skew]].\n\n### Connections\n- **Builds on:** [[ito-lemma]], [[lognormal-distribution]].\n- **Under $\\mathbb Q$:** $\\mu\\to r-q$ ([[risk-neutral-pricing]]) ⇒ [[black-scholes-formula]]. **Simulated in:** [[monte-carlo-pricing]].\n\n<a id=\"martingales-ito-isometry\"></a>\n\n## Martingales & Itô Isometry\n<!-- section: martingales-ito-isometry | prerequisites: [brownian-motion, ito-lemma] | related: [risk-neutral-pricing] | tags: [martingale, isometry] -->\n\nA martingale is a process whose best forecast of the future is its current value. Itô integrals against Brownian motion are martingales, and the Itô isometry gives their variance.\n\n### Formulas\n$$E[M_t\\mid\\mathcal F_s]=M_s\\ \\ (s<t);\\qquad E\\Big[\\int_0^TH_t\\,dW_t\\Big]=0,\\qquad E\\Big[\\Big(\\int_0^TH_t\\,dW_t\\Big)^2\\Big]=E\\Big[\\int_0^TH_t^2\\,dt\\Big]$$\n\n**Variables:**\n\n- $M_t$ martingale\n- $\\mathcal F_s$ information available at time $s$\n- $H_t$ adapted, square-integrable integrand\n- $W_t$ Brownian motion\n- $T$ horizon\n\n### Key points\n- $W_t^2$ is **not** a martingale ($E[W_t^2\\mid\\mathcal F_s]=W_s^2+(t-s)$); $W_t^2-t$ is.\n- Martingale = zero *expected* change, not zero realised change.\n\n### Connections\n- **Builds on:** [[brownian-motion]], [[ito-lemma]].\n- **Foundation of:** [[risk-neutral-pricing]] (discounted prices are $\\mathbb Q$-martingales).\n\n<a id=\"risk-neutral-pricing\"></a>\n\n## Risk-Neutral Pricing (ℚ vs ℙ)\n<!-- section: risk-neutral-pricing | prerequisites: [martingales-ito-isometry, binomial-replication, geometric-brownian-motion] | related: [black-scholes-formula, delta-vs-itm-probability, realized-volatility, breeden-litzenberger, bs-call-setup-risk-neutral] | tags: [risk-neutral, measure, numeraire] -->\n\nThe continuous-time version of binomial replication: the price of a replicable payoff equals its discounted expectation under the risk-neutral measure $\\mathbb Q$, under which the stock drifts at $r-q$ instead of $\\mu$.\n\n### Formula\n$$dS_t=(r-q)S_t\\,dt+\\sigma S_t\\,dW_t^{\\mathbb Q},\\qquad V_t=e^{-r(T-t)}\\,E^{\\mathbb Q}\\big[h(S_T)\\mid\\mathcal F_t\\big]$$\n\n**Variables:**\n\n- $\\mathbb Q$ risk-neutral measure ($\\mathbb P$: real-world measure)\n- $W_t^{\\mathbb Q}$ Brownian motion under $\\mathbb Q$\n- $r$ risk-free rate\n- $q$ continuous dividend yield\n- $\\sigma$ volatility\n- $h(S_T)$ payoff at maturity $T$\n- $V_t$ derivative value at time $t$\n- $\\mathcal F_t$ information at $t$\n\n### Key points\n- The price of a replicable payoff is the cost of replication; the $\\mathbb Q$-expectation is a **representation** of that cost, not a claim that investors are risk-neutral.\n- The physical drift $\\mu$ drops out → the Black–Scholes price is independent of $\\mu$.\n- Incomplete markets: no unique $\\mathbb Q$, hence no unique price.\n- **ℙ vs ℚ:** historical/realised vol is a $\\mathbb P$-number (risk, forecasting); implied vol is a $\\mathbb Q$-number (pricing). The gap is the variance risk premium ([[realized-volatility]]).\n\n### Connections\n- **Discrete version:** [[binomial-replication]] ($p^*$).\n- **Constructed step by step in:** [[bs-call-setup-risk-neutral]], [[girsanov-risk-neutral-dynamics]].\n- **Leads to:** [[black-scholes-formula]]; $N(d_2)$ = $\\mathbb Q$-probability of finishing ITM ([[delta-vs-itm-probability]]).\n- **Density from prices:** [[breeden-litzenberger]].",
@@ -3480,6 +3480,11 @@
   },
   {
    "source": "map-black-scholes",
+   "target": "stochastic-calculus",
+   "type": "mention"
+  },
+  {
+   "source": "map-black-scholes",
    "target": "black-scholes",
    "type": "mention"
   },
@@ -3670,6 +3675,11 @@
   },
   {
    "source": "map-stochastic-finance",
+   "target": "map-black-scholes",
+   "type": "mention"
+  },
+  {
+   "source": "map-stochastic-finance",
    "target": "no-arbitrage-finance-basics",
    "type": "mention"
   },
@@ -3681,11 +3691,6 @@
   {
    "source": "map-stochastic-finance",
    "target": "no-arbitrage-parity",
-   "type": "mention"
-  },
-  {
-   "source": "map-stochastic-finance",
-   "target": "stochastic-calculus",
    "type": "mention"
   },
   {
