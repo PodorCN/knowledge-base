@@ -1,11 +1,11 @@
 ---
 id: calculus-mental-math
-title: "Mathematical Toolkit: Series, Linear Algebra & Mental Math"
+title: "Math Toolkit"
 type: topic
 domain: prob-stats
 sources: [src-quant-finance-study-notes, src-squarepoint-dqa-workbook, src-rbc-gam-quantdev-notes]
 ---
-# Mathematical Toolkit: Series, Linear Algebra & Mental Math
+# Math Toolkit
 
 This chapter collects the tools used by every later chapter: Taylor expansions, the exponential function and compounding, fast mental arithmetic with logarithms, complex exponents, and the matrix facts behind covariance matrices.
 

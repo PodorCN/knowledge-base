@@ -1,11 +1,11 @@
 ---
 id: time-series-validation
-title: "Time Series & Validation"
+title: "Time Series"
 type: topic
 domain: signal-research
 sources: [src-squarepoint-dqa-workbook, src-rbc-gam-quantdev-notes]
 ---
-# Time Series & Validation
+# Time Series
 
 Financial data arrive in time order and are serially dependent. This chapter defines stationarity through the AR(1) model, shows how autocorrelation shrinks the effective sample size, and sets out how to validate a model on time-ordered data without leaking future information.
 

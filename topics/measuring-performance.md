@@ -1,11 +1,11 @@
 ---
 id: measuring-performance
-title: "Measuring Performance"
+title: "Performance"
 type: topic
 domain: portfolio-construction
 sources: [src-squarepoint-dqa-workbook]
 ---
-# Measuring Performance
+# Performance
 
 Before building portfolios we need to measure them. This chapter covers the Sharpe ratio and its statistical pitfalls, why a high win rate says little about profitability, and how gross/net exposure and neutrality describe a long-short book.
 

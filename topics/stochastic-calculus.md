@@ -1,11 +1,11 @@
 ---
 id: stochastic-calculus
-title: "Stochastic Calculus & Risk-Neutral Pricing"
+title: "Stochastic Calculus"
 type: topic
 domain: black-scholes
 sources: [src-squarepoint-dqa-workbook, src-rbc-quantdev-prep]
 ---
-# Stochastic Calculus & Risk-Neutral Pricing
+# Stochastic Calculus
 
 This chapter moves from one-period replication to continuous time. It introduces Brownian motion, Itô's lemma (the chain rule with a second-order correction), geometric Brownian motion as the stock model, martingales, and finally the risk-neutral pricing formula that the Black–Scholes chapters evaluate.
 

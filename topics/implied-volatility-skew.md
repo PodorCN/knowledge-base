@@ -1,11 +1,11 @@
 ---
 id: implied-volatility-skew
-title: "Implied Volatility & the Volatility Surface"
+title: "Implied Volatility"
 type: topic
 domain: pricing
 sources: [src-vol-surface-exotics-notes, src-rbc-quantdev-prep, src-quant-study-notes-pcp-skew, src-quant-finance-study-notes]
 ---
-# Implied Volatility & the Volatility Surface
+# Implied Volatility
 
 Markets quote options in volatility, not price. This chapter explains how an implied volatility is computed and why it is used as a quoting unit, contrasts it with realised volatility, and then assembles implied vols across strikes and expiries into the volatility surface — its term structure, its skew, and the FX market's delta-based quoting conventions.
 

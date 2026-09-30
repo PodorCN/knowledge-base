@@ -1,11 +1,11 @@
 ---
 id: estimation-testing
-title: "Estimation & Confidence Intervals"
+title: "Estimation"
 type: topic
 domain: prob-stats
 sources: [src-squarepoint-dqa-workbook]
 ---
-# Estimation & Confidence Intervals
+# Estimation
 
 This chapter covers how to estimate an unknown parameter from data and how to quantify the uncertainty of the estimate: estimator quality (bias, variance, MSE), the limit theorems that make sample means work, maximum likelihood, the Bayesian alternative, and interval estimates (analytic and bootstrap).
 

@@ -16,4 +16,3 @@ Part of [[map-buyside]]. Finding and validating predictive signals: regression a
 - [[time-series-validation]]
 - [[signals-research-process]]
 - [[multi-asset-signals]]
-- [[research-backtesting]]

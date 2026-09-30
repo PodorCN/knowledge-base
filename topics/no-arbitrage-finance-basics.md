@@ -1,11 +1,11 @@
 ---
 id: no-arbitrage-finance-basics
-title: "Returns, No-Arbitrage & Forwards"
+title: "Returns & Forwards"
 type: topic
 domain: stochastic-finance
 sources: [src-squarepoint-dqa-workbook, src-quant-study-notes-pcp-skew, src-rbc-quantdev-prep, src-quant-finance-study-notes]
 ---
-# Returns, No-Arbitrage & Forwards
+# Returns & Forwards
 
 This chapter introduces the basic financial quantities: how returns are measured and aggregated, the no-arbitrage principle, discounting conventions, geometric series for valuing cash-flow streams, and the first derivative priced purely by replication — the forward.
 

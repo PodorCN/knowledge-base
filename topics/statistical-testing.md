@@ -1,11 +1,11 @@
 ---
 id: statistical-testing
-title: "Hypothesis Testing & Multiple Testing"
+title: "Hypothesis Testing"
 type: topic
 domain: prob-stats
 sources: [src-squarepoint-dqa-workbook, src-quant-finance-study-notes]
 ---
-# Hypothesis Testing & Multiple Testing
+# Hypothesis Testing
 
 This chapter covers deciding whether an effect is real: the single t-test and what a p-value does (and does not) mean, what goes wrong when many hypotheses are tested at once, and two Bayesian readings of the p-value. In finance this is the statistics of "is this signal or this Sharpe ratio genuine?".
 

@@ -1,11 +1,11 @@
 ---
 id: fixed-income-bonds
-title: "Bonds: Yields, Duration & Spreads"
+title: "Bonds"
 type: topic
 domain: stochastic-finance
 sources: [src-squarepoint-dqa-workbook, src-quant-finance-study-notes]
 ---
-# Bonds: Yields, Duration & Spreads
+# Bonds
 
 A bond is a stream of discounted cash flows. This chapter defines the yield measures used to quote it, the duration–convexity approximation of its interest-rate risk, the spreads used to compare it with government bonds, and the accrued-interest mechanics needed to compute its daily return.
 

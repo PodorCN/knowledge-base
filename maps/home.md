@@ -7,13 +7,14 @@ tags: [index]
 ---
 # Home — Knowledge Map
 
-- **[[map-foundations]]**: [[map-prob-stats]] · [[map-stochastic-finance]] · [[map-quant-dev]]
+- **[[map-foundations]]**: [[map-prob-stats]] · [[map-stochastic-finance]]
 - **[[map-buyside]]**: [[map-signal-research]] · [[map-portfolio-construction]]
 - **[[map-sellside]]**: [[map-black-scholes]] · [[map-pricing]] · [[map-risk-management]]
+- **[[map-engineering]]**: [[map-quant-dev]]
 
 ## How to read this wiki
 
-Chapters are numbered in reading order: every section is placed after the sections it builds on, and each chapter opens with its prerequisites and what it leads to. Foundations are needed by both sides; the Buy-side and Sell-side groups can be read independently after the Foundations. Inside a section the layout is always the same: a short statement of the idea, the **Formula** or **Definition** with a table of its variables, **Key points**, a **Worked example** where one exists, and **See also** links. Marks such as **(自己推理)** (own reasoning) and ✏️ (a corrected number) are kept from the original notes.
+Chapters are numbered in reading order: every section is placed after the sections it builds on, and each chapter opens with its prerequisites and what it leads to. Foundations are needed by both sides; the Buy-side and Sell-side groups can be read independently after the Foundations; Engineering comes last because its examples use both sides. Inside a section the layout is always the same: a short statement of the idea, the **Formula** or **Definition** with a table of its variables, **Key points**, a **Worked example** where one exists, and **See also** links. Marks such as **(自己推理)** (own reasoning) and ✏️ (a corrected number) are kept from the original notes.
 
 ## Notation & conventions
 

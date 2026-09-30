@@ -1,11 +1,11 @@
 ---
 id: black-scholes-call-derivation
-title: "Deriving the Black–Scholes Call Price (Risk-Neutral Route)"
+title: "Deriving Black–Scholes"
 type: topic
 domain: black-scholes
 sources: [src-bs-derivation-study-notes, src-rbc-quantdev-prep, src-squarepoint-dqa-workbook]
 ---
-# Deriving the Black–Scholes Call Price (Risk-Neutral Route)
+# Deriving Black–Scholes
 
 Big picture: price = discounted expectation of the payoff under the risk-neutral measure $\mathbb Q$. Every step of this chapter either constructs $\mathbb Q$ or computes that one expectation, and the two terms of the result are then read as probabilities under two different measures — which is exactly the distinction between $N(d_1)$ and $N(d_2)$.
 

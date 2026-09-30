@@ -1,11 +1,11 @@
 ---
 id: matlab-quant-dev
-title: "MATLAB for Quant Developers (vs Python) & Portfolio Optimisation"
+title: "MATLAB"
 type: topic
 domain: quant-dev
 sources: [src-rbc-gam-quantdev-notes]
 ---
-# MATLAB for Quant Developers (vs Python) & Portfolio Optimisation
+# MATLAB
 
 Many asset-management teams keep their portfolio optimiser in MATLAB while data work moves to Python. This chapter teaches MATLAB to a Python programmer: the core differences and silent-bug traps, the syntax and containers, name-value arguments, calling Python from MATLAB and back, how the runtime executes code, how to write fast MATLAB, the pass-by-value memory model, MATLAB's object system, and how to handle constants and configuration in both languages. It ends with the tooling view of portfolio construction: which Optimization Toolbox solver fits which portfolio problem, how the Financial Toolbox `Portfolio` object sets up and solves mean–variance problems, and how to go beyond it with custom objectives and constraints — and when to use the object versus writing the QP directly.
 

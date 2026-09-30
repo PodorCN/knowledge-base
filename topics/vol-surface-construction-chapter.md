@@ -1,11 +1,11 @@
 ---
 id: vol-surface-construction-chapter
-title: "Building the Volatility Surface"
+title: "Vol Surface"
 type: topic
 domain: pricing
 sources: [src-vol-surface-exotics-notes, src-rbc-quantdev-prep, src-quant-study-notes-pcp-skew]
 ---
-# Building the Volatility Surface
+# Vol Surface
 
 This chapter turns raw option quotes into a clean, arbitrage-free surface. It starts with the desk recipe as a roadmap, then covers each step in turn: extracting the forward and discount factor from put–call parity, using only OTM quotes, fitting a smooth smile (SVI), the link between option prices and the risk-neutral density, and the no-arbitrage checks the finished surface must pass.
 

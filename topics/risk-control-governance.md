@@ -1,11 +1,11 @@
 ---
 id: risk-control-governance
-title: "Risk Control & Governance"
+title: "Risk Control"
 type: topic
 domain: risk-management
 sources: [src-rbc-quantdev-prep, src-squarepoint-dqa-workbook, src-vol-surface-exotics-notes, src-rbc-gam-quantdev-notes]
 ---
-# Risk Control & Governance
+# Risk Control
 
 Beyond the Greeks of individual positions, a desk measures risk by full revaluation under scenarios, summarises tail risk with drawdown, VaR and expected shortfall, and controls the risk that the model itself is wrong.
 
