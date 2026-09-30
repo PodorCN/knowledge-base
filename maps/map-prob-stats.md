@@ -12,8 +12,7 @@ Part of [[map-foundations]]. The mathematical and statistical toolkit asked in e
 ## Topics (in reading order)
 
 - [[calculus-mental-math]]
-- [[probability-bayes]]
-- [[distributions]]
+- [[probability-distributions]]
 - [[moments-covariance]]
 - [[puzzles-markov]]
 - [[estimation-testing]]

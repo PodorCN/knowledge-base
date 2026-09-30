@@ -1,11 +1,11 @@
 ---
 id: no-arbitrage-parity
-title: "Options: Payoffs, Parity & Replication"
+title: "Option Basics"
 type: topic
 domain: stochastic-finance
 sources: [src-squarepoint-dqa-workbook, src-quant-study-notes-pcp-skew, src-rbc-quantdev-prep, src-vol-surface-exotics-notes]
 ---
-# Options: Payoffs, Parity & Replication
+# Option Basics
 
 This chapter applies no-arbitrage to options before any model is introduced. It defines call and put payoffs, derives model-free price bounds and put–call parity, prices an option by replication in a one-period binomial model — the discrete origin of risk-neutral pricing — and shows how other payoffs are built statically from vanillas.
 

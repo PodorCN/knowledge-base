@@ -1,11 +1,11 @@
 ---
 id: structured-products-delta-one
-title: "Structured Products & Delta One"
+title: "Structured Products"
 type: topic
 domain: pricing
 sources: [src-vol-surface-exotics-notes, src-rbc-quantdev-prep]
 ---
-# Structured Products & Delta One
+# Structured Products
 
 Structured notes are packages of a bond and options sold to investors; delta-one products are the linear instruments dealers use to fund and hedge them. This chapter starts with delta-one (pure carry), builds up the note families from simple to complex — principal-protected notes, reverse convertibles, worst-of payoffs — culminating in the autocallable case study, and ends with swaptions, the rates option embedded in callable notes.
 

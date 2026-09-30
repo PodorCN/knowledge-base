@@ -1,11 +1,11 @@
 ---
 id: risk-budgeting-position-sizing
-title: "Risk Budgeting & Position Sizing"
+title: "Risk Budgeting"
 type: topic
 domain: portfolio-construction
 sources: [src-signal-to-weight, src-squarepoint-dqa-workbook]
 ---
-# Risk Budgeting & Position Sizing
+# Risk Budgeting
 
 Instead of optimising noisy expected returns, a portfolio can be built by deciding how much risk each position may contribute. This chapter decomposes portfolio volatility into per-asset contributions, inverts that decomposition to solve for weights given risk budgets (Bruder & Roncalli), and connects a signal score to a risk budget and hence to a position size.
 

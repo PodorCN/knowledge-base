@@ -1,19 +1,19 @@
 ---
 id: signals-research-process
-title: "Alpha, Signals & the Information Coefficient"
+title: "Signals & Research"
 type: topic
 domain: signal-research
 sources: [src-signal-to-weight, src-squarepoint-dqa-workbook, src-quant-finance-study-notes]
 ---
-# Alpha, Signals & the Information Coefficient
+# Signals & Research
 
-This chapter goes from "what is alpha" to "how big a return should I forecast". It defines excess return, alpha and beta, builds a simple time-series signal, measures a signal's skill with the information coefficient, attributes a composite signal's skill to its components, and converts a signal score into an expected-return forecast that a portfolio optimiser can use.
+This chapter goes from "what is alpha" to "how big a return should I forecast". It defines excess return, alpha and beta, builds a simple time-series signal, measures a signal's skill with the information coefficient, attributes a composite signal's skill to its components, and converts a signal score into an expected-return forecast that a portfolio optimiser can use. It ends with method rather than models: the sequence of steps a research project should follow, how to present it, and how to investigate a strategy whose backtest does not survive contact with live trading.
 
-**Prerequisites:** [[ols-regression]], [[returns-simple-log]], [[variance-covariance-correlation]], [[time-series-validation]].
+**Prerequisites:** [[ols-regression]], [[returns-simple-log]], [[variance-covariance-correlation]], [[time-series-validation]], [[cross-validation-leakage]], [[multiple-testing]].
 
-**Leads to:** [[signal-to-weight]], [[mean-variance-optimization]], [[black-litterman]], [[multi-asset-signals]].
+**Leads to:** [[signal-to-weight]], [[mean-variance-optimization]], [[black-litterman]], [[multi-asset-signals]], [[sharpe-ratio]] (why a high backtest Sharpe misleads), [[price-reconciliation]] (the same debugging discipline on the sell side).
 
-**Sections:** [[capm-alpha-beta]] · [[time-series-momentum]] · [[information-coefficient]] · [[ic-contribution]] · [[grinold-alpha]]
+**Sections:** [[capm-alpha-beta]] · [[time-series-momentum]] · [[information-coefficient]] · [[ic-contribution]] · [[grinold-alpha]] · [[research-workflow]] · [[backtest-pitfalls]]
 
 <a id="capm-alpha-beta"></a>
 
@@ -254,3 +254,64 @@ $$\alpha_i=IC_{\text{comp}}\,\sigma_i\,z_{\text{comp},i}\ \ \text{(preferred: ca
 ### Connections
 - **Builds on:** [[information-coefficient]], [[ols-regression]].
 - **Feeds:** [[mean-variance-optimization]], [[black-litterman]], [[signal-to-weight]].
+
+<a id="research-workflow"></a>
+
+## Research Workflow & Project Storytelling
+<!-- section: research-workflow | prerequisites: [cross-validation-leakage] | related: [backtest-pitfalls, multiple-testing] | sources: [src-squarepoint-dqa-workbook] | tags: [research, communication] -->
+
+A research project should move from a stated hypothesis to a documented, monitored deployment, checking at each step that only information available at decision time is used.
+
+### Workflow
+1. Hypothesis + an economic or operational reason.
+2. What information is available **at decision time**.
+3. A simple baseline.
+4. Chronological validation + uncertainty ([[cross-validation-leakage]]).
+5. Costs and feasibility.
+6. Stability across periods, instruments and parameters.
+7. Document failure modes; monitor the deployment.
+
+### One project at three depths
+- **30 s:** problem, your contribution, result.
+- **2 min:** data, baseline, method, validation, result, limitation.
+- **10 min:** assumptions, features, model choice, failed experiments, uncertainty, debugging, improvements.
+- Be ready to explain every technical noun on your résumé.
+
+### Answering technique
+1. Clarify the setup.
+2. Define the variables.
+3. Name the principle.
+4. Write the first equation.
+5. Solve and check a limiting case.
+6. Interpret, and state when it breaks.
+
+If stuck: say what you know and simplify (e.g. solve the equal-vol case first).
+
+### Connections
+- **Builds on:** [[cross-validation-leakage]].
+- **Selection risk:** [[multiple-testing]]. **When it goes wrong:** [[backtest-pitfalls]].
+
+<a id="backtest-pitfalls"></a>
+
+## Backtest Pitfalls & Live Underperformance
+<!-- section: backtest-pitfalls | prerequisites: [research-workflow, multiple-testing] | related: [cross-validation-leakage, sharpe-ratio, price-reconciliation, conditional-probability-bayes] | sources: [src-squarepoint-dqa-workbook] | tags: [backtest, overfitting, survivorship] -->
+
+A strategy that looked excellent in a backtest and loses money live is investigated from the most mechanical explanations to the most statistical ones: first check the implementation, then execution, then the research process, and only then ask whether the loss is actually surprising.
+
+### "Sharpe 4 in backtest, loses immediately live" — investigation order
+1. **Reconcile the implementation:** inputs, signal timing, target positions, fills, costs, P&L accounting; timestamps, corporate actions, duplicates, look-ahead data.
+2. **Execution realism:** spread, slippage, delay, participation limits, borrow, financing.
+3. **Research process:** selection across many trials ([[multiple-testing]]), out-of-sample evidence.
+4. **Is the loss surprising** given the sample length, exposures and return distribution? Has the regime, liquidity or crowding changed?
+
+### Key points
+- Don't explain a bug as a regime change.
+- A bad first week alone doesn't prove failure.
+- Signal precision vs base rate: a rare true edge makes even good-looking detectors imprecise ([[conditional-probability-bayes]]).
+
+### Usual suspects
+Future information / leakage, bad corporate-action adjustment, unrealistic execution, duplicated rows, survivorship bias, strategy selection, stale prices, ignored costs.
+
+### Connections
+- **Builds on:** [[research-workflow]], [[multiple-testing]].
+- **Related:** [[cross-validation-leakage]], [[sharpe-ratio]] (why a high SR misleads), [[price-reconciliation]] (the same "diff the inputs first" discipline).
