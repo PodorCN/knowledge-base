@@ -3,7 +3,7 @@ id: calculus-mental-math
 title: "Mathematical Toolkit: Series, Linear Algebra & Mental Math"
 type: topic
 domain: prob-stats
-sources: [src-quant-finance-study-notes, src-squarepoint-dqa-workbook]
+sources: [src-quant-finance-study-notes, src-squarepoint-dqa-workbook, src-rbc-gam-quantdev-notes]
 ---
 # Mathematical Toolkit: Series, Linear Algebra & Mental Math
 
@@ -289,7 +289,7 @@ $$i=e^{i(\pi/2+2\pi k)}\Rightarrow i^i=e^{-\pi/2-2\pi k},\qquad z^w=e^{w\ln z},\
 <a id="eigen-svd-psd"></a>
 
 ## Eigen-decomposition, SVD & PSD Matrices
-<!-- section: eigen-svd-psd | prerequisites: [] | related: [pca, multicollinearity, portfolio-variance-diversification, mean-variance-optimization, variance-covariance-correlation] | sources: [src-squarepoint-dqa-workbook] | tags: [linear-algebra] -->
+<!-- section: eigen-svd-psd | prerequisites: [] | related: [pca, multicollinearity, portfolio-variance-diversification, mean-variance-optimization, variance-covariance-correlation] | sources: [src-squarepoint-dqa-workbook, src-rbc-gam-quantdev-notes] | tags: [linear-algebra, psd, covariance] -->
 
 Covariance matrices, regression design matrices and optimisers are all analysed through eigenvalues and singular values. These are the facts used later.
 
@@ -312,5 +312,65 @@ $$Av=\lambda v,\qquad v^\top Av\ge0\ \ \forall v\ \ (\text{PSD}),\qquad X=UDV^\t
 - A matrix is invertible ⇔ it has full rank.
 - Small singular values ⇒ unstable least squares (the inverse amplifies noise in those directions).
 
+### PSD covariance matrices
+Plain language: for a covariance matrix, PSD means **no portfolio can have negative variance**.
+
+$$\Sigma\succeq0\iff w^\top\Sigma w\ge0\ \ \forall w\iff\lambda_i\ge0\ \ \forall i$$
+
+**Variables:**
+
+- $\Sigma$ symmetric $N\times N$ matrix (a covariance matrix)
+- $w$ any vector (portfolio weights)
+- $\lambda_i$ eigenvalues of $\Sigma$
+
+| Term | Condition | Portfolio meaning |
+|---|---|---|
+| PD | $w^\top\Sigma w>0$ for $w\ne0$; all $\lambda_i>0$ | Every portfolio has positive risk |
+| PSD | $\ge0$; all $\lambda_i\ge0$ | Some portfolio can have zero risk |
+| Indefinite | some $\lambda_i<0$ | "Negative variance" — Σ is broken |
+
+**Example:** (computed)
+
+- $\Sigma=\begin{bmatrix}0.04&0.012\\0.012&0.09\end{bmatrix}$ → eigenvalues 0.037, 0.093 (PD); $w=[0.6,0.4]$ → variance 0.0346 (vol ≈ 18.6%).
+- $C=\begin{bmatrix}1&0.9&-0.9\\0.9&1&0.9\\-0.9&0.9&1\end{bmatrix}$ → eigenvalues **−0.8**, 1.9, 1.9; $w=[0.577,-0.577,0.577]$ → "variance" = **−0.8** → indefinite (1~2 and 2~3 highly correlated but 1~3 strongly negative is impossible).
+
+**Why it matters:** mean–variance optimisation is **convex** only if Σ is PSD → a single global optimum (`quadprog`'s default algorithm is *interior-point-convex*, [[matlab-optimization-solvers]]). An indefinite Σ lets the optimiser exploit fake negative-risk directions (自己推理). Cholesky ($\Sigma=LL^\top$, used in Monte Carlo) needs PD.
+
+**When it breaks (自己推理):**
+
+| Cause | Result |
+|---|---|
+| $N>T$ | PSD but singular — test: $N$ = 50, $T$ = 20 → **31/50 eigenvalues ≈ 0** (rank ≤ T−1 = 19) |
+| Pairwise-NaN estimation | Can be indefinite |
+| Hand-set / stress correlations | Can be indefinite |
+| Floating point | Tiny −1e−15 eigenvalues |
+
+Here $N$ is the number of assets and $T$ the number of observations.
+
+**Check & fix:**
+
+```matlab
+isPSD = all(eig(Sigma) >= -1e-10);
+[~, p] = chol(Sigma);  isPD = (p == 0);
+```
+
+```python
+is_psd = np.linalg.eigvalsh(Sigma).min() >= -1e-10
+np.linalg.cholesky(Sigma)   # raises LinAlgError if not PD
+```
+
+Fixes: eigenvalue clipping ($V\,\mathrm{diag}(\max(\lambda,\epsilon))\,V^\top$); nearest correlation matrix (Higham; MATLAB `nearcorr` — verify); Ledoit–Wolf shrinkage; a factor model, which is PD by construction:
+
+$$\Sigma=BFB^\top+D$$
+
+**Variables:**
+
+- $B$ $N\times K$ matrix of factor exposures
+- $F$ $K\times K$ factor covariance
+- $D$ diagonal matrix of specific (idiosyncratic) variances
+- $K$ number of factors
+
+The sample Σ is noisy and singular when $N>T$; the factor model has far fewer parameters, is PD by construction, and gives an interpretable risk decomposition. Alternative: Ledoit–Wolf shrinkage.
+
 ### Connections
-- **Used by:** [[pca]] (eigenvectors of $\Sigma$), [[multicollinearity]] (small eigenvalues of $X^\top X$), [[portfolio-variance-diversification]] (valid correlation matrices), [[mean-variance-optimization]] (inverting $\Sigma$ amplifies small-eigenvalue noise).
+- **Used by:** [[pca]] (eigenvectors of $\Sigma$), [[multicollinearity]] (small eigenvalues of $X^\top X$), [[portfolio-variance-diversification]] (valid correlation matrices), [[mean-variance-optimization]] (inverting $\Sigma$ amplifies small-eigenvalue noise), [[matlab-optimization-solvers]] (convexity of the QP).

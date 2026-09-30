@@ -3,11 +3,11 @@ id: production-coding
 title: "Production & Coding"
 type: topic
 domain: quant-dev
-sources: [src-rbc-quantdev-prep]
+sources: [src-rbc-quantdev-prep, src-rbc-gam-quantdev-notes]
 ---
 # Production & Coding
 
-The final chapter covers running pricing code in production: integrating a new model-library release safely, reconciling prices that disagree between two systems, and a classic coding-interview algorithm.
+The last chapter of the Quant Dev track covers running code in production: integrating a new model-library release safely, reconciling prices that disagree between two systems, and a classic coding-interview algorithm.
 
 **Prerequisites:** [[pricing-app-architecture]], [[put-call-parity]], [[greeks-conventions-bumping]].
 
@@ -61,7 +61,7 @@ When two systems price the same trade differently, isolate the cause before touc
 <a id="floyd-cycle-detection"></a>
 
 ## Floyd's Cycle Detection (tortoise & hare)
-<!-- section: floyd-cycle-detection | prerequisites: [] | related: [] | sources: [src-rbc-quantdev-prep] | tags: [algorithms, linked-list] -->
+<!-- section: floyd-cycle-detection | prerequisites: [] | related: [] | sources: [src-rbc-quantdev-prep, src-rbc-gam-quantdev-notes] | tags: [algorithms, linked-list] -->
 
 Detect whether a linked list contains a cycle using two pointers moving at different speeds.
 
@@ -70,3 +70,13 @@ Detect whether a linked list contains a cycle using two pointers moving at diffe
 - **O(n) time, O(1) space.**
 - Cycle start: reset one pointer to the head, move both +1 until they meet.
 - (Glassdoor-reported RBC quant-dev question, alongside "explain basic OO concepts".)
+
+### Code (Python)
+```python
+def has_cycle(head):
+    slow = fast = head
+    while fast and fast.next:
+        slow, fast = slow.next, fast.next.next
+        if slow is fast: return True
+    return False
+```

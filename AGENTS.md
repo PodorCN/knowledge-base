@@ -39,9 +39,9 @@ Read this whole file before editing.
 
 ```
 home
-├── Foundations  → prob-stats · stochastic-finance
+├── Foundations  → prob-stats · stochastic-finance · quant-dev
 ├── Buy-side     → signal-research · portfolio-construction
-└── Sell-side    → black-scholes · pricing · risk-management · quant-dev
+└── Sell-side    → black-scholes · pricing · risk-management
 ```
 
 Tracks and chapters are in **reading order**: a section's `prerequisites` must come earlier in this order
@@ -64,8 +64,8 @@ Levels: **Group → Track → Chapter → Section**.
 Ask in this order:
 
 1. **Which interview is it for?** Asked in any quant interview (probability, statistics, basic
-   finance) → **Foundations**. Finding signals or building portfolios → **Buy-side**.
-   Stochastic calculus, pricing, modelling, hedging or building derivatives systems → **Sell-side**.
+   finance, programming / quant dev) → **Foundations**. Finding signals or building portfolios → **Buy-side**.
+   Stochastic calculus, pricing, modelling or hedging derivatives → **Sell-side**.
 2. **Which track?**
 
 | Track | Put here |
@@ -77,7 +77,7 @@ Ask in this order:
 | `pricing` | numerical methods, implied vol, vol surface construction, local/stochastic vol; exotic options, structured products, delta one (track title: "Pricing Models") |
 | `black-scholes` | Brownian motion, Itô, GBM, martingales, risk-neutral pricing; Black–Scholes PDE/formula, N(d1) vs N(d2), Black-76, American exercise; **Greeks** (own chapter) (track title: "Stochastic Calculus & Black–Scholes") |
 | `risk-management` | hedging, pin risk, scenarios, VaR/ES, model risk (Greeks themselves live in the `black-scholes` track) |
-| `quant-dev` | OOP, design patterns, C#/.NET, pricing-app architecture, releases, reconciliation, coding questions |
+| `quant-dev` | OOP, design patterns, C#/.NET, MATLAB (vs Python, interop, performance, memory model, config), portfolio optimisation in MATLAB, pricing-app architecture, releases, reconciliation, coding questions |
 
 3. **Which chapter?** Pick the existing chapter below whose subject fits. Only create a new chapter for a
    genuinely new topic (and list it in the track map).
@@ -90,12 +90,12 @@ Current chapters and question banks:
 |---|---|---|
 | `prob-stats` | `calculus-mental-math`, `probability-bayes`, `distributions`, `moments-covariance`, `puzzles-markov`, `estimation-testing`, `statistical-testing` | `qb-probability`, `qb-statistics-inference` |
 | `stochastic-finance` | `no-arbitrage-finance-basics`, `fixed-income-bonds`, `no-arbitrage-parity` | `qb-finance-foundations` |
+| `quant-dev` | `oop-design`, `csharp-dotnet`, `matlab-quant-dev`, `matlab-portfolio-optimisation`, `production-coding` | `qb-quant-dev-engineering` |
 | `signal-research` | `linear-regression`, `ml-regularisation`, `time-series-validation`, `signals-research-process`, `multi-asset-signals`, `research-backtesting` | `qb-regression-ml`, `qb-research-judgment` |
 | `portfolio-construction` | `measuring-performance`, `portfolio-optimisation`, `risk-budgeting-position-sizing` | `qb-portfolio-performance` |
 | `black-scholes` | `stochastic-calculus`, `black-scholes`, `black-scholes-call-derivation`, `greeks-sensitivities` | `qb-stochastic-calculus`, `qb-options-bs-greeks` |
 | `pricing` | `numerical-methods`, `implied-volatility-skew`, `vol-surface-construction-chapter`, `volatility-models`, `exotic-options`, `structured-products-delta-one` | `qb-vol-surface`, `qb-exotics-structured` |
 | `risk-management` | `hedging`, `risk-control-governance` | `qb-risk-management` |
-| `quant-dev` | `oop-design`, `csharp-dotnet`, `production-coding` | `qb-quant-dev-engineering` |
 
 Section ids are permanent (local question banks link to them): move sections between chapters freely,
 but never rename or delete a section id.

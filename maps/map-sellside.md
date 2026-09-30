@@ -10,6 +10,5 @@ tags: [map, group]
 - [[map-black-scholes]]
 - [[map-pricing]]
 - [[map-risk-management]]
-- [[map-quant-dev]]
 
 Back to [[home]].

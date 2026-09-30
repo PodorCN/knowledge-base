@@ -3,7 +3,7 @@ id: time-series-validation
 title: "Time Series & Validation"
 type: topic
 domain: signal-research
-sources: [src-squarepoint-dqa-workbook]
+sources: [src-squarepoint-dqa-workbook, src-rbc-gam-quantdev-notes]
 ---
 # Time Series & Validation
 
@@ -74,7 +74,7 @@ $$\mathrm{Var}(\bar X)=\frac{\sigma^2}{n}\Big[1+2\sum_{k=1}^{n-1}\Big(1-\frac kn
 <a id="cross-validation-leakage"></a>
 
 ## Validation, Walk-Forward CV & Leakage
-<!-- section: cross-validation-leakage | prerequisites: [bias-variance-tradeoff] | related: [backtest-pitfalls, stationarity-ar1, research-workflow] | sources: [src-squarepoint-dqa-workbook] | tags: [walk-forward, purging, leakage] -->
+<!-- section: cross-validation-leakage | prerequisites: [bias-variance-tradeoff] | related: [backtest-pitfalls, stationarity-ar1, research-workflow] | sources: [src-squarepoint-dqa-workbook, src-rbc-gam-quantdev-notes] | tags: [walk-forward, purging, leakage, point-in-time] -->
 
 Model selection needs data the model has not seen. With time series the split must respect time order, and any use of future information ("leakage") makes the validation meaningless.
 
@@ -88,6 +88,14 @@ Model selection needs data the model has not seen. With time series the split mu
 - Standardising or selecting features using future data.
 - Revised (not point-in-time) economic data.
 - Trading at a close you couldn't have observed before deciding.
+
+### Point-in-time join (no look-ahead)
+Join each price date to the latest fundamental record that was already **available** on that date:
+
+```python
+merged = pd.merge_asof(prices.sort_values("date"), fund.sort_values("available_date"),
+                       left_on="date", right_on="available_date", by="ticker", direction="backward")
+```
 
 ### Connections
 - **Builds on:** [[bias-variance-tradeoff]].

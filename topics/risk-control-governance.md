@@ -3,7 +3,7 @@ id: risk-control-governance
 title: "Risk Control & Governance"
 type: topic
 domain: risk-management
-sources: [src-rbc-quantdev-prep, src-squarepoint-dqa-workbook, src-vol-surface-exotics-notes]
+sources: [src-rbc-quantdev-prep, src-squarepoint-dqa-workbook, src-vol-surface-exotics-notes, src-rbc-gam-quantdev-notes]
 ---
 # Risk Control & Governance
 
@@ -39,12 +39,12 @@ Greeks are local. Revaluing the whole book under a grid of market moves captures
 <a id="risk-measures"></a>
 
 ## Drawdown, VaR, Expected Shortfall, Information Ratio
-<!-- section: risk-measures | prerequisites: [sharpe-ratio] | related: [win-rate-expectancy] | sources: [src-squarepoint-dqa-workbook] | tags: [var, es, drawdown] -->
+<!-- section: risk-measures | prerequisites: [sharpe-ratio] | related: [win-rate-expectancy] | sources: [src-squarepoint-dqa-workbook, src-rbc-gam-quantdev-notes] | tags: [var, es, drawdown, tracking-error] -->
 
 The Sharpe ratio summarises only the mean and standard deviation. Tails and path need their own measures.
 
 ### Formulas
-$$MDD=\max_t\Big(1-\frac{V_t}{\max_{s\le t}V_s}\Big),\qquad VaR_\alpha=\alpha\text{-quantile of }L,\qquad ES_\alpha=E[L\mid L\ge VaR_\alpha],\qquad IR=\frac{E[R-R_b]}{\sigma(R-R_b)}$$
+$$MDD=\max_t\Big(1-\frac{V_t}{\max_{s\le t}V_s}\Big),\qquad VaR_\alpha=\alpha\text{-quantile of }L,\qquad ES_\alpha=E[L\mid L\ge VaR_\alpha],\qquad TE=\sigma(R-R_b),\qquad IR=\frac{E[R-R_b]}{TE}$$
 
 **Variables:**
 
@@ -54,7 +54,10 @@ $$MDD=\max_t\Big(1-\frac{V_t}{\max_{s\le t}V_s}\Big),\qquad VaR_\alpha=\alpha\te
 - $\alpha$ confidence level (e.g. 99%)
 - $VaR_\alpha$ value at risk; $ES_\alpha$ expected shortfall
 - $R$ portfolio return; $R_b$ benchmark return
-- $IR$ information ratio (its denominator is the tracking error)
+- $TE$ tracking error
+- $IR$ information ratio
+
+**Max drawdown in pandas:** `wealth = (1 + rets).cumprod()`, then `(wealth / wealth.cummax() - 1).min()`.
 
 ### Connections
 - **Builds on:** [[sharpe-ratio]]. **Related:** [[win-rate-expectancy]].
