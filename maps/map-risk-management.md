@@ -7,7 +7,7 @@ tags: [map, track]
 ---
 # Risk Management
 
-Part of [[map-sellside]].
+Part of [[map-sellside]]. Hedging options and controlling desk risk: delta and gamma hedging, smile dynamics, overhedges, scenarios, tail measures and model risk.
 
 ## Topics (in reading order)
 

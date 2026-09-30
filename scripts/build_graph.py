@@ -280,6 +280,24 @@ def main() -> int:
         if track_map and f"[[{n['id']}]]" not in track_map["content"]:
             errors.append(f"{n['path']}: topic is not listed in map-{n['domain']}.md")
 
+    # Reading order: tracks as listed in home.md, chapters as listed in each track map.
+    # A section's prerequisites must appear earlier in that order.
+    home = nodes.get("home")
+    if home:
+        position: dict[str, int] = {}
+        for mid in WIKILINK.findall(home["content"]):
+            track_map = nodes.get(mid.strip())
+            if not track_map or track_map.get("domain") in ("", None):
+                continue
+            for tid in WIKILINK.findall(track_map["content"]):
+                topic = nodes.get(tid.strip())
+                if topic and topic["type"] == "topic":
+                    for sid in topic.get("sections", []):
+                        position.setdefault(sid, len(position))
+        for s, t, ty in raw_edges:
+            if ty == "prerequisite" and s in position and t in position and position[t] > position[s]:
+                warnings.append(f"{nodes[s]['path']}: prerequisite [[{t}]] of '{s}' comes later in the reading order")
+
     # Broken links. Source notes (sources/) are local-only, so a missing src-* note is not an error.
     for src, target in link_sites:
         if target not in nodes and not target.startswith(("src-", "qb-")):

@@ -7,7 +7,7 @@ tags: [map, track]
 ---
 # Quant Dev
 
-Part of [[map-sellside]].
+Part of [[map-sellside]]. Engineering a pricing application: object-oriented design, C# and .NET, and production practices.
 
 ## Topics (in reading order)
 
