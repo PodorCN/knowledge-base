@@ -2,7 +2,7 @@
 id: numerical-methods
 title: "Numerical Methods"
 type: topic
-domain: quant-models
+domain: pricing
 sources: [src-rbc-quantdev-prep, src-vol-surface-exotics-notes]
 ---
 # Numerical Methods

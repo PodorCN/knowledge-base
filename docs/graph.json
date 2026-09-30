@@ -9,10 +9,10 @@
     "index"
    ],
    "path": "maps/home.md",
-   "content": "# Home — Knowledge Map\n\n- **[[map-foundations]]**: [[map-prob-stats]] · [[map-stochastic-finance]]\n- **[[map-buyside]]**: [[map-signal-research]] · [[map-portfolio-construction]]\n- **[[map-sellside]]**: [[map-black-scholes]] · [[map-quant-models]] · [[map-pricing]] · [[map-risk-management]] · [[map-quant-dev]]\n\n## How to read this wiki\n\nChapters are numbered in reading order: every section is placed after the sections it builds on, and each chapter opens with its prerequisites and what it leads to. Foundations are needed by both sides; the Buy-side and Sell-side groups can be read independently after the Foundations. Inside a section the layout is always the same: a short statement of the idea, the **Formula** or **Definition** with a table of its variables, **Key points**, a **Worked example** where one exists, and **See also** links. Marks such as **(自己推理)** (own reasoning) and ✏️ (a corrected number) are kept from the original notes.\n\n## Notation & conventions\n\nSymbols below have the same meaning everywhere; a chapter that needs a local symbol defines it in its introduction or in the section's variable table.\n\n| Symbol | Meaning |\n|---|---|\n| $\\mathbb P$, $\\mathbb Q$, $\\mathbb Q^S$ | real-world, risk-neutral and stock-numeraire probability measures; $E^{\\mathbb Q}[\\cdot]$ expectation under $\\mathbb Q$ |\n| $N(\\cdot)$, $\\phi(\\cdot)$ | standard normal CDF and density |\n| $\\ln$ | natural logarithm |\n| $\\mathbf 1_A$, $x^+$ | indicator of event $A$; $\\max(x,0)$ |\n| $t$, $T$, $\\tau$ | current time, maturity (years), time to maturity $\\tau=T-t$ (formulas at $t=0$ use $T$) |\n| $r$, $q$, $D$ | continuously compounded risk-free rate, continuous dividend yield (incl. borrow where stated), discount factor $D=e^{-r\\tau}$ |\n| $\\mathrm{Div}_i$ | cash dividend with ex-date $t_i$ |\n| $S_t$, $F$, $K$ | spot price, forward price for delivery at $T$ ($F=S_0e^{(r-q)T}$), strike |\n| $k$, $\\omega$ | log-moneyness $k=\\ln(K/F)$; total implied variance $\\omega=\\sigma^2T$ |\n| $C$, $P$, $V$, $h$ | call price, put price, generic derivative value, payoff function |\n| $\\sigma$, $\\sigma_{\\text{imp}}$, $\\sigma_{\\text{real}}$ | volatility; implied and realised volatility |\n| $\\Delta$, $\\Gamma$, $\\mathcal V$, $\\Theta$, $\\mathrm{Rho}$ | delta, gamma, vega, theta, rho |\n| $\\mu$, $W_t$, $\\mathcal F_t$ | real-world drift / expected return, Brownian motion, information at $t$ |\n| $R_t$, $r_t$, $r_f$ | simple return, log return, risk-free return per period |\n| $n$, $\\bar X$, $s$ | sample size, sample mean, sample standard deviation |\n| $y$, $X$, $\\beta$, $\\varepsilon$, $e$, $p$ | regression response, design matrix, coefficients, errors, residuals, number of coefficients (incl. intercept) |\n| $\\rho$, $\\Sigma$ | correlation, covariance matrix |\n| $w$, $\\mu$, $\\sigma_p$, $\\gamma$ | portfolio weights, expected excess returns, portfolio volatility, risk aversion |\n| $SR$, $IR$, $IC$ | Sharpe ratio, information ratio, information coefficient |\n| $s_{i,t}$, $z_i$, $b_i$ | signal of asset $i$ at $t$, cross-sectional z-score, risk budget |\n\nBonds use $P$ (price), $M$ (face value), $c$ (annual coupon) and $y$ (yield) inside their chapter.",
+   "content": "# Home — Knowledge Map\n\n- **[[map-foundations]]**: [[map-prob-stats]] · [[map-stochastic-finance]]\n- **[[map-buyside]]**: [[map-signal-research]] · [[map-portfolio-construction]]\n- **[[map-sellside]]**: [[map-black-scholes]] · [[map-pricing]] · [[map-risk-management]] · [[map-quant-dev]]\n\n## How to read this wiki\n\nChapters are numbered in reading order: every section is placed after the sections it builds on, and each chapter opens with its prerequisites and what it leads to. Foundations are needed by both sides; the Buy-side and Sell-side groups can be read independently after the Foundations. Inside a section the layout is always the same: a short statement of the idea, the **Formula** or **Definition** with a table of its variables, **Key points**, a **Worked example** where one exists, and **See also** links. Marks such as **(自己推理)** (own reasoning) and ✏️ (a corrected number) are kept from the original notes.\n\n## Notation & conventions\n\nSymbols below have the same meaning everywhere; a chapter that needs a local symbol defines it in its introduction or in the section's variable table.\n\n| Symbol | Meaning |\n|---|---|\n| $\\mathbb P$, $\\mathbb Q$, $\\mathbb Q^S$ | real-world, risk-neutral and stock-numeraire probability measures; $E^{\\mathbb Q}[\\cdot]$ expectation under $\\mathbb Q$ |\n| $N(\\cdot)$, $\\phi(\\cdot)$ | standard normal CDF and density |\n| $\\ln$ | natural logarithm |\n| $\\mathbf 1_A$, $x^+$ | indicator of event $A$; $\\max(x,0)$ |\n| $t$, $T$, $\\tau$ | current time, maturity (years), time to maturity $\\tau=T-t$ (formulas at $t=0$ use $T$) |\n| $r$, $q$, $D$ | continuously compounded risk-free rate, continuous dividend yield (incl. borrow where stated), discount factor $D=e^{-r\\tau}$ |\n| $\\mathrm{Div}_i$ | cash dividend with ex-date $t_i$ |\n| $S_t$, $F$, $K$ | spot price, forward price for delivery at $T$ ($F=S_0e^{(r-q)T}$), strike |\n| $k$, $\\omega$ | log-moneyness $k=\\ln(K/F)$; total implied variance $\\omega=\\sigma^2T$ |\n| $C$, $P$, $V$, $h$ | call price, put price, generic derivative value, payoff function |\n| $\\sigma$, $\\sigma_{\\text{imp}}$, $\\sigma_{\\text{real}}$ | volatility; implied and realised volatility |\n| $\\Delta$, $\\Gamma$, $\\mathcal V$, $\\Theta$, $\\mathrm{Rho}$ | delta, gamma, vega, theta, rho |\n| $\\mu$, $W_t$, $\\mathcal F_t$ | real-world drift / expected return, Brownian motion, information at $t$ |\n| $R_t$, $r_t$, $r_f$ | simple return, log return, risk-free return per period |\n| $n$, $\\bar X$, $s$ | sample size, sample mean, sample standard deviation |\n| $y$, $X$, $\\beta$, $\\varepsilon$, $e$, $p$ | regression response, design matrix, coefficients, errors, residuals, number of coefficients (incl. intercept) |\n| $\\rho$, $\\Sigma$ | correlation, covariance matrix |\n| $w$, $\\mu$, $\\sigma_p$, $\\gamma$ | portfolio weights, expected excess returns, portfolio volatility, risk aversion |\n| $SR$, $IR$, $IC$ | Sharpe ratio, information ratio, information coefficient |\n| $s_{i,t}$, $z_i$, $b_i$ | signal of asset $i$ at $t$, cross-sectional z-score, risk budget |\n\nBonds use $P$ (price), $M$ (face value), $c$ (annual coupon) and $y$ (yield) inside their chapter.",
    "summary": "Chapters are numbered in reading order: every section is placed after the sections it builds on, and each chapter opens with its prerequisites and what it leads to. Foundations ar…",
    "topic": "",
-   "degree": 12
+   "degree": 11
   },
   {
    "id": "map-black-scholes",
@@ -76,7 +76,7 @@
   },
   {
    "id": "map-pricing",
-   "title": "Exotics & Structured Products",
+   "title": "Pricing Models",
    "type": "map",
    "domain": "pricing",
    "tags": [
@@ -84,10 +84,10 @@
     "track"
    ],
    "path": "maps/map-pricing.md",
-   "content": "# Exotics & Structured Products\n\nPart of [[map-sellside]]. Pricing exotic options and structured notes with the Black–Scholes, surface and model tools of the previous tracks.\n\n## Topics (in reading order)\n\n- [[exotic-options]]\n- [[structured-products-delta-one]]",
-   "summary": "Part of map-sellside. Pricing exotic options and structured notes with the Black–Scholes, surface and model tools of the previous tracks.",
+   "content": "# Pricing Models\n\nPart of [[map-sellside]]. Everything needed to price beyond Black–Scholes, in one sequence: numerical methods, implied volatility and the volatility surface, how the surface is built, the models used on top of it (local, stochastic, local-stochastic vol), and then the exotic options and structured products those tools price.\n\n## Topics (in reading order)\n\n- [[numerical-methods]]\n- [[implied-volatility-skew]]\n- [[vol-surface-construction-chapter]]\n- [[volatility-models]]\n- [[exotic-options]]\n- [[structured-products-delta-one]]",
+   "summary": "Part of map-sellside. Everything needed to price beyond Black–Scholes, in one sequence: numerical methods, implied volatility and the volatility surface, how the surface is built,…",
    "topic": "",
-   "degree": 4
+   "degree": 8
   },
   {
    "id": "map-prob-stats",
@@ -120,21 +120,6 @@
    "degree": 5
   },
   {
-   "id": "map-quant-models",
-   "title": "Quant Models",
-   "type": "map",
-   "domain": "quant-models",
-   "tags": [
-    "map",
-    "track"
-   ],
-   "path": "maps/map-quant-models.md",
-   "content": "# Quant Models\n\nPart of [[map-sellside]]. Numerical methods, implied volatility and the volatility surface, how the surface is built, and the models (local, stochastic, local-stochastic vol) used on top of it.\n\n## Topics (in reading order)\n\n- [[numerical-methods]]\n- [[implied-volatility-skew]]\n- [[vol-surface-construction-chapter]]\n- [[volatility-models]]",
-   "summary": "Part of map-sellside. Numerical methods, implied volatility and the volatility surface, how the surface is built, and the models (local, stochastic, local-stochastic vol) used on…",
-   "topic": "",
-   "degree": 6
-  },
-  {
    "id": "map-risk-management",
    "title": "Risk Management",
    "type": "map",
@@ -159,10 +144,10 @@
     "group"
    ],
    "path": "maps/map-sellside.md",
-   "content": "# Sell-side\n\n- [[map-black-scholes]]\n- [[map-quant-models]]\n- [[map-pricing]]\n- [[map-risk-management]]\n- [[map-quant-dev]]\n\nBack to [[home]].",
+   "content": "# Sell-side\n\n- [[map-black-scholes]]\n- [[map-pricing]]\n- [[map-risk-management]]\n- [[map-quant-dev]]\n\nBack to [[home]].",
    "summary": "Back to home.",
    "topic": "",
-   "degree": 6
+   "degree": 5
   },
   {
    "id": "map-signal-research",
@@ -1301,7 +1286,7 @@
    "id": "implied-volatility",
    "title": "Implied Volatility (inversion & quoting convention)",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "implied-vol",
     "newton",
@@ -1319,7 +1304,7 @@
    "id": "realized-volatility",
    "title": "Realised / Historical Volatility (EWMA) & Variance Risk Premium",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "ewma",
     "garch",
@@ -1335,7 +1320,7 @@
    "id": "volatility-surface",
    "title": "The Volatility Surface σ(K,T)",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "smile",
     "skew",
@@ -1351,7 +1336,7 @@
    "id": "vol-term-structure",
    "title": "Vol Term Structure, Forward Vol & Event Variance",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "forward-vol",
     "total-variance",
@@ -1367,7 +1352,7 @@
    "id": "volatility-skew",
    "title": "Volatility Skew & Smile (why equity skew is negative)",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "skew",
     "smile",
@@ -1383,7 +1368,7 @@
    "id": "fx-vol-conventions",
    "title": "FX Vol Quoting (ATM, Risk Reversal, Butterfly)",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "fx",
     "risk-reversal",
@@ -1400,10 +1385,10 @@
    "id": "implied-volatility-skew",
    "title": "Implied Volatility & the Volatility Surface",
    "type": "topic",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [],
    "path": "topics/implied-volatility-skew.md",
-   "content": "# Implied Volatility & the Volatility Surface\n\nMarkets quote options in volatility, not price. This chapter explains how an implied volatility is computed and why it is used as a quoting unit, contrasts it with realised volatility, and then assembles implied vols across strikes and expiries into the volatility surface — its term structure, its skew, and the FX market's delta-based quoting conventions.\n\n**Prerequisites:** [[black-scholes-formula]], [[black-76]], [[put-call-parity]], [[root-finding]], [[greeks]].\n\n**Leads to:** [[vol-surface-construction]], [[local-volatility-dupire]], [[digital-options]], [[variance-swaps]].\n\n**Sections:** [[implied-volatility]] · [[realized-volatility]] · [[volatility-surface]] · [[vol-term-structure]] · [[volatility-skew]] · [[fx-vol-conventions]]\n\nNotation for the quant-models track: $k=\\ln(K/F)$ log-moneyness, $\\omega=\\sigma^2T$ total implied variance, $\\sigma_{\\text{imp}}$ implied and $\\sigma_{\\text{real}}$ realised volatility, $\\mathcal V$ vega, $D$ discount factor, $F$ forward.\n\n<a id=\"implied-volatility\"></a>\n\n## Implied Volatility (inversion & quoting convention)\n<!-- section: implied-volatility | prerequisites: [black-scholes-formula, black-76, root-finding] | related: [volatility-surface, realized-volatility, put-call-parity, bond-duration, otm-stitching, implied-forward-regression, american-early-exercise, option-price-bounds] | tags: [implied-vol, newton, quoting, initial-guess, manaster-koehler] -->\n\nThe implied volatility of an option is the single $\\sigma$ that makes the Black–Scholes (Black-76) price equal to the market price. Because the price is strictly increasing in $\\sigma$, the inversion has a unique solution and is solved with Newton's method.\n\n### Formula\n$$C_{BS}(F,K,T,D,\\sigma)=C_{mkt},\\qquad \\sigma_{n+1}=\\sigma_n-\\frac{C_{BS}(\\sigma_n)-C_{mkt}}{\\mathcal V(\\sigma_n)},\\qquad \\mathcal V=D\\,F\\,\\phi(d_1)\\sqrt T$$\n\n**Variables:**\n\n- $C_{BS}$ Black-76 call price ([[black-76]])\n- $C_{mkt}$ observed market price (mid)\n- $F$ forward\n- $K$ strike\n- $T$ expiry\n- $D$ discount factor\n- $\\sigma$ implied vol solved for; $\\sigma_n$ guess at iteration $n$\n- $\\mathcal V=\\partial C/\\partial\\sigma$ vega ([[greeks]])\n- $\\phi$ standard normal pdf\n\n### Key points\n- Vega > 0 ⇒ price strictly increasing in $\\sigma$ ⇒ a **unique** solution, if the price is within the [[option-price-bounds]].\n- Newton converges in ~1 step near ATM (vega large and ~constant): e.g. a 5000 put with mid 151.20 → 16.81%.\n- Deep OTM / short-dated: vega → 0 and Newton explodes → bisection / Brent ([[root-finding]]). Production: Jäckel's *\"Let's be rational\"*.\n- **Call IV = put IV** at the same $(K,T)$ by [[put-call-parity]].\n- **Three meanings of \"calibrating vol\":** (1) invert each option (what desks do); (2) fit one σ to the whole chain (fails: −86% error on the 4300 put, +541% on the 5700 call); (3) estimate realised vol ($\\mathbb P$-measure, for risk only, [[realized-volatility]]).\n- **Circular?** Price → IV → price adds nothing for one option; the value is as a common unit, an interpolator, and because European payoffs are model-free given the whole surface ([[volatility-surface]]).\n\n| Bond world | Option world |\n|---|---|\n| YTM (flat curve — false) | IV (constant σ — false) |\n| Yield curve | Vol surface |\n| Callable bonds need a term-structure model | Barriers/cliquets need LV/SV |\n\n### Worked example: Newton with Black-76 after a parity regression\nOnce [[implied-forward-regression]] gives $D$ and $F$, invert Black-76 directly (no need for $r$, $q$ or dividends separately). Computed in Python: $D=0.96,\\ F=102,\\ K=100,\\ T=1,\\ C_{mkt}=9.00$.\n\n| Iter | σ | Model C | Vega |\n|---|---|---|---|\n| 0 | 0.2000 | 8.7211 | 38.30 |\n| 1 | 0.2073 | 9.0000 | 38.30 |\n\n**IV ≈ 20.73%.** The parity put $P=9-0.96\\times(102-100)=7.08$ gives the **same IV** (same $D$ and $F$).\n\n### Practical points (自己推理)\n- Use the **OTM** option at each strike (puts for $K<F$, calls for $K>F$) → [[otm-stitching]].\n- Fitting $D,F$ from data captures market-implied borrow / dividends / funding; a wrong $F$ makes call IV ≠ put IV.\n- **American options:** early exercise breaks parity → de-Americanise or use a tree first ([[american-early-exercise]]); cleanest on SPX.\n- Use mids; drop quotes violating $C<D\\max(F-K,0)$ (no IV exists).\n- Repeat per strike and expiry → the **vol surface** ([[volatility-surface]]).\n\n### Initial guess for Newton\n**Why it matters:** starting too high → vega small → overshoot to a negative σ; deep ITM/OTM at low σ → vega ≈ 0 → a huge step.\n\n**Option 1: Manaster–Koehler (1982)**\n\n$$\\sigma_0=\\sqrt{\\frac{2\\,|\\ln(F/K)|}{T}}\\quad\\Big(\\text{spot form: }\\sqrt{\\tfrac2T\\,|\\ln(S/K)+rT|}\\Big),\\qquad \\frac{\\partial\\mathcal V}{\\partial\\sigma}=\\mathcal V\\cdot\\frac{d_1d_2}{\\sigma}=0\\iff d_1d_2=0\\iff\\sigma^2T=2|\\ln(F/K)|$$\n\n**Variables:**\n\n- $\\sigma_0$ initial guess\n- $F,K,T$ forward, strike, expiry\n- $S$ spot; $r$ risk-free rate\n- $d_1,d_2$ Black-76 terms\n\n→ $\\sigma_0$ is where **vega is maximal** = the **inflection point** of $C(\\sigma)$ (convex below, concave above) → Newton moves monotonically and never overshoots. It fails at ATM ($\\sigma_0=0$).\n\n**Option 2: Brenner–Subrahmanyam (ATM)**\n\n$$\\sigma_0\\approx\\sqrt{\\frac{2\\pi}{T}}\\cdot\\frac{C}{D\\,F}$$\n\n**Variables:**\n\n- $C$ market call price\n- $D$ discount factor; $F$ forward; $T$ expiry\n\nA first-order Taylor expansion of Black–Scholes at ATM (the $C\\approx0.4\\,S\\sigma\\sqrt T$ shortcut of [[black-scholes-formula]]); poor away from the money (Corrado–Miller 1996 adds a moneyness correction).\n\n**Test** (computed; $D=0.96,F=102,T=1$):\n\n| Case | Start | Path | Result |\n|---|---|---|---|\n| K=100, true 20.73% | MK 0.199 | 0.199 → 0.2073 | ✅ 1 step |\n| | BS 0.230 | 0.230 → 0.2073 | ✅ 1 step |\n| | 3.0 | 3.0 → −3.05 → 4.61 → −27.4 | ❌ diverges |\n| K=150, true 25% | MK 0.878 | 0.878 → 0.345 → 0.269 → 0.251 → 0.250 | ✅ monotone |\n| | BS 0.020 | blows up | ❌ vega ≈ 0 |\n| | 3.0 | swings ± | ⚠️ unstable |\n\n**Practical recipe (自己推理):**\n\n1. Check the price ∈ $[D\\max(F-K,0),\\ DF]$; otherwise no IV exists.\n2. Start from MK; if $F\\approx K$, use Brenner–Subrahmanyam.\n3. Safeguarded Newton: keep a bracket, bisect if a step leaves it or vega is too small (Newton/Brent hybrid, [[root-finding]]).\n4. Production: **Jäckel \"Let's Be Rational\" (2015)**: machine precision in ~2 iterations.\n\n**Interview answer:** \"Start at the vega-maximising σ, √(2|ln(F/K)|/T), the inflection point of price in σ, so Newton converges monotonically. Near ATM use Brenner–Subrahmanyam, and always keep a bisection fallback.\"\n\n### Connections\n- **Builds on:** [[black-76]], [[root-finding]].\n- **Collected across $(K,T)$:** [[volatility-surface]]. **Contrast:** [[realized-volatility]]. **Analogy:** [[bond-duration]] (YTM).\n\n<a id=\"realized-volatility\"></a>\n\n## Realised / Historical Volatility (EWMA) & Variance Risk Premium\n<!-- section: realized-volatility | prerequisites: [returns-simple-log] | related: [implied-volatility, gamma-theta-pnl, variance-swaps, risk-neutral-pricing, structural-risk-premia] | tags: [ewma, garch, vrp] -->\n\nRealised volatility is measured from past returns under the real-world measure; implied volatility is a price under $\\mathbb Q$. Implied usually exceeds subsequently realised vol, and the gap is the variance risk premium.\n\n### Formulas\n$$\\hat\\sigma_{\\text{ann}}=\\mathrm{std}(r_t)\\,\\sqrt{252},\\qquad \\sigma_t^2=\\lambda\\,\\sigma_{t-1}^2+(1-\\lambda)\\,r_{t-1}^2$$\n\n**Variables:**\n\n- $\\hat\\sigma_{\\text{ann}}$ annualised historical volatility\n- $r_t$ daily log return\n- 252 trading days per year\n- $\\sigma_t^2$ EWMA variance estimate for day $t$\n- $\\lambda$ EWMA decay (0.94 for daily data, RiskMetrics)\n\n### Key points\n- A 1% daily standard deviation → ≈ 15.9% annual.\n- Realised vol is a $\\mathbb P$-measure quantity (risk, forecasting); implied vol is a $\\mathbb Q$-measure quantity (pricing). Implied is usually above subsequently realised → the **variance risk premium** ([[structural-risk-premia]]).\n\n### Connections\n- **Builds on:** [[returns-simple-log]].\n- **Traded against implied via:** [[gamma-theta-pnl]], [[variance-swaps]].\n\n<a id=\"volatility-surface\"></a>\n\n## The Volatility Surface σ(K,T)\n<!-- section: volatility-surface | prerequisites: [implied-volatility] | related: [volatility-skew, vol-term-structure, vol-surface-construction, breeden-litzenberger, sticky-strike-vs-sticky-moneyness, local-volatility-dupire] | tags: [smile, skew, surface] -->\n\nCollecting the implied vols of all listed options gives a function of strike and expiry. Its departures from a flat plane measure how wrong Black–Scholes is; at the same time, the surface prices every European payoff without a model.\n\n### Definition\n$$\\sigma_{\\text{imp}}=f(K,T)$$\n\n**Variables:**\n\n- $\\sigma_{\\text{imp}}$ implied volatility\n- $K$ strike (or log-moneyness $k=\\ln(K/F)$, or delta)\n- $T$ expiry\n\n### Key points\n- One point = a single option's IV; fix $T$ → the **smile/skew**; fix $K$ → the **term structure**; both → the **surface**.\n- If BS were right the surface would be a flat plane. The departure from flat measures how wrong BS is (equity skew in its modern form since 1987).\n- Surface ⇔ full set of call prices ⇔ risk-neutral density per maturity ([[breeden-litzenberger]]) ⇒ **European payoffs are model-free**; BS is just a coordinate system.\n- **Interpolate vol (or total variance), not price**: prices are convex in $K$ and grow ~$\\sqrt T$, so linear price interpolation is biased (2M 4800 put: price-interpolation 67.90, vol-interpolation 70.80, truth 71.98).\n- Where BS still bites: **Greeks** (surface dynamics, [[sticky-strike-vs-sticky-moneyness]]) and **path-dependent / forward-start** payoffs ([[forward-smile]]).\n\n### Worked example (index at 5000, synthetic)\n\n| Expiry | ATM-forward vol | 90% strike | 110% strike | 90–110 skew |\n|---|---|---|---|---|\n| 1M | 14.98% | 25.84% | 11.34% | 14.5 pts |\n| 3M | 16.49% | 23.30% | 11.91% | 11.4 pts |\n| 6M | 17.48% | 22.43% | 13.45% | 9.0 pts |\n\nTypical: an upward ATM term structure, with the skew flattening as maturity grows.\n\n### Connections\n- **Builds on:** [[implied-volatility]].\n- **Shape:** [[vol-term-structure]], [[volatility-skew]]. **Build:** [[vol-surface-construction]]. **Dynamics:** [[sticky-strike-vs-sticky-moneyness]].\n- **Models on top:** [[local-volatility-dupire]], [[heston-model]], [[local-stochastic-volatility]].\n\n<a id=\"vol-term-structure\"></a>\n\n## Vol Term Structure, Forward Vol & Event Variance\n<!-- section: vol-term-structure | prerequisites: [volatility-surface] | related: [surface-no-arbitrage, forward-smile, cliquets-forward-start] | tags: [forward-vol, total-variance, earnings] -->\n\nVariance, not volatility, adds up over time. Working in total variance gives forward vols between two expiries and lets a one-day event (such as earnings) be separated from the diffusive vol.\n\n### Formulas\n$$\\bar\\sigma^2=\\frac1T\\int_0^T\\sigma(t)^2\\,dt,\\qquad \\sigma_{\\text{fwd}}(T_1,T_2)=\\sqrt{\\frac{\\sigma_2^2T_2-\\sigma_1^2T_1}{T_2-T_1}},\\qquad \\sigma_T^2\\,T=\\sigma_{\\text{base}}^2\\,T+\\sigma_{\\text{event}}^2$$\n\n**Variables:**\n\n- $\\sigma(t)$ instantaneous deterministic vol\n- $\\bar\\sigma$ RMS vol to plug into Black–Scholes for expiry $T$\n- $\\sigma_1,\\sigma_2$ implied vols for expiries $T_1<T_2$\n- $\\sigma_{\\text{fwd}}(T_1,T_2)$ forward vol between $T_1$ and $T_2$\n- $\\sigma_T$ implied vol of an expiry spanning the event\n- $\\sigma_{\\text{base}}$ diffusive (non-event) vol\n- $\\sigma_{\\text{event}}$ standard deviation of the one-day event move\n\n### Worked examples\n- 3M 20%, 6M 22% → forward vol $\\sqrt{(0.22^2\\times0.5-0.20^2\\times0.25)/0.25}=\\sqrt{(0.0242-0.01)/0.25}=23.8\\%$.\n- Base 25%; a 1M expiry spanning earnings is at 40% → $\\sigma_{\\text{event}}^2=(0.40^2-0.25^2)/12=(0.16-0.0625)/12=0.0081$ → ±9% implied move.\n\n### Key idea\n**Total variance $\\omega=\\sigma^2T$ is additive in time** → interpolate in $\\omega$ (at constant log-moneyness), and require $\\omega$ to be non-decreasing in $T$ (no calendar arbitrage).\n\n### Connections\n- **Builds on:** [[volatility-surface]].\n- **Constraint:** calendar arbitrage in [[surface-no-arbitrage]]. **Future smiles:** [[forward-smile]]. **Products:** [[cliquets-forward-start]].\n\n<a id=\"volatility-skew\"></a>\n\n## Volatility Skew & Smile (why equity skew is negative)\n<!-- section: volatility-skew | prerequisites: [volatility-surface] | related: [digital-options, variance-swaps, autocallables, heston-model, jump-diffusion, fx-vol-conventions, lognormal-distribution] | tags: [skew, smile, leverage-effect] -->\n\nIn equity markets implied vol falls as the strike rises: downside puts are dear relative to Black–Scholes at a flat vol. This skew drives the prices of many exotic products.\n\n### Definitions\n- **Skew:** the left wing is up (equity). **Smile:** both wings are up (typical of FX).\n- Example, 3M chain with $S$ = 100: the 90 put trades at 26% vol (price 1.45, vs 0.71 at a flat 20%) — the market charges ~2× for downside protection.\n\n### Why equity skew is negative\n1. **Leverage effect** — price ↓ → leverage ↑ → vol ↑.\n2. **Crash fear** — hedgers' demand for downside puts (post-1987).\n3. **Supply of upside calls** from overwriters.\n\n→ OTM puts are richer than OTM calls; $\\partial\\sigma/\\partial K<0$.\n\n### Where skew shows up in prices\n- [[digital-options]]: the skew term $-\\mathcal V\\,\\partial\\sigma/\\partial K>0$ makes digital calls dearer.\n- [[variance-swaps]]: $1/K^2$ weights on expensive puts → variance strike > ATM vol.\n- [[autocallables]]: the investor sells a deep OTM put priced in the steep part of the skew.\n- [[sticky-strike-vs-sticky-moneyness]]: skew makes delta depend on the surface dynamics.\n\n### Models producing skew\nHeston with $\\rho<0$ ([[heston-model]]); jumps for short-dated skew ([[jump-diffusion]]); the SVI $\\rho$ parameter ([[svi]]).\n\n### Connections\n- **Builds on:** [[volatility-surface]]; it is the failure of the lognormal assumption ([[lognormal-distribution]]).\n\n<a id=\"fx-vol-conventions\"></a>\n\n## FX Vol Quoting (ATM, Risk Reversal, Butterfly)\n<!-- section: fx-vol-conventions | prerequisites: [volatility-surface, greeks] | related: [second-order-greeks, sabr, volatility-skew] | tags: [fx, risk-reversal, butterfly, delta-quoting] -->\n\nThe OTC FX market quotes the smile directly in vol terms, per tenor, by three numbers: the ATM vol, the 25-delta risk reversal (skew) and the 25-delta butterfly (curvature).\n\n### Formulas\n$$\\sigma_{25C}=\\sigma_{ATM}+\\tfrac12RR+BF,\\qquad \\sigma_{25P}=\\sigma_{ATM}-\\tfrac12RR+BF$$\n\n**Variables:**\n\n- $\\sigma_{25C},\\sigma_{25P}$ vols of the 25-delta call and put\n- $\\sigma_{ATM}$ delta-neutral straddle vol\n- $RR$ 25-delta risk reversal: call vol − put vol (measures skew)\n- $BF$ 25-delta butterfly: average wing vol − ATM vol (measures curvature)\n\n### Worked example\nATM 7.0%, RR −0.5%, BF 0.2% → 25Δ call $7.0-0.25+0.2=6.95\\%$, 25Δ put $7.0+0.25+0.2=7.45\\%$.\n\n### Key points\n- The OTC market quotes **vol**, not price; per tenor, often also at 10Δ.\n- Interpolating across delta: vanna–volga (standard, not arbitrage-free, [[second-order-greeks]]), SABR ([[sabr]]), polynomial.\n- Traps: delta conventions (spot vs forward delta, premium-adjusted), market vs smile strangle.\n\n### Connections\n- **Builds on:** [[volatility-surface]], [[greeks]] (delta as the strike coordinate).",
+   "content": "# Implied Volatility & the Volatility Surface\n\nMarkets quote options in volatility, not price. This chapter explains how an implied volatility is computed and why it is used as a quoting unit, contrasts it with realised volatility, and then assembles implied vols across strikes and expiries into the volatility surface — its term structure, its skew, and the FX market's delta-based quoting conventions.\n\n**Prerequisites:** [[black-scholes-formula]], [[black-76]], [[put-call-parity]], [[root-finding]], [[greeks]].\n\n**Leads to:** [[vol-surface-construction]], [[local-volatility-dupire]], [[digital-options]], [[variance-swaps]].\n\n**Sections:** [[implied-volatility]] · [[realized-volatility]] · [[volatility-surface]] · [[vol-term-structure]] · [[volatility-skew]] · [[fx-vol-conventions]]\n\nNotation for the pricing-models track: $k=\\ln(K/F)$ log-moneyness, $\\omega=\\sigma^2T$ total implied variance, $\\sigma_{\\text{imp}}$ implied and $\\sigma_{\\text{real}}$ realised volatility, $\\mathcal V$ vega, $D$ discount factor, $F$ forward.\n\n<a id=\"implied-volatility\"></a>\n\n## Implied Volatility (inversion & quoting convention)\n<!-- section: implied-volatility | prerequisites: [black-scholes-formula, black-76, root-finding] | related: [volatility-surface, realized-volatility, put-call-parity, bond-duration, otm-stitching, implied-forward-regression, american-early-exercise, option-price-bounds] | tags: [implied-vol, newton, quoting, initial-guess, manaster-koehler] -->\n\nThe implied volatility of an option is the single $\\sigma$ that makes the Black–Scholes (Black-76) price equal to the market price. Because the price is strictly increasing in $\\sigma$, the inversion has a unique solution and is solved with Newton's method.\n\n### Formula\n$$C_{BS}(F,K,T,D,\\sigma)=C_{mkt},\\qquad \\sigma_{n+1}=\\sigma_n-\\frac{C_{BS}(\\sigma_n)-C_{mkt}}{\\mathcal V(\\sigma_n)},\\qquad \\mathcal V=D\\,F\\,\\phi(d_1)\\sqrt T$$\n\n**Variables:**\n\n- $C_{BS}$ Black-76 call price ([[black-76]])\n- $C_{mkt}$ observed market price (mid)\n- $F$ forward\n- $K$ strike\n- $T$ expiry\n- $D$ discount factor\n- $\\sigma$ implied vol solved for; $\\sigma_n$ guess at iteration $n$\n- $\\mathcal V=\\partial C/\\partial\\sigma$ vega ([[greeks]])\n- $\\phi$ standard normal pdf\n\n### Key points\n- Vega > 0 ⇒ price strictly increasing in $\\sigma$ ⇒ a **unique** solution, if the price is within the [[option-price-bounds]].\n- Newton converges in ~1 step near ATM (vega large and ~constant): e.g. a 5000 put with mid 151.20 → 16.81%.\n- Deep OTM / short-dated: vega → 0 and Newton explodes → bisection / Brent ([[root-finding]]). Production: Jäckel's *\"Let's be rational\"*.\n- **Call IV = put IV** at the same $(K,T)$ by [[put-call-parity]].\n- **Three meanings of \"calibrating vol\":** (1) invert each option (what desks do); (2) fit one σ to the whole chain (fails: −86% error on the 4300 put, +541% on the 5700 call); (3) estimate realised vol ($\\mathbb P$-measure, for risk only, [[realized-volatility]]).\n- **Circular?** Price → IV → price adds nothing for one option; the value is as a common unit, an interpolator, and because European payoffs are model-free given the whole surface ([[volatility-surface]]).\n\n| Bond world | Option world |\n|---|---|\n| YTM (flat curve — false) | IV (constant σ — false) |\n| Yield curve | Vol surface |\n| Callable bonds need a term-structure model | Barriers/cliquets need LV/SV |\n\n### Worked example: Newton with Black-76 after a parity regression\nOnce [[implied-forward-regression]] gives $D$ and $F$, invert Black-76 directly (no need for $r$, $q$ or dividends separately). Computed in Python: $D=0.96,\\ F=102,\\ K=100,\\ T=1,\\ C_{mkt}=9.00$.\n\n| Iter | σ | Model C | Vega |\n|---|---|---|---|\n| 0 | 0.2000 | 8.7211 | 38.30 |\n| 1 | 0.2073 | 9.0000 | 38.30 |\n\n**IV ≈ 20.73%.** The parity put $P=9-0.96\\times(102-100)=7.08$ gives the **same IV** (same $D$ and $F$).\n\n### Practical points (自己推理)\n- Use the **OTM** option at each strike (puts for $K<F$, calls for $K>F$) → [[otm-stitching]].\n- Fitting $D,F$ from data captures market-implied borrow / dividends / funding; a wrong $F$ makes call IV ≠ put IV.\n- **American options:** early exercise breaks parity → de-Americanise or use a tree first ([[american-early-exercise]]); cleanest on SPX.\n- Use mids; drop quotes violating $C<D\\max(F-K,0)$ (no IV exists).\n- Repeat per strike and expiry → the **vol surface** ([[volatility-surface]]).\n\n### Initial guess for Newton\n**Why it matters:** starting too high → vega small → overshoot to a negative σ; deep ITM/OTM at low σ → vega ≈ 0 → a huge step.\n\n**Option 1: Manaster–Koehler (1982)**\n\n$$\\sigma_0=\\sqrt{\\frac{2\\,|\\ln(F/K)|}{T}}\\quad\\Big(\\text{spot form: }\\sqrt{\\tfrac2T\\,|\\ln(S/K)+rT|}\\Big),\\qquad \\frac{\\partial\\mathcal V}{\\partial\\sigma}=\\mathcal V\\cdot\\frac{d_1d_2}{\\sigma}=0\\iff d_1d_2=0\\iff\\sigma^2T=2|\\ln(F/K)|$$\n\n**Variables:**\n\n- $\\sigma_0$ initial guess\n- $F,K,T$ forward, strike, expiry\n- $S$ spot; $r$ risk-free rate\n- $d_1,d_2$ Black-76 terms\n\n→ $\\sigma_0$ is where **vega is maximal** = the **inflection point** of $C(\\sigma)$ (convex below, concave above) → Newton moves monotonically and never overshoots. It fails at ATM ($\\sigma_0=0$).\n\n**Option 2: Brenner–Subrahmanyam (ATM)**\n\n$$\\sigma_0\\approx\\sqrt{\\frac{2\\pi}{T}}\\cdot\\frac{C}{D\\,F}$$\n\n**Variables:**\n\n- $C$ market call price\n- $D$ discount factor; $F$ forward; $T$ expiry\n\nA first-order Taylor expansion of Black–Scholes at ATM (the $C\\approx0.4\\,S\\sigma\\sqrt T$ shortcut of [[black-scholes-formula]]); poor away from the money (Corrado–Miller 1996 adds a moneyness correction).\n\n**Test** (computed; $D=0.96,F=102,T=1$):\n\n| Case | Start | Path | Result |\n|---|---|---|---|\n| K=100, true 20.73% | MK 0.199 | 0.199 → 0.2073 | ✅ 1 step |\n| | BS 0.230 | 0.230 → 0.2073 | ✅ 1 step |\n| | 3.0 | 3.0 → −3.05 → 4.61 → −27.4 | ❌ diverges |\n| K=150, true 25% | MK 0.878 | 0.878 → 0.345 → 0.269 → 0.251 → 0.250 | ✅ monotone |\n| | BS 0.020 | blows up | ❌ vega ≈ 0 |\n| | 3.0 | swings ± | ⚠️ unstable |\n\n**Practical recipe (自己推理):**\n\n1. Check the price ∈ $[D\\max(F-K,0),\\ DF]$; otherwise no IV exists.\n2. Start from MK; if $F\\approx K$, use Brenner–Subrahmanyam.\n3. Safeguarded Newton: keep a bracket, bisect if a step leaves it or vega is too small (Newton/Brent hybrid, [[root-finding]]).\n4. Production: **Jäckel \"Let's Be Rational\" (2015)**: machine precision in ~2 iterations.\n\n**Interview answer:** \"Start at the vega-maximising σ, √(2|ln(F/K)|/T), the inflection point of price in σ, so Newton converges monotonically. Near ATM use Brenner–Subrahmanyam, and always keep a bisection fallback.\"\n\n### Connections\n- **Builds on:** [[black-76]], [[root-finding]].\n- **Collected across $(K,T)$:** [[volatility-surface]]. **Contrast:** [[realized-volatility]]. **Analogy:** [[bond-duration]] (YTM).\n\n<a id=\"realized-volatility\"></a>\n\n## Realised / Historical Volatility (EWMA) & Variance Risk Premium\n<!-- section: realized-volatility | prerequisites: [returns-simple-log] | related: [implied-volatility, gamma-theta-pnl, variance-swaps, risk-neutral-pricing, structural-risk-premia] | tags: [ewma, garch, vrp] -->\n\nRealised volatility is measured from past returns under the real-world measure; implied volatility is a price under $\\mathbb Q$. Implied usually exceeds subsequently realised vol, and the gap is the variance risk premium.\n\n### Formulas\n$$\\hat\\sigma_{\\text{ann}}=\\mathrm{std}(r_t)\\,\\sqrt{252},\\qquad \\sigma_t^2=\\lambda\\,\\sigma_{t-1}^2+(1-\\lambda)\\,r_{t-1}^2$$\n\n**Variables:**\n\n- $\\hat\\sigma_{\\text{ann}}$ annualised historical volatility\n- $r_t$ daily log return\n- 252 trading days per year\n- $\\sigma_t^2$ EWMA variance estimate for day $t$\n- $\\lambda$ EWMA decay (0.94 for daily data, RiskMetrics)\n\n### Key points\n- A 1% daily standard deviation → ≈ 15.9% annual.\n- Realised vol is a $\\mathbb P$-measure quantity (risk, forecasting); implied vol is a $\\mathbb Q$-measure quantity (pricing). Implied is usually above subsequently realised → the **variance risk premium** ([[structural-risk-premia]]).\n\n### Connections\n- **Builds on:** [[returns-simple-log]].\n- **Traded against implied via:** [[gamma-theta-pnl]], [[variance-swaps]].\n\n<a id=\"volatility-surface\"></a>\n\n## The Volatility Surface σ(K,T)\n<!-- section: volatility-surface | prerequisites: [implied-volatility] | related: [volatility-skew, vol-term-structure, vol-surface-construction, breeden-litzenberger, sticky-strike-vs-sticky-moneyness, local-volatility-dupire] | tags: [smile, skew, surface] -->\n\nCollecting the implied vols of all listed options gives a function of strike and expiry. Its departures from a flat plane measure how wrong Black–Scholes is; at the same time, the surface prices every European payoff without a model.\n\n### Definition\n$$\\sigma_{\\text{imp}}=f(K,T)$$\n\n**Variables:**\n\n- $\\sigma_{\\text{imp}}$ implied volatility\n- $K$ strike (or log-moneyness $k=\\ln(K/F)$, or delta)\n- $T$ expiry\n\n### Key points\n- One point = a single option's IV; fix $T$ → the **smile/skew**; fix $K$ → the **term structure**; both → the **surface**.\n- If BS were right the surface would be a flat plane. The departure from flat measures how wrong BS is (equity skew in its modern form since 1987).\n- Surface ⇔ full set of call prices ⇔ risk-neutral density per maturity ([[breeden-litzenberger]]) ⇒ **European payoffs are model-free**; BS is just a coordinate system.\n- **Interpolate vol (or total variance), not price**: prices are convex in $K$ and grow ~$\\sqrt T$, so linear price interpolation is biased (2M 4800 put: price-interpolation 67.90, vol-interpolation 70.80, truth 71.98).\n- Where BS still bites: **Greeks** (surface dynamics, [[sticky-strike-vs-sticky-moneyness]]) and **path-dependent / forward-start** payoffs ([[forward-smile]]).\n\n### Worked example (index at 5000, synthetic)\n\n| Expiry | ATM-forward vol | 90% strike | 110% strike | 90–110 skew |\n|---|---|---|---|---|\n| 1M | 14.98% | 25.84% | 11.34% | 14.5 pts |\n| 3M | 16.49% | 23.30% | 11.91% | 11.4 pts |\n| 6M | 17.48% | 22.43% | 13.45% | 9.0 pts |\n\nTypical: an upward ATM term structure, with the skew flattening as maturity grows.\n\n### Connections\n- **Builds on:** [[implied-volatility]].\n- **Shape:** [[vol-term-structure]], [[volatility-skew]]. **Build:** [[vol-surface-construction]]. **Dynamics:** [[sticky-strike-vs-sticky-moneyness]].\n- **Models on top:** [[local-volatility-dupire]], [[heston-model]], [[local-stochastic-volatility]].\n\n<a id=\"vol-term-structure\"></a>\n\n## Vol Term Structure, Forward Vol & Event Variance\n<!-- section: vol-term-structure | prerequisites: [volatility-surface] | related: [surface-no-arbitrage, forward-smile, cliquets-forward-start] | tags: [forward-vol, total-variance, earnings] -->\n\nVariance, not volatility, adds up over time. Working in total variance gives forward vols between two expiries and lets a one-day event (such as earnings) be separated from the diffusive vol.\n\n### Formulas\n$$\\bar\\sigma^2=\\frac1T\\int_0^T\\sigma(t)^2\\,dt,\\qquad \\sigma_{\\text{fwd}}(T_1,T_2)=\\sqrt{\\frac{\\sigma_2^2T_2-\\sigma_1^2T_1}{T_2-T_1}},\\qquad \\sigma_T^2\\,T=\\sigma_{\\text{base}}^2\\,T+\\sigma_{\\text{event}}^2$$\n\n**Variables:**\n\n- $\\sigma(t)$ instantaneous deterministic vol\n- $\\bar\\sigma$ RMS vol to plug into Black–Scholes for expiry $T$\n- $\\sigma_1,\\sigma_2$ implied vols for expiries $T_1<T_2$\n- $\\sigma_{\\text{fwd}}(T_1,T_2)$ forward vol between $T_1$ and $T_2$\n- $\\sigma_T$ implied vol of an expiry spanning the event\n- $\\sigma_{\\text{base}}$ diffusive (non-event) vol\n- $\\sigma_{\\text{event}}$ standard deviation of the one-day event move\n\n### Worked examples\n- 3M 20%, 6M 22% → forward vol $\\sqrt{(0.22^2\\times0.5-0.20^2\\times0.25)/0.25}=\\sqrt{(0.0242-0.01)/0.25}=23.8\\%$.\n- Base 25%; a 1M expiry spanning earnings is at 40% → $\\sigma_{\\text{event}}^2=(0.40^2-0.25^2)/12=(0.16-0.0625)/12=0.0081$ → ±9% implied move.\n\n### Key idea\n**Total variance $\\omega=\\sigma^2T$ is additive in time** → interpolate in $\\omega$ (at constant log-moneyness), and require $\\omega$ to be non-decreasing in $T$ (no calendar arbitrage).\n\n### Connections\n- **Builds on:** [[volatility-surface]].\n- **Constraint:** calendar arbitrage in [[surface-no-arbitrage]]. **Future smiles:** [[forward-smile]]. **Products:** [[cliquets-forward-start]].\n\n<a id=\"volatility-skew\"></a>\n\n## Volatility Skew & Smile (why equity skew is negative)\n<!-- section: volatility-skew | prerequisites: [volatility-surface] | related: [digital-options, variance-swaps, autocallables, heston-model, jump-diffusion, fx-vol-conventions, lognormal-distribution] | tags: [skew, smile, leverage-effect] -->\n\nIn equity markets implied vol falls as the strike rises: downside puts are dear relative to Black–Scholes at a flat vol. This skew drives the prices of many exotic products.\n\n### Definitions\n- **Skew:** the left wing is up (equity). **Smile:** both wings are up (typical of FX).\n- Example, 3M chain with $S$ = 100: the 90 put trades at 26% vol (price 1.45, vs 0.71 at a flat 20%) — the market charges ~2× for downside protection.\n\n### Why equity skew is negative\n1. **Leverage effect** — price ↓ → leverage ↑ → vol ↑.\n2. **Crash fear** — hedgers' demand for downside puts (post-1987).\n3. **Supply of upside calls** from overwriters.\n\n→ OTM puts are richer than OTM calls; $\\partial\\sigma/\\partial K<0$.\n\n### Where skew shows up in prices\n- [[digital-options]]: the skew term $-\\mathcal V\\,\\partial\\sigma/\\partial K>0$ makes digital calls dearer.\n- [[variance-swaps]]: $1/K^2$ weights on expensive puts → variance strike > ATM vol.\n- [[autocallables]]: the investor sells a deep OTM put priced in the steep part of the skew.\n- [[sticky-strike-vs-sticky-moneyness]]: skew makes delta depend on the surface dynamics.\n\n### Models producing skew\nHeston with $\\rho<0$ ([[heston-model]]); jumps for short-dated skew ([[jump-diffusion]]); the SVI $\\rho$ parameter ([[svi]]).\n\n### Connections\n- **Builds on:** [[volatility-surface]]; it is the failure of the lognormal assumption ([[lognormal-distribution]]).\n\n<a id=\"fx-vol-conventions\"></a>\n\n## FX Vol Quoting (ATM, Risk Reversal, Butterfly)\n<!-- section: fx-vol-conventions | prerequisites: [volatility-surface, greeks] | related: [second-order-greeks, sabr, volatility-skew] | tags: [fx, risk-reversal, butterfly, delta-quoting] -->\n\nThe OTC FX market quotes the smile directly in vol terms, per tenor, by three numbers: the ATM vol, the 25-delta risk reversal (skew) and the 25-delta butterfly (curvature).\n\n### Formulas\n$$\\sigma_{25C}=\\sigma_{ATM}+\\tfrac12RR+BF,\\qquad \\sigma_{25P}=\\sigma_{ATM}-\\tfrac12RR+BF$$\n\n**Variables:**\n\n- $\\sigma_{25C},\\sigma_{25P}$ vols of the 25-delta call and put\n- $\\sigma_{ATM}$ delta-neutral straddle vol\n- $RR$ 25-delta risk reversal: call vol − put vol (measures skew)\n- $BF$ 25-delta butterfly: average wing vol − ATM vol (measures curvature)\n\n### Worked example\nATM 7.0%, RR −0.5%, BF 0.2% → 25Δ call $7.0-0.25+0.2=6.95\\%$, 25Δ put $7.0+0.25+0.2=7.45\\%$.\n\n### Key points\n- The OTC market quotes **vol**, not price; per tenor, often also at 10Δ.\n- Interpolating across delta: vanna–volga (standard, not arbitrage-free, [[second-order-greeks]]), SABR ([[sabr]]), polynomial.\n- Traps: delta conventions (spot vs forward delta, premium-adjusted), market vs smile strangle.\n\n### Connections\n- **Builds on:** [[volatility-surface]], [[greeks]] (delta as the strike coordinate).",
    "summary": "Markets quote options in volatility, not price. This chapter explains how an implied volatility is computed and why it is used as a quoting unit, contrasts it with realised volati…",
    "topic": "",
    "sections": [
@@ -2122,7 +2107,7 @@
    "id": "root-finding",
    "title": "Root Finding (Newton, Bisection, Brent)",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "numerics",
     "newton",
@@ -2138,7 +2123,7 @@
    "id": "pde-finite-difference",
    "title": "PDE / Finite-Difference Pricing",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "pde",
     "grid",
@@ -2154,7 +2139,7 @@
    "id": "monte-carlo-pricing",
    "title": "Monte Carlo Pricing",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "monte-carlo",
     "aad",
@@ -2171,7 +2156,7 @@
    "id": "numerical-methods",
    "title": "Numerical Methods",
    "type": "topic",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [],
    "path": "topics/numerical-methods.md",
    "content": "# Numerical Methods\n\nWhen no closed form exists, prices and implied quantities are computed numerically. This chapter covers the three workhorses: root finding (implied vols, yields), finite-difference solution of the pricing PDE, and Monte Carlo simulation — and when to use which.\n\n**Prerequisites:** [[black-scholes-pde]], [[risk-neutral-pricing]], [[lln-clt]].\n\n**Leads to:** [[implied-volatility]] (Newton inversion), [[barrier-options]], [[autocallables]], [[local-stochastic-volatility]].\n\n**Sections:** [[root-finding]] · [[pde-finite-difference]] · [[monte-carlo-pricing]]\n\n<a id=\"root-finding\"></a>\n\n## Root Finding (Newton, Bisection, Brent)\n<!-- section: root-finding | prerequisites: [taylor-expansions] | related: [implied-volatility, bond-yield-measures] | tags: [numerics, newton, brent] -->\n\nSolving $f(x)=0$ numerically: Newton's method uses the derivative for fast convergence; bracketing methods trade speed for guaranteed convergence.\n\n### Formula\n$$x_{n+1}=x_n-\\frac{f(x_n)}{f'(x_n)}\\quad\\text{(Newton)}$$\n\n**Variables:**\n\n- $f$ function whose root is sought\n- $f'$ its derivative\n- $x_n$ iterate at step $n$\n\nNewton's step is the root of the first-order Taylor expansion of $f$ at $x_n$ ([[taylor-expansions]]).\n\n### Key points\n- **Newton:** quadratic convergence near the root; explodes when $f'\\to0$.\n- **Bisection:** guaranteed (needs a bracket), linear convergence.\n- **Brent:** bracketed + fast — the robust default.\n- For implied vol: check the price is within the arbitrage bounds first, keep a bracket, use a good initial guess ([[implied-volatility]]).\n\n### Connections\n- **Used by:** [[implied-volatility]], [[bond-yield-measures]] (YTM).\n\n<a id=\"pde-finite-difference\"></a>\n\n## PDE / Finite-Difference Pricing\n<!-- section: pde-finite-difference | prerequisites: [black-scholes-pde] | related: [monte-carlo-pricing, barrier-options, american-early-exercise, local-volatility-dupire] | tags: [pde, grid, crank-nicolson] -->\n\nThe pricing PDE is solved backward in time on a grid in $(S,t)$, starting from the payoff at expiry.\n\n### Key points\n- Accurate, stable Greeks in 1–2 factors; natural for **American exercise** ([[american-early-exercise]]) and **single-asset barriers** (the barrier is a boundary; align grid nodes with the barrier $H$, [[barrier-options]]).\n- Discrete dividends: jump conditions at ex-dates.\n- Curse of dimensionality → multi-asset products go to [[monte-carlo-pricing]].\n\n### Connections\n- **Builds on:** [[black-scholes-pde]].\n- **Used for:** [[barrier-options]], [[american-early-exercise]], [[local-volatility-dupire]].\n\n<a id=\"monte-carlo-pricing\"></a>\n\n## Monte Carlo Pricing\n<!-- section: monte-carlo-pricing | prerequisites: [risk-neutral-pricing, lln-clt] | related: [pde-finite-difference, autocallables, barrier-options, asian-options, greeks-conventions-bumping, local-stochastic-volatility, static-replication] | tags: [monte-carlo, aad, longstaff-schwartz, variance-reduction] -->\n\nMonte Carlo simulates many risk-neutral paths and averages the discounted payoff. By the CLT its error falls like $1/\\sqrt M$ in the number of paths $M$ ([[lln-clt]]).\n\n### Formula\n$$V_0\\approx e^{-rT}\\,\\frac1M\\sum_{j=1}^Mh\\big(S^{(j)}\\big),\\qquad \\text{standard error}\\propto\\frac{1}{\\sqrt M}$$\n\n**Variables:**\n\n- $V_0$ price estimate\n- $M$ number of simulated paths\n- $S^{(j)}$ the $j$-th simulated path under $\\mathbb Q$\n- $h$ payoff (may depend on the whole path)\n- $r$ risk-free rate; $T$ maturity\n\n### Key points\n- **Workhorse** for high-dimensional / path-dependent products: worst-of autocallables, baskets, cliquets.\n- **Variance reduction:** antithetic paths; control variates (closed-form geometric Asian, flat-vol barrier).\n- **Greeks:** AAD (adjoint algorithmic differentiation — \"Smoking Adjoints\") or bumping with common random numbers ([[greeks-conventions-bumping]]).\n- **Early exercise:** Longstaff–Schwartz regression.\n- **Barriers:** discrete monitoring needs the BGK shift; Brownian-bridge crossing probabilities for continuous monitoring ([[barrier-options]]).\n- Performance (.NET): avoid allocations in hot loops (`Span`, `ArrayPool`), parallelise paths ([[csharp-essentials]]).\n\n### Numerical-method map\n\n| Method | Idea | Typical products |\n|---|---|---|\n| Closed form | analytic under flat vol | Reiner–Rubinstein barrier, geometric Asian, Margrabe, digital |\n| [[static-replication]] | build from vanillas | digitals, variance swaps, any European |\n| [[pde-finite-difference]] | solve the pricing PDE on a grid | single-asset barriers, American, local vol |\n| **Monte Carlo** | simulate paths | autocallables, baskets, cliquets |\n\n### Connections\n- **Builds on:** [[risk-neutral-pricing]], [[lln-clt]].\n- **Used for:** [[autocallables]], [[barrier-options]], [[asian-options]], [[local-stochastic-volatility]]; implemented in [[csharp-pricing-library-example]].",
@@ -3185,7 +3170,7 @@
    "id": "vol-surface-construction",
    "title": "Building a Vol Surface (the desk recipe)",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "pipeline",
     "calibration",
@@ -3201,7 +3186,7 @@
    "id": "implied-forward-regression",
    "title": "Implied Forward & Discount via Parity Regression",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "parity",
     "ols",
@@ -3218,7 +3203,7 @@
    "id": "otm-stitching",
    "title": "OTM Liquidity Stitching (why discard ITM quotes)",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "otm",
     "vega",
@@ -3234,7 +3219,7 @@
    "id": "svi",
    "title": "SVI Smile Parametrisation",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "svi",
     "ssvi",
@@ -3250,7 +3235,7 @@
    "id": "breeden-litzenberger",
    "title": "Breeden–Litzenberger (density from option prices)",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "risk-neutral-density",
     "butterfly",
@@ -3266,7 +3251,7 @@
    "id": "surface-no-arbitrage",
    "title": "No-Arbitrage Conditions on a Vol Surface",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "calendar",
     "butterfly",
@@ -3282,7 +3267,7 @@
    "id": "vol-surface-construction-chapter",
    "title": "Building the Volatility Surface",
    "type": "topic",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [],
    "path": "topics/vol-surface-construction-chapter.md",
    "content": "# Building the Volatility Surface\n\nThis chapter turns raw option quotes into a clean, arbitrage-free surface. It starts with the desk recipe as a roadmap, then covers each step in turn: extracting the forward and discount factor from put–call parity, using only OTM quotes, fitting a smooth smile (SVI), the link between option prices and the risk-neutral density, and the no-arbitrage checks the finished surface must pass.\n\n**Prerequisites:** [[volatility-surface]], [[vol-term-structure]], [[put-call-parity]], [[ols-regression]], [[risk-neutral-pricing]].\n\n**Leads to:** [[local-volatility-dupire]] (needs a smooth, arbitrage-free surface), [[digital-options]], [[variance-swaps]].\n\n**Sections:** [[vol-surface-construction]] · [[implied-forward-regression]] · [[otm-stitching]] · [[svi]] · [[breeden-litzenberger]] · [[surface-no-arbitrage]]\n\n<a id=\"vol-surface-construction\"></a>\n\n## Building a Vol Surface (the desk recipe)\n<!-- section: vol-surface-construction | prerequisites: [volatility-surface, put-call-parity] | related: [implied-forward-regression, otm-stitching, svi, surface-no-arbitrage, american-early-exercise, sticky-strike-vs-sticky-moneyness, model-risk-governance, fx-vol-conventions, sabr] | tags: [pipeline, calibration, real-time] -->\n\nThe surface is built in six steps; the following sections of this chapter treat each step in detail.\n\n### The 6-step recipe\n1. **Clean quotes** — use mids; drop zero bids, crossed, stale and abnormally wide quotes (VIX drops puts after two consecutive zero-bid strikes).\n2. **Extract $F$ and $D$** per expiry from parity → [[implied-forward-regression]].\n3. **Invert OTM options only** (puts below $F$, calls above) → [[otm-stitching]].\n4. **Fit a smooth smile** per expiry: [[svi]] (equity), [[sabr]] (rates/FX), spline/kernel. Weighted least squares (1/spread², vega); fit **inside bid/ask**.\n5. **Interpolate across expiries in total variance** $\\omega=\\sigma^2T$ at constant log-moneyness ([[vol-term-structure]]).\n6. **Check no-arbitrage**: calendar, butterfly, wings → [[surface-no-arbitrage]].\n\nThen **state the dynamics** (sticky strike / moneyness): Greeks are meaningless without it ([[sticky-strike-vs-sticky-moneyness]]).\n\n### Real-time design (RBC prep)\nIngest bid/ask → filter → forward & IV per expiry → SVI/SSVI fit with **warm start** → arbitrage checks → publish an **immutable versioned snapshot** → reprice only affected trades, throttled. Speed: incremental fits, vectorised IV, expiries in parallel.\n\n### Robustness to one bad quote\nVega / inverse-spread weights, a bid–ask band, a robust loss, rejection of no-arbitrage violators, trader overrides with an audit trail.\n\n### Asset-class differences\n- **Index:** dense listed strikes; the recipe applies directly.\n- **Single stock:** de-Americanise ([[american-early-exercise]]), imply discrete dividends/borrow per expiry, strip earnings event variance ([[vol-term-structure]]); thinner liquidity.\n- **FX:** the market quotes vols (ATM/RR/BF) → [[fx-vol-conventions]].\n- **Rates:** swaption cube, normal vol, (shifted) SABR → [[sabr]].\n\n### Daily practice\nSynchronise spot and option snapshots; trading time, not calendar time; event variance; independent price verification vs consensus (Totem) and P&L explain → [[model-risk-governance]].\n\n### Who builds them\nSell-side market makers (intraday; SVI/SSVI, Orc wing, SABR + trader overrides); the buy side consumes vendors (Bloomberg BVOL, OptionMetrics, ORATS); Cboe's VIX uses the same inputs (OTM options + parity forward).\n\n### Connections\n- **Builds on:** [[volatility-surface]], [[put-call-parity]].\n\n<a id=\"implied-forward-regression\"></a>\n\n## Implied Forward & Discount via Parity Regression\n<!-- section: implied-forward-regression | prerequisites: [put-call-parity, ols-regression] | related: [forward-pricing, black-76, delta-one-products, discounting-compounding, vol-surface-construction] | tags: [parity, ols, implied-dividend, box-spread] -->\n\nPut–call parity says $C-P$ is a straight line in the strike with intercept $DF$ and slope $-D$. Regressing observed $C-P$ on $K$ across strikes therefore recovers the market's discount factor and forward, including all unobservable dividends, borrow and funding.\n\n### Formulas\n$$Y_i=C_{mkt}(K_i)-P_{mkt}(K_i)=\\underbrace{DF}_{\\alpha}+\\underbrace{(-D)}_{\\beta}\\,K_i\\ \\Rightarrow\\ D=-\\beta,\\qquad F=\\frac{\\alpha}{D}=-\\frac\\alpha\\beta$$\n$$r_{\\text{imp}}=-\\frac{\\ln D}{T},\\qquad q_{\\text{imp}}=r_{\\text{imp}}-\\frac1T\\ln\\frac FS$$\n\n**Variables:**\n\n- $C_{mkt}(K_i),P_{mkt}(K_i)$ call and put mids at strike $K_i$\n- $Y_i$ regression response\n- $D$ discount factor; $F$ forward\n- $\\alpha$ intercept, $\\beta$ slope of the OLS fit ([[ols-regression]])\n- $S$ spot; $T$ expiry\n- $r_{\\text{imp}}$ implied rate\n- $q_{\\text{imp}}$ implied dividend yield + borrow\n\n### Why it's needed\nDiscrete dividends, hard-to-borrow repo and dealer funding are unobservable; plugging in Treasury rates and dividend guesses makes call and put IVs **diverge near ATM**.\n\n### Why regress, not solve from two strikes\nThe slope is fragile when the strikes are close:\n\n| Strikes used | D | implied r | F |\n|---|---|---|---|\n| 4900 & 5100 | 0.98250 | 7.08% ✗ | 5031.30 |\n| 4300 & 5700 | 0.98966 | 4.17% | 5031.16 |\n| All 15 (OLS) | 0.99004 | 4.02% | 5031.29 |\n| Truth | 0.99008 | 4.00% | 5031.26 |\n\n- **F** is robust (the level of the line); **D** (the slope) is not.\n- Alternative for illiquid names: take $D$ from the curve and solve $F_i=K_i+(C_i-P_i)/D$ near ATM.\n- VIX does a version of this at the strike with the smallest $|C-P|$.\n\n### Interpretation\n- The slope is the **box-spread** discount factor: $[C-P](K_1)-[C-P](K_2)=D\\,(K_2-K_1)$.\n- Option-implied rates ≠ Treasuries — Treasuries yield ~40 bp less (convenience yield; van Binsbergen–Diamond–Grotteria).\n\n### Connections\n- **Builds on:** [[put-call-parity]] + [[ols-regression]] — a cross-domain link (statistics ↔ derivatives).\n- **Feeds:** [[black-76]] inversion ([[implied-volatility]]), [[delta-one-products]] (implied dividends/borrow), step 2 of [[vol-surface-construction]].\n\n<a id=\"otm-stitching\"></a>\n\n## OTM Liquidity Stitching (why discard ITM quotes)\n<!-- section: otm-stitching | prerequisites: [put-call-parity, implied-volatility] | related: [vol-surface-construction, variance-swaps] | tags: [otm, vega, data-cleaning] -->\n\nAt each strike only the out-of-the-money option is used: puts below the forward, calls above. Nothing is lost, because parity makes the call and put IVs equal.\n\n### Rule\nLeft wing ($K<F$) from OTM **puts**, right wing ($K>F$) from OTM **calls**, blended around $K\\approx F$.\n\n### Why discard deep ITM quotes\n1. **Vanishing vega:** an ITM option is worth ≈ intrinsic value; $\\Delta\\sigma\\approx\\Delta\\text{Price}/\\mathcal V$ — a 1-tick price bounce divided by a tiny vega is huge fake vol noise.\n2. **Wide, stale bid–ask:** ITM options are capital-heavy and costly to delta-hedge.\n\nNothing is lost: by [[put-call-parity]], ITM call IV = OTM put IV at the same strike, so the surface joins seamlessly at $K=F$.\n\nAlso filter quotes violating conversion/reversal or box bounds before fitting SVI/SABR.\n\n### Connections\n- **Builds on:** [[put-call-parity]], [[implied-volatility]].\n- **Same OTM strip used in:** [[variance-swaps]] / VIX. **Step 3 of:** [[vol-surface-construction]].\n\n<a id=\"svi\"></a>\n\n## SVI Smile Parametrisation\n<!-- section: svi | prerequisites: [volatility-surface, vol-term-structure] | related: [surface-no-arbitrage, vol-surface-construction, sabr, local-volatility-dupire] | tags: [svi, ssvi, parametrisation] -->\n\nSVI describes one expiry's smile with five parameters, in total variance as a function of log-moneyness. It has linear wings and known conditions for absence of arbitrage.\n\n### Formula\n$$\\omega(k)=a+b\\Big[\\rho\\,(k-m)+\\sqrt{(k-m)^2+\\varsigma^2}\\Big]$$\n\n**Variables:**\n\n- $\\omega=\\sigma_{BS}^2T$ total implied variance\n- $k=\\ln(K/F)$ log-moneyness\n- $a$ overall level\n- $b$ wing slope\n- $\\rho$ skew / rotation ($-1<\\rho<1$, negative for equity)\n- $m$ horizontal shift\n- $\\varsigma$ ATM curvature (written $\\sigma$ in raw SVI; renamed here to avoid confusion with volatility)\n\n### Worked example\nWeighted least squares (1/spread², vega). A 3M fit: $a=0.0012,\\ b=0.0443,\\ \\rho=-0.595,\\ m=0.0616,\\ \\varsigma=0.0645$; 15/15 fitted vols inside bid/ask.\n\n### Key points\n- Linear wings in $|k|$ satisfy **Lee's bound** iff $b(1\\pm\\rho)\\le2$ ([[surface-no-arbitrage]]).\n- SSVI (surface SVI) has known no-arbitrage conditions (Gatheral & Jacquier).\n- Smooth fits matter because [[local-volatility-dupire]] divides by the density.\n\n### Connections\n- **Builds on:** [[volatility-surface]], [[vol-term-structure]] (total variance).\n- **Checked by:** [[surface-no-arbitrage]]. **Alternative:** [[sabr]].\n\n<a id=\"breeden-litzenberger\"></a>\n\n## Breeden–Litzenberger (density from option prices)\n<!-- section: breeden-litzenberger | prerequisites: [risk-neutral-pricing, option-payoffs-moneyness] | related: [digital-options, surface-no-arbitrage, static-replication, volatility-surface] | tags: [risk-neutral-density, butterfly, static-replication] -->\n\nDifferentiating call prices with respect to the strike reads off the risk-neutral distribution: the first derivative is (minus) a digital, the second derivative is the density.\n\n### Formulas\n$$f_T(K)=\\frac1D\\,\\frac{\\partial^2C(K,T)}{\\partial K^2}=e^{rT}\\,\\frac{\\partial^2C}{\\partial K^2},\\qquad \\text{Digital}(K)=-\\frac{\\partial C}{\\partial K}$$\n\n**Variables:**\n\n- $f_T(K)$ risk-neutral density of $S_T$ evaluated at $K$\n- $C(K,T)$ call price read off the surface\n- $D=e^{-rT}$ discount factor\n- $\\text{Digital}(K)$ price of a cash-or-nothing call paying 1 if $S_T>K$\n\n### Key points\n- First derivative in strike → digital (tight call spread); second derivative → density (tight butterfly).\n- Butterfly price ≥ 0 ⇔ density ≥ 0 → the butterfly-arbitrage check ([[surface-no-arbitrage]]).\n- Surface ⇔ densities ⇔ all European payoffs priced model-free.\n\n### Connections\n- **Builds on:** [[risk-neutral-pricing]].\n- **Gives:** [[digital-options]] (1st derivative), [[surface-no-arbitrage]] (2nd derivative). **General principle:** [[static-replication]].\n\n<a id=\"surface-no-arbitrage\"></a>\n\n## No-Arbitrage Conditions on a Vol Surface\n<!-- section: surface-no-arbitrage | prerequisites: [breeden-litzenberger, vol-term-structure, option-price-bounds] | related: [svi, no-arbitrage] | tags: [calendar, butterfly, lee] -->\n\nA fitted surface can still admit arbitrage. Four conditions — calendar, butterfly, call-spread and wing (Lee) — must be checked before the surface is published.\n\n### Conditions\n\n| Condition | Statement |\n|---|---|\n| **Calendar** | total variance $\\omega(k,T)$ non-decreasing in $T$ at fixed $k$ |\n| **Butterfly** | $C$ convex in $K$ ⇔ density $f_T(K)=\\frac1D\\partial^2C/\\partial K^2\\ge0$ |\n| **Call spread** | $-D\\le\\partial C/\\partial K\\le0$ |\n| **Wings (Lee)** | $\\limsup_{\\lvert k\\rvert\\to\\infty}\\omega(k)/\\lvert k\\rvert\\le2$ |\n\n**Variables:**\n\n- $\\omega=\\sigma^2T$ total implied variance\n- $k=\\ln(K/F)$ log-moneyness\n- $C(K)$ call price\n- $D$ discount factor\n- $f_T$ risk-neutral density\n\n### Key points\n- A fit inside bid/ask is not the end: also check stability against yesterday's parameters and choose the dynamics.\n\n### Connections\n- **From:** [[breeden-litzenberger]] (butterfly), [[vol-term-structure]] (calendar), [[option-price-bounds]] (call spread), [[no-arbitrage]].\n- **Parametrisation satisfying Lee:** [[svi]].",
@@ -3302,7 +3287,7 @@
    "id": "local-volatility-dupire",
    "title": "Local Volatility (Dupire)",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "local-vol",
     "dupire"
@@ -3317,7 +3302,7 @@
    "id": "forward-smile",
    "title": "Forward Smile",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "forward-skew",
     "model-risk"
@@ -3332,7 +3317,7 @@
    "id": "heston-model",
    "title": "Heston Stochastic Volatility",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "stochastic-vol",
     "heston",
@@ -3348,7 +3333,7 @@
    "id": "jump-diffusion",
    "title": "Jump-Diffusion (Merton, Bates)",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "jumps",
     "short-dated-skew"
@@ -3363,7 +3348,7 @@
    "id": "local-stochastic-volatility",
    "title": "Local-Stochastic Volatility (LSV)",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "lsv",
     "leverage-function",
@@ -3379,7 +3364,7 @@
    "id": "sabr",
    "title": "SABR & Normal (Bachelier) Vol",
    "type": "concept",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [
     "sabr",
     "rates",
@@ -3395,7 +3380,7 @@
    "id": "volatility-models",
    "title": "Volatility Models",
    "type": "topic",
-   "domain": "quant-models",
+   "domain": "pricing",
    "tags": [],
    "path": "topics/volatility-models.md",
    "content": "# Volatility Models\n\nA surface prices European options, but exotics also depend on how the surface moves. This chapter presents the models that sit on top of the surface: local volatility (fits today exactly but gets the dynamics wrong, visible in the forward smile), stochastic volatility (Heston), jumps, the local-stochastic combination used for equity exotics, and SABR for rates and FX.\n\n**Prerequisites:** [[volatility-surface]], [[breeden-litzenberger]], [[svi]], [[geometric-brownian-motion]], [[exponential-poisson-process]].\n\n**Leads to:** [[barrier-options]], [[cliquets-forward-start]], [[autocallables]], [[swaptions]].\n\n**Sections:** [[local-volatility-dupire]] · [[forward-smile]] · [[heston-model]] · [[jump-diffusion]] · [[local-stochastic-volatility]] · [[sabr]]\n\n<a id=\"local-volatility-dupire\"></a>\n\n## Local Volatility (Dupire)\n<!-- section: local-volatility-dupire | prerequisites: [volatility-surface, breeden-litzenberger, svi] | related: [heston-model, local-stochastic-volatility, forward-smile, barrier-options, pde-finite-difference, sticky-strike-vs-sticky-moneyness] | tags: [local-vol, dupire] -->\n\nLocal volatility makes the instantaneous vol a deterministic function of spot and time, chosen so that the model reproduces every vanilla price. Dupire's formula reads it directly off the call-price surface.\n\n### Formula\n$$\\sigma_{\\text{loc}}^2(K,T)=\\frac{\\partial C/\\partial T+(r-q)\\,K\\,\\partial C/\\partial K+q\\,C}{\\tfrac12K^2\\,\\partial^2C/\\partial K^2}$$\n\n**Variables:**\n\n- $C(K,T)$ call-price surface\n- $\\sigma_{\\text{loc}}(S,t)$ local vol, evaluated at spot level $S=K$ and time $t=T$\n- $r$ risk-free rate; $q$ dividend yield\n\n### Pros and cons\n\n| Pros | Cons |\n|---|---|\n| Fits today's surface **exactly**; fast PDE | **Forward smile too flat** → misprices forward-starts and cliquets; wrong dynamics |\n\n### Key points\n- The denominator is proportional to the density ([[breeden-litzenberger]]) → numerically unstable unless the surface is smooth and arbitrage-free → fit [[svi]] first.\n- Standard for short-dated barriers and as a first pass.\n\n### Connections\n- **Needs:** the [[breeden-litzenberger]] density. **Fails at:** [[forward-smile]]. **Fixed by:** [[local-stochastic-volatility]].\n- **Implied dynamics:** ≈ sticky tree ([[sticky-strike-vs-sticky-moneyness]]).\n\n<a id=\"forward-smile\"></a>\n\n## Forward Smile\n<!-- section: forward-smile | prerequisites: [vol-term-structure, local-volatility-dupire] | related: [cliquets-forward-start, heston-model, local-stochastic-volatility] | tags: [forward-skew, model-risk] -->\n\nThe forward smile is the smile a model implies **at a future date**. Today's surface does not pin it down, so models that fit today equally well can disagree about it.\n\n### Key points\n- Local vol reproduces today's surface but flattens future smiles → it **underprices forward skew**.\n- SV / LSV keep a realistic forward smile → needed for forward-starts and cliquets.\n- The classic example of \"model choice changes price materially\".\n\n### Connections\n- **Builds on:** [[vol-term-structure]], [[local-volatility-dupire]].\n- **Priced products:** [[cliquets-forward-start]]. **Right models:** [[heston-model]], [[local-stochastic-volatility]].\n\n<a id=\"heston-model\"></a>\n\n## Heston Stochastic Volatility\n<!-- section: heston-model | prerequisites: [geometric-brownian-motion, ito-lemma] | related: [local-volatility-dupire, local-stochastic-volatility, volatility-skew, forward-smile, jump-diffusion] | tags: [stochastic-vol, heston, feller] -->\n\nIn Heston's model the variance is itself random and mean-reverting, and correlated with the stock. Negative correlation produces the equity skew; the vol of variance produces curvature.\n\n### Formula\n$$dS_t=(r-q)S_t\\,dt+\\sqrt{v_t}\\,S_t\\,dW^S_t,\\qquad dv_t=\\kappa(\\bar v-v_t)\\,dt+\\xi\\sqrt{v_t}\\,dW^v_t,\\qquad d\\langle W^S,W^v\\rangle_t=\\rho\\,dt$$\n\n**Variables:**\n\n- $S_t$ spot; $r$ rate; $q$ dividend yield\n- $v_t$ instantaneous variance\n- $\\kappa$ mean-reversion speed\n- $\\bar v$ long-run variance\n- $\\xi$ vol-of-vol (controls smile curvature)\n- $\\rho$ spot–vol correlation (controls skew; negative for equity)\n- $W^S,W^v$ Brownian motions of spot and variance\n\n### Key points\n- **Feller condition:** $2\\kappa\\bar v>\\xi^2$ keeps $v_t>0$.\n- Pros: realistic dynamics, semi-closed-form vanilla prices. Cons: can't fit short-dated skew well; calibration unstable. (The Bergomi family is also used.)\n\n### Connections\n- **Builds on:** [[geometric-brownian-motion]], [[ito-lemma]].\n- **Skew source:** $\\rho<0$ → [[volatility-skew]]. **Short-dated fix:** [[jump-diffusion]]. **Combined with LV:** [[local-stochastic-volatility]].\n\n<a id=\"jump-diffusion\"></a>\n\n## Jump-Diffusion (Merton, Bates)\n<!-- section: jump-diffusion | prerequisites: [geometric-brownian-motion, exponential-poisson-process] | related: [heston-model, volatility-skew, variance-swaps] | tags: [jumps, short-dated-skew] -->\n\nAdding Poisson-arriving jumps to GBM (Merton), or to a stochastic-vol model (Bates), creates the steep short-dated skew that pure diffusions cannot.\n\n### Key points\n- **Pro:** generates steep **short-dated skew** ([[volatility-skew]]).\n- **Con:** jumps can't be delta-hedged; more parameters.\n- Jumps also cause replication error in [[variance-swaps]].\n\n### Connections\n- **Builds on:** [[geometric-brownian-motion]], [[exponential-poisson-process]] (jump arrivals).\n\n<a id=\"local-stochastic-volatility\"></a>\n\n## Local-Stochastic Volatility (LSV)\n<!-- section: local-stochastic-volatility | prerequisites: [local-volatility-dupire, heston-model] | related: [autocallables, forward-smile, monte-carlo-pricing, barrier-options] | tags: [lsv, leverage-function, particle-method] -->\n\nLSV multiplies a stochastic variance by a local \"leverage function\" calibrated so that every vanilla is still matched. It combines local vol's exact fit with stochastic vol's realistic dynamics.\n\n### Formula\n$$\\frac{dS_t}{S_t}=(r-q)\\,dt+L(S_t,t)\\sqrt{v_t}\\,dW_t$$\n\n**Variables:**\n\n- $S_t$ spot; $r$ rate; $q$ dividend yield\n- $L(S,t)$ leverage function, calibrated so that every vanilla is matched (particle methods are standard)\n- $v_t$ stochastic variance (sets how the smile evolves)\n- $W_t$ Brownian motion\n\n### Key points\n- Fits the surface **exactly** + realistic dynamics → the **industry standard for equity exotics**. Cons: complex, slow, needs a mixing parameter.\n- Around it: discrete cash dividends near-dated / yield further out; stochastic rates for long notes; a correlation matrix for multi-asset products.\n\n| Model | Fits vanillas | Dynamics | Used for |\n|---|---|---|---|\n| Flat BS | no | none | quoting, sanity checks |\n| Local vol | exactly | forward smile too flat | short barriers |\n| SV (Heston, Bergomi) | approximately | realistic | forward-start, vol-of-vol |\n| **LSV** | exactly | realistic | equity exotics |\n\n### Connections\n- **Builds on:** [[local-volatility-dupire]], [[heston-model]].\n- **Used to price:** [[autocallables]], [[barrier-options]], [[cliquets-forward-start]] via [[monte-carlo-pricing]].\n\n<a id=\"sabr\"></a>\n\n## SABR & Normal (Bachelier) Vol\n<!-- section: sabr | prerequisites: [volatility-surface] | related: [svi, swaptions, fx-vol-conventions, black-76] | tags: [sabr, rates, normal-vol] -->\n\nSABR (Hagan et al.) is a stochastic-vol smile model fitted separately per expiry, and the standard for rates and FX smiles.\n\n### Key points\n- Fitted **per expiry** (per expiry–tenor pair in rates).\n- Standard for rates and FX smiles.\n- Since negative rates, rates vol is quoted as **normal (Bachelier) vol in bp**, often with **shifted SABR** (in place of Black vol, [[black-76]]).\n\n### Connections\n- **Builds on:** [[volatility-surface]].\n- **Equity counterpart:** [[svi]]. **Used for:** the [[swaptions]] cube, [[fx-vol-conventions]].",
@@ -3451,11 +3436,6 @@
   {
    "source": "home",
    "target": "map-black-scholes",
-   "type": "mention"
-  },
-  {
-   "source": "home",
-   "target": "map-quant-models",
    "type": "mention"
   },
   {
@@ -3540,6 +3520,26 @@
   },
   {
    "source": "map-pricing",
+   "target": "numerical-methods",
+   "type": "mention"
+  },
+  {
+   "source": "map-pricing",
+   "target": "implied-volatility-skew",
+   "type": "mention"
+  },
+  {
+   "source": "map-pricing",
+   "target": "vol-surface-construction-chapter",
+   "type": "mention"
+  },
+  {
+   "source": "map-pricing",
+   "target": "volatility-models",
+   "type": "mention"
+  },
+  {
+   "source": "map-pricing",
    "target": "exotic-options",
    "type": "mention"
   },
@@ -3601,31 +3601,6 @@
   {
    "source": "map-quant-dev",
    "target": "production-coding",
-   "type": "mention"
-  },
-  {
-   "source": "map-quant-models",
-   "target": "map-sellside",
-   "type": "mention"
-  },
-  {
-   "source": "map-quant-models",
-   "target": "numerical-methods",
-   "type": "mention"
-  },
-  {
-   "source": "map-quant-models",
-   "target": "implied-volatility-skew",
-   "type": "mention"
-  },
-  {
-   "source": "map-quant-models",
-   "target": "vol-surface-construction-chapter",
-   "type": "mention"
-  },
-  {
-   "source": "map-quant-models",
-   "target": "volatility-models",
    "type": "mention"
   },
   {

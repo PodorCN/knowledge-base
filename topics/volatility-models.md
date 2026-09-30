@@ -2,7 +2,7 @@
 id: volatility-models
 title: "Volatility Models"
 type: topic
-domain: quant-models
+domain: pricing
 sources: [src-rbc-quantdev-prep, src-vol-surface-exotics-notes]
 ---
 # Volatility Models

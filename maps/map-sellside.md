@@ -8,7 +8,6 @@ tags: [map, group]
 # Sell-side
 
 - [[map-black-scholes]]
-- [[map-quant-models]]
 - [[map-pricing]]
 - [[map-risk-management]]
 - [[map-quant-dev]]

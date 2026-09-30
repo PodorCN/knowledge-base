@@ -9,7 +9,7 @@ tags: [index]
 
 - **[[map-foundations]]**: [[map-prob-stats]] · [[map-stochastic-finance]]
 - **[[map-buyside]]**: [[map-signal-research]] · [[map-portfolio-construction]]
-- **[[map-sellside]]**: [[map-black-scholes]] · [[map-quant-models]] · [[map-pricing]] · [[map-risk-management]] · [[map-quant-dev]]
+- **[[map-sellside]]**: [[map-black-scholes]] · [[map-pricing]] · [[map-risk-management]] · [[map-quant-dev]]
 
 ## How to read this wiki
 

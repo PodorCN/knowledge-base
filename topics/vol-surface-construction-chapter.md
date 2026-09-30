@@ -2,7 +2,7 @@
 id: vol-surface-construction-chapter
 title: "Building the Volatility Surface"
 type: topic
-domain: quant-models
+domain: pricing
 sources: [src-vol-surface-exotics-notes, src-rbc-quantdev-prep, src-quant-study-notes-pcp-skew]
 ---
 # Building the Volatility Surface

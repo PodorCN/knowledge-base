@@ -2,7 +2,7 @@
 id: implied-volatility-skew
 title: "Implied Volatility & the Volatility Surface"
 type: topic
-domain: quant-models
+domain: pricing
 sources: [src-vol-surface-exotics-notes, src-rbc-quantdev-prep, src-quant-study-notes-pcp-skew, src-quant-finance-study-notes]
 ---
 # Implied Volatility & the Volatility Surface
@@ -15,7 +15,7 @@ Markets quote options in volatility, not price. This chapter explains how an imp
 
 **Sections:** [[implied-volatility]] · [[realized-volatility]] · [[volatility-surface]] · [[vol-term-structure]] · [[volatility-skew]] · [[fx-vol-conventions]]
 
-Notation for the quant-models track: $k=\ln(K/F)$ log-moneyness, $\omega=\sigma^2T$ total implied variance, $\sigma_{\text{imp}}$ implied and $\sigma_{\text{real}}$ realised volatility, $\mathcal V$ vega, $D$ discount factor, $F$ forward.
+Notation for the pricing-models track: $k=\ln(K/F)$ log-moneyness, $\omega=\sigma^2T$ total implied variance, $\sigma_{\text{imp}}$ implied and $\sigma_{\text{real}}$ realised volatility, $\mathcal V$ vega, $D$ discount factor, $F$ forward.
 
 <a id="implied-volatility"></a>
 
