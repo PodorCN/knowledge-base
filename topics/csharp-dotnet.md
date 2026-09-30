@@ -11,7 +11,7 @@ This chapter teaches the C# needed to read and write a pricing library. It start
 
 **Prerequisites:** [[oop-pillars]]; the pricing example uses [[black-scholes-formula]], [[binomial-replication]] and [[monte-carlo-pricing]].
 
-**Leads to:** [[production-coding]] ([[model-release-regression-testing]], [[price-reconciliation]]).
+**Leads to:** [[model-release-regression-testing]], [[price-reconciliation]].
 
 **Sections:** [[csharp-refresher]] · [[csharp-essentials]] · [[csharp-abstract-classes]] · [[csharp-arrow-syntax]] · [[csharp-constructors-base]] · [[csharp-ternary-operator]] · [[csharp-syntax-cheatsheet]] · [[csharp-pricing-library-example]] · [[dotnet-concurrency-wpf]]
 

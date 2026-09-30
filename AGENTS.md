@@ -90,7 +90,7 @@ Current chapters and question banks:
 |---|---|---|
 | `prob-stats` | `calculus-mental-math`, `probability-bayes`, `distributions`, `moments-covariance`, `puzzles-markov`, `estimation-testing`, `statistical-testing` | `qb-probability`, `qb-statistics-inference` |
 | `stochastic-finance` | `no-arbitrage-finance-basics`, `fixed-income-bonds`, `no-arbitrage-parity` | `qb-finance-foundations` |
-| `quant-dev` | `oop-design`, `csharp-dotnet`, `matlab-quant-dev`, `matlab-portfolio-optimisation`, `production-coding` | `qb-quant-dev-engineering` |
+| `quant-dev` | `oop-design`, `csharp-dotnet`, `matlab-quant-dev` | `qb-quant-dev-engineering` |
 | `signal-research` | `linear-regression`, `ml-regularisation`, `time-series-validation`, `signals-research-process`, `multi-asset-signals`, `research-backtesting` | `qb-regression-ml`, `qb-research-judgment` |
 | `portfolio-construction` | `measuring-performance`, `portfolio-optimisation`, `risk-budgeting-position-sizing` | `qb-portfolio-performance` |
 | `black-scholes` | `stochastic-calculus`, `black-scholes`, `black-scholes-call-derivation`, `greeks-sensitivities` | `qb-stochastic-calculus`, `qb-options-bs-greeks` |
