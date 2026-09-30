@@ -208,6 +208,7 @@ a { color: var(--accent); }
 .vars tr { display: grid; grid-template-columns: minmax(76px, .3fr) minmax(0, 1fr); column-gap: 14px; padding: 5px 0; border-bottom: 1px solid color-mix(in srgb, var(--rule) 72%, transparent); }
 .vars td { padding: 0; border: 0; }
 .vars td.sym { white-space: nowrap; text-align: right; }
+.vars tr.full { grid-template-columns: minmax(0, 1fr); }
 .exercise { margin: 16px 0; }
 .lockbox { display: flex; flex-direction: column; gap: 8px; padding: 16px 18px; margin: 10px 0; border: 1px dashed var(--rule); border-radius: 6px; font-size: 14.5px; color: var(--muted); }
 .lockrow { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -371,9 +372,9 @@ window.MathJax = {
 const DATA = /*__GRAPH_DATA__*/null;
 
 const GROUPS = [
-  { id: "map-foundations", name: "Foundations", tracks: ["prob-stats", "stochastic-finance"] },
+  { id: "map-foundations", name: "Foundations", tracks: ["prob-stats", "stochastic-finance", "quant-dev"] },
   { id: "map-buyside", name: "Buy-side", tracks: ["signal-research", "portfolio-construction"] },
-  { id: "map-sellside", name: "Sell-side", tracks: ["pricing", "black-scholes", "quant-models", "risk-management", "quant-dev"] }
+  { id: "map-sellside", name: "Sell-side", tracks: ["black-scholes", "pricing", "risk-management"] }
 ];
 const TYPE_LABEL = { concept: "Section", topic: "Chapter", map: "Overview", question: "Question", "question-bank": "Question bank", source: "Source" };
 
@@ -574,6 +575,9 @@ function enhance(root) {
     const parseVariable = input => {
       const source = typeof input === "string" ? null : input.cloneNode(true);
       if (source) source.querySelector("strong")?.remove();
+      // Canonical form "- $symbol$ meaning": keep the symbol as TeX so MathJax typesets it (e.g. $\hat\beta$, $\sigma_1,\sigma_2$).
+      const lead = source && source.innerHTML.match(/^\s*(\$[^$]+\$(?:\s*(?:,|\/)\s*\$[^$]+\$)*)\s*(?:[:—–]\s*)?([\s\S]*)$/);
+      if (lead) return { symbol: lead[1], description: lead[2].trim() };
       const text = (source ? source.textContent : input).replace(/\$/g, "").replace(/\s+/g, " ").trim();
       const short = text.match(/^([A-Za-zΑ-Ωα-ω\p{N}][A-Za-zΑ-Ωα-ω0-9_(),+\-/^]{0,11})\s+(.+)$/u);
       if (short) {
@@ -594,13 +598,12 @@ function enhance(root) {
     const next = p.nextElementSibling;
     let items = [];
     if (standalone && next && next.tagName === "UL") {
-      const entries = [...next.children], variables = [];
-      for (const entry of entries) {
-        const variable = parseVariable(entry);
-        if (!variable) break;
-        variables.push(variable);
-      }
-      if (!variables.length) return;
+      const entries = [...next.children], parsed = entries.map(parseVariable);
+      // Rows run up to the last entry that names a symbol; unlabelled lines in between become full-width rows.
+      let last = -1;
+      parsed.forEach((v, i) => { if (v) last = i; });
+      if (last < 0) return;
+      const variables = parsed.slice(0, last + 1).map((v, i) => v || { symbol: "", description: entries[i].innerHTML.trim(), full: true });
       const remainder = entries.slice(variables.length);
       if (remainder.length) {
         const rest = document.createElement("ul");
@@ -614,7 +617,7 @@ function enhance(root) {
       if (!variable) return;
       st.remove(); items = [variable];
     }
-    const rows = items.map(v => `<tr><td class="sym">${v.symbol}</td><td>${v.description}</td></tr>`).join("");
+    const rows = items.map(v => v.full ? `<tr class="full"><td colspan="2">${v.description}</td></tr>` : `<tr><td class="sym">${v.symbol}</td><td>${v.description}</td></tr>`).join("");
     const div = document.createElement("div"); div.className = "vars";
     div.innerHTML = `<span class="vars-h">where</span><table>${rows}</table>`;
     p.replaceWith(div);
@@ -624,12 +627,17 @@ function renderBank(n) {
   const intro = n.content.replace(/^# .*\n?/, "").trim();
   return header(n) + (intro ? `<div class="prose">${md(intro)}</div>` : "") + qBlock("Questions", questionsOf(n.id), true, "");
 }
+// Home: everything in home.md from the first "## " heading on (reading guide, notation table).
+function homeNotes(n) {
+  const i = n.content.search(/^## /m);
+  return i < 0 ? "" : `<div class="prose home-notes">${md(n.content.slice(i))}</div>`;
+}
 function renderMap(n) {
   if (n.id === "home") {
     return `<div class="kicker">Start here</div><h1 class="title">Quant Interview Wiki</h1>
       <p class="lead">Each chapter is one document. Links jump to the exact section.</p>` +
       GROUPS.map(g => `<section class="qsection"><h2><a href="#${g.id}" data-id="${g.id}">${g.name}</a></h2><div class="cards">${g.tracks.map(trackCard).join("")}</div></section>`).join("") +
-      "";
+      homeNotes(n);
   }
   const g = GROUPS.find(g => g.id === n.id);
   if (g) return header(n) + `<div class="cards">${g.tracks.map(trackCard).join("")}</div>`;

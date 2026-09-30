@@ -7,10 +7,8 @@ tags: [map, group]
 ---
 # Sell-side
 
-- [[map-pricing]]
 - [[map-black-scholes]]
-- [[map-quant-models]]
+- [[map-pricing]]
 - [[map-risk-management]]
-- [[map-quant-dev]]
 
 Back to [[home]].

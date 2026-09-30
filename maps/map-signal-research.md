@@ -7,7 +7,7 @@ tags: [map, track]
 ---
 # Signal Research
 
-Part of [[map-buyside]].
+Part of [[map-buyside]]. Finding and validating predictive signals: regression and its assumptions, regularisation, time-series validation, alpha and the information coefficient, multi-asset signals, and the research process.
 
 ## Topics (in reading order)
 
@@ -16,3 +16,4 @@ Part of [[map-buyside]].
 - [[time-series-validation]]
 - [[signals-research-process]]
 - [[multi-asset-signals]]
+- [[research-backtesting]]

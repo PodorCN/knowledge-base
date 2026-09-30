@@ -9,5 +9,6 @@ tags: [map, group]
 
 - [[map-prob-stats]]
 - [[map-stochastic-finance]]
+- [[map-quant-dev]]
 
 Back to [[home]].

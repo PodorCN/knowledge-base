@@ -7,7 +7,7 @@ tags: [map, track]
 ---
 # Portfolio Construction
 
-Part of [[map-buyside]].
+Part of [[map-buyside]]. Turning forecasts into positions: performance measurement, mean–variance and Black–Litterman optimisation, and risk budgeting.
 
 ## Topics (in reading order)
 

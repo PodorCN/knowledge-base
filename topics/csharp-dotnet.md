@@ -7,12 +7,202 @@ sources: [src-rbc-quantdev-prep, src-csharp-syntax-notes, src-quant-finance-stud
 ---
 # C# & .NET
 
-**Sections:** [[csharp-abstract-classes]] · [[csharp-arrow-syntax]] · [[csharp-constructors-base]] · [[csharp-ternary-operator]] · [[csharp-syntax-cheatsheet]] · [[csharp-pricing-library-example]] · [[csharp-refresher]] · [[csharp-essentials]] · [[dotnet-concurrency-wpf]]
+This chapter teaches the C# needed to read and write a pricing library. It starts with a refresher for Python/C++ programmers and the .NET essentials interviewers ask about, then explains the syntax used in pricing code one construct at a time, puts it together in a complete, annotated pricing library, and ends with concurrency in a desktop pricing app.
+
+**Prerequisites:** [[oop-pillars]]; the pricing example uses [[black-scholes-formula]], [[binomial-replication]] and [[monte-carlo-pricing]].
+
+**Leads to:** [[production-coding]] ([[model-release-regression-testing]], [[price-reconciliation]]).
+
+**Sections:** [[csharp-refresher]] · [[csharp-essentials]] · [[csharp-abstract-classes]] · [[csharp-arrow-syntax]] · [[csharp-constructors-base]] · [[csharp-ternary-operator]] · [[csharp-syntax-cheatsheet]] · [[csharp-pricing-library-example]] · [[dotnet-concurrency-wpf]]
+
+<a id="csharp-refresher"></a>
+
+## C# Refresher for a Python / C++ Programmer
+<!-- section: csharp-refresher | prerequisites: [oop-pillars] | related: [csharp-essentials, csharp-syntax-cheatsheet, csharp-abstract-classes, dotnet-concurrency-wpf] | sources: [src-quant-finance-study-notes] | tags: [csharp, python, cpp, linq, async, pattern-matching, records] -->
+
+A tour of C# for someone who already knows Python or C++: the type system, classes and interfaces, generics, LINQ, async, pattern matching, records and collections, each compared with its Python/C++ equivalent.
+
+### Types and variables
+- Statically typed (like C++). **Value types** (struct, enum, int, double, bool) vs **reference types** (class, interface, delegate, string, array). Garbage collected: no `delete`.
+- `var` = compile-time type inference (still static).
+
+```csharp
+var name = "Claude";            // string
+var count = 42;                  // int
+var prices = new List<double>(); // List<double>
+
+int? maybeValue = null;          // nullable value type
+int result = maybeValue ?? 0;    // null-coalescing (≈ Python `x or default`)
+string? city = person?.Address?.City; // null-conditional
+```
+
+### Classes, properties, interfaces
+
+```csharp
+public abstract class Instrument
+{
+    public string Ticker { get; set; }          // auto-property (≈ @property)
+    public decimal Price { get; private set; }
+
+    public Instrument(string ticker, decimal price) { Ticker = ticker; Price = price; }
+
+    public abstract decimal CalculateRisk();    // ≈ C++ pure virtual
+    public virtual string Summary() => $"[{Ticker}] @ {Price:C}";
+}
+
+public class Equity : Instrument
+{
+    public double Beta { get; set; }
+    public Equity(string t, decimal p, double beta) : base(t, p) { Beta = beta; } // ≈ super().__init__
+    public override decimal CalculateRisk() => Price * (decimal)Beta;
+}
+```
+
+```csharp
+private decimal _notional;
+public decimal Notional
+{
+    get => _notional;
+    set { if (value < 0) throw new ArgumentException("Notional must be >= 0"); _notional = value; }
+}
+public DateTime TradeDate { get; init; }   // init-only: settable at construction, then immutable
+```
+
+Single class inheritance, **multiple interfaces**:
+
+```csharp
+public interface IPriceable { decimal GetMtm(DateTime asOf); }
+public interface IRiskMeasurable { Dictionary<string, decimal> GetGreeks(); }
+public class Option : Instrument, IPriceable, IRiskMeasurable { /* ... */ }
+```
+
+### Generics (≈ C++ templates with constraints)
+
+```csharp
+public class TimeSeries<T> where T : struct, IComparable<T>
+{
+    private readonly SortedDictionary<DateTime, T> _data = new();
+    public void Add(DateTime d, T v) => _data[d] = v;
+    public T? GetLatest() => _data.Count > 0 ? _data.Last().Value : null;
+}
+```
+
+### LINQ (≈ comprehensions + pandas chaining)
+
+```csharp
+var large  = trades.Where(t => t.Notional > 1_000_000).ToList();       // [t for t in trades if ...]
+var sorted = trades.OrderByDescending(t => t.TradeDate).ToList();     // sorted(..., reverse=True)
+var byCcy  = trades.GroupBy(t => t.Currency)
+                   .ToDictionary(g => g.Key, g => g.Sum(t => t.Notional));
+
+var report = trades
+    .Where(t => t.TradeDate >= DateTime.Today.AddDays(-30))
+    .GroupBy(t => t.Desk)
+    .Select(g => new { Desk = g.Key, N = g.Count(), Total = g.Sum(t => t.Notional), Avg = g.Average(t => t.Notional) })
+    .OrderByDescending(x => x.Total);
+```
+
+### async / await (≈ asyncio)
+
+```csharp
+public async Task<decimal> FetchPriceAsync(string ticker)
+{
+    using var client = new HttpClient();
+    var json = await client.GetStringAsync($"https://api.example.com/price/{ticker}");
+    return JsonSerializer.Deserialize<PriceData>(json).Price;
+}
+decimal[] prices = await Task.WhenAll(tickers.Select(FetchPriceAsync)); // ≈ asyncio.gather
+```
+
+### Pattern matching
+
+```csharp
+string RiskBucket(Instrument inst) => inst switch
+{
+    Equity { Beta: > 1.5 } => "High Beta",
+    Equity { Beta: > 0.8 } => "Market Beta",
+    Equity                 => "Low Beta",
+    Option { Strike: var s } when s > inst.Price * 1.2m => "Deep OTM",
+    Option                 => "Near Money",
+    _                      => "Unknown"
+};
+
+if (instrument is Equity { Ticker: "AAPL", Beta: var beta })   // replaces dynamic_cast checks
+    Console.WriteLine($"Apple beta: {beta}");
+```
+
+### Records (≈ frozen dataclass)
+
+```csharp
+public record TradeRecord(string Ticker, decimal Notional, DateTime TradeDate, string Desk);
+var trade   = new TradeRecord("AAPL", 1_000_000m, DateTime.Today, "Delta One");
+var amended = trade with { Notional = 2_000_000m };  // ≈ dataclasses.replace
+// value equality: records compare by content; classes by reference
+```
+
+### Collections
+
+| C# | Python | C++ |
+|---|---|---|
+| `List<T>` | `list` | `std::vector<T>` |
+| `Dictionary<K,V>` | `dict` | `std::unordered_map<K,V>` |
+| `HashSet<T>` | `set` | `std::unordered_set<T>` |
+| `SortedDictionary<K,V>` | — | `std::map<K,V>` |
+| `Queue<T>` | `collections.deque` | `std::queue<T>` |
+| `ConcurrentDictionary<K,V>` | — | — |
+
+### Delegates, events, exceptions
+
+```csharp
+Func<decimal, decimal, decimal> spread = (bid, ask) => ask - bid;   // ≈ std::function / callable
+Action<string> log = m => Console.WriteLine($"[{DateTime.Now}] {m}");
+
+public event EventHandler<PriceEventArgs>? PriceUpdated;              // built-in observer pattern
+
+try { var p = await FetchPriceAsync("AAPL"); }
+catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { /* filtered catch */ }
+catch (Exception ex) { logger.Error(ex, "Unexpected"); throw; }       // `throw;` keeps the stack trace
+finally { }
+```
+
+### Gotchas
+- **From Python:** immutable strings (use `StringBuilder` in loops); no duck typing; braces, not indentation.
+- **From C++:** no manual memory management; no pointers outside `unsafe`; no multiple class inheritance; minimal preprocessor (no macros); `struct` vs `class` is value vs reference type, not just default access (see [[csharp-essentials]]).
+
+### Connections
+- **Deeper:** [[csharp-essentials]] (interface vs abstract, struct/class/record, GC), [[csharp-syntax-cheatsheet]], [[dotnet-concurrency-wpf]] (async in a UI).
+
+<a id="csharp-essentials"></a>
+
+## C# / .NET Essentials for Quant Dev
+<!-- section: csharp-essentials | prerequisites: [csharp-refresher] | related: [dotnet-concurrency-wpf, pricing-app-architecture, monte-carlo-pricing, csharp-abstract-classes, csharp-syntax-cheatsheet, csharp-refresher] | sources: [src-rbc-quantdev-prep, src-csharp-syntax-notes, src-quant-finance-study-notes] | tags: [csharp, dotnet, gc, interop] -->
+
+The .NET topics that come up in quant-dev interviews: interface vs abstract class, value vs reference types, immutability, garbage collection, error handling and interop with C++.
+
+### Key points
+- **Interface vs abstract class:** interface = contract, multiple implementation, no state (default methods since C# 8) → pluggable things (models, data sources). Abstract class = shared state + partial implementation, single inheritance → shared instrument behaviour.
+
+| | `abstract class` | `interface` |
+|---|---|---|
+| Can it have implementation? | Can mix: some methods implemented, some abstract | Usually not (C# 8+ allows default implementations) |
+| Can it have fields? | Yes | No instance fields |
+| How many? | A class can inherit only **one** class | A class can implement **many** interfaces |
+
+- **struct / class / record:** struct = value type, copied on assignment (small immutable data like a tenor, `readonly struct PricePoint { Bid, Ask, Mid }`); class = reference, identity, used for most things (differs from C++, where struct/class differ only in default access); **record** = reference type with value equality + `with` → ideal for immutable trades / market snapshots.
+- **Immutability:** lock-free concurrent pricing, reproducible results, scenarios = `md with { Spot = 105 }`.
+- **GC:** generational (Gen 0/1/2, LOH > 85 KB). In MC hot loops reuse arrays, `Span<T>`, `ArrayPool<T>`. Unsubscribed event handlers leak memory in long-running desktop apps.
+- **Errors:** validate inputs up front (negative vol, past expiry, missing dividend); clear trader-readable error; never silently return 0/NaN; log trade ID + model version.
+- **Generics/LINQ:** `Dictionary<string, Func<Instrument, IPricingModel>>` registry; `trades.GroupBy(t => t.Underlying).Select(g => new { g.Key, Delta = g.Sum(t => t.Delta) })`.
+- **C++ interop:** P/Invoke to a C API, C++/CLI wrapper, COM, or out-of-process service (gRPC/REST). Watch marshalling cost, memory ownership, version pinning.
+- **Python → C#:** ABCs ≈ interfaces, dataclasses ≈ records; add static typing and explicit threading.
+
+### Connections
+- **Builds on:** [[csharp-refresher]]. **Used in:** [[csharp-abstract-classes]], [[pricing-app-architecture]], [[monte-carlo-pricing]] (hot loops), [[dotnet-concurrency-wpf]].
 
 <a id="csharp-abstract-classes"></a>
 
 ## Abstract Classes & Abstract Methods
-<!-- section: csharp-abstract-classes | prerequisites: [oop-pillars] | related: [csharp-essentials, pricing-app-architecture, csharp-constructors-base] | sources: [src-csharp-syntax-notes] | tags: [csharp, abstract, polymorphism, override] -->
+<!-- section: csharp-abstract-classes | prerequisites: [oop-pillars, csharp-essentials] | related: [csharp-essentials, pricing-app-architecture, csharp-constructors-base] | sources: [src-csharp-syntax-notes] | tags: [csharp, abstract, polymorphism, override] -->
 
 Examples come from equity-derivative pricing class design (Payoff / Exercise / Option / PricingEngine).
 
@@ -66,6 +256,8 @@ public:
 
 ## The Two Uses of `=>`
 <!-- section: csharp-arrow-syntax | prerequisites: [csharp-abstract-classes] | related: [csharp-essentials, csharp-constructors-base] | sources: [src-csharp-syntax-notes] | tags: [csharp, lambda, expression-bodied, linq] -->
+
+The arrow `=>` has two unrelated meanings in C#: a one-expression method body, and a lambda (anonymous function). Both appear throughout pricing code.
 
 ### Use 1: expression-bodied member
 
@@ -143,6 +335,8 @@ var total = portfolio.Sum(inst => inst.NPV());       // aggregate
 ## Constructors & `: base(...)`
 <!-- section: csharp-constructors-base | prerequisites: [csharp-abstract-classes, csharp-arrow-syntax] | related: [oop-pillars] | sources: [src-csharp-syntax-notes] | tags: [csharp, constructor, inheritance, initialization-order] -->
 
+A subclass constructor first hands the base-class arguments to the base constructor with `: base(...)`, then initialises its own fields.
+
 ```csharp
 public CashOrNothingPayoff(OptionType type, double strike, double cash) : base(type, strike) => _cash = cash;
 //     ①                   ②                                            ③                      ④
@@ -211,7 +405,9 @@ CashOrNothingPayoff(OptionType t, double K, double cash)
 <a id="csharp-ternary-operator"></a>
 
 ## The Ternary Operator `? :`
-<!-- section: csharp-ternary-operator | prerequisites: [] | related: [csharp-constructors-base] | sources: [src-csharp-syntax-notes] | tags: [csharp, operators, control-flow] -->
+<!-- section: csharp-ternary-operator | prerequisites: [csharp-constructors-base] | related: [csharp-constructors-base] | sources: [src-csharp-syntax-notes] | tags: [csharp, operators, control-flow] -->
+
+The ternary operator picks one of two values in a single expression; payoff code uses it constantly.
 
 **Format:**
 
@@ -260,7 +456,9 @@ else
 <a id="csharp-syntax-cheatsheet"></a>
 
 ## C# Syntax Cheat Sheet
-<!-- section: csharp-syntax-cheatsheet | prerequisites: [csharp-abstract-classes] | related: [csharp-essentials, csharp-arrow-syntax, csharp-constructors-base] | sources: [src-csharp-syntax-notes] | tags: [csharp, syntax, reference] -->
+<!-- section: csharp-syntax-cheatsheet | prerequisites: [csharp-abstract-classes, csharp-arrow-syntax, csharp-constructors-base, csharp-ternary-operator] | related: [csharp-essentials, csharp-arrow-syntax, csharp-constructors-base] | sources: [src-csharp-syntax-notes] | tags: [csharp, syntax, reference] -->
+
+A one-table reference of the C# syntax used in the pricing library that follows.
 
 | Syntax | Example | Meaning |
 |---|---|---|
@@ -333,7 +531,6 @@ Four independent parts, combined at the end by composition:
 
 ```csharp
 using System;   // imports the System namespace: Math, Random, Console, exception classes, etc. Without it you'd write System.Math.Max(...)
-
 
 // [enum] a set of named constants. OptionType can only be Call or Put, safer than a string "call" (a typo is a compile error)
 public enum OptionType { Call, Put }
@@ -662,7 +859,7 @@ public sealed class MCAsianEngine : IPricingEngine<AsianOption>
 }
 ```
 
-### Usage example
+### Usage example (Main)
 
 ```csharp
 public static class Program
@@ -730,189 +927,19 @@ public static class Program
 - **Same design idea:** [[pricing-app-architecture]], [[design-patterns-pricing]] (Strategy = swappable engine).
 - **Engines:** [[black-scholes-formula]], [[binomial-replication]], [[american-early-exercise]], [[monte-carlo-pricing]]. **Products:** [[digital-options]], [[asian-options]].
 
-<a id="csharp-refresher"></a>
-
-## C# Refresher for a Python / C++ Programmer
-<!-- section: csharp-refresher | prerequisites: [oop-pillars] | related: [csharp-essentials, csharp-syntax-cheatsheet, csharp-abstract-classes, dotnet-concurrency-wpf] | sources: [src-quant-finance-study-notes] | tags: [csharp, python, cpp, linq, async, pattern-matching, records] -->
-
-### Types and variables
-- Statically typed (like C++). **Value types** (struct, enum, int, double, bool) vs **reference types** (class, interface, delegate, string, array). Garbage collected: no `delete`.
-- `var` = compile-time type inference (still static).
-
-```csharp
-var name = "Claude";            // string
-var count = 42;                  // int
-var prices = new List<double>(); // List<double>
-
-int? maybeValue = null;          // nullable value type
-int result = maybeValue ?? 0;    // null-coalescing (≈ Python `x or default`)
-string? city = person?.Address?.City; // null-conditional
-```
-
-### Classes, properties, interfaces
-
-```csharp
-public abstract class Instrument
-{
-    public string Ticker { get; set; }          // auto-property (≈ @property)
-    public decimal Price { get; private set; }
-
-    public Instrument(string ticker, decimal price) { Ticker = ticker; Price = price; }
-
-    public abstract decimal CalculateRisk();    // ≈ C++ pure virtual
-    public virtual string Summary() => $"[{Ticker}] @ {Price:C}";
-}
-
-public class Equity : Instrument
-{
-    public double Beta { get; set; }
-    public Equity(string t, decimal p, double beta) : base(t, p) { Beta = beta; } // ≈ super().__init__
-    public override decimal CalculateRisk() => Price * (decimal)Beta;
-}
-```
-
-```csharp
-private decimal _notional;
-public decimal Notional
-{
-    get => _notional;
-    set { if (value < 0) throw new ArgumentException("Notional must be >= 0"); _notional = value; }
-}
-public DateTime TradeDate { get; init; }   // init-only: settable at construction, then immutable
-```
-
-Single class inheritance, **multiple interfaces**:
-
-```csharp
-public interface IPriceable { decimal GetMtm(DateTime asOf); }
-public interface IRiskMeasurable { Dictionary<string, decimal> GetGreeks(); }
-public class Option : Instrument, IPriceable, IRiskMeasurable { /* ... */ }
-```
-
-### Generics (≈ C++ templates with constraints)
-
-```csharp
-public class TimeSeries<T> where T : struct, IComparable<T>
-{
-    private readonly SortedDictionary<DateTime, T> _data = new();
-    public void Add(DateTime d, T v) => _data[d] = v;
-    public T? GetLatest() => _data.Count > 0 ? _data.Last().Value : null;
-}
-```
-
-### LINQ (≈ comprehensions + pandas chaining)
-
-```csharp
-var large  = trades.Where(t => t.Notional > 1_000_000).ToList();       // [t for t in trades if ...]
-var sorted = trades.OrderByDescending(t => t.TradeDate).ToList();     // sorted(..., reverse=True)
-var byCcy  = trades.GroupBy(t => t.Currency)
-                   .ToDictionary(g => g.Key, g => g.Sum(t => t.Notional));
-
-var report = trades
-    .Where(t => t.TradeDate >= DateTime.Today.AddDays(-30))
-    .GroupBy(t => t.Desk)
-    .Select(g => new { Desk = g.Key, N = g.Count(), Total = g.Sum(t => t.Notional), Avg = g.Average(t => t.Notional) })
-    .OrderByDescending(x => x.Total);
-```
-
-### async / await (≈ asyncio)
-
-```csharp
-public async Task<decimal> FetchPriceAsync(string ticker)
-{
-    using var client = new HttpClient();
-    var json = await client.GetStringAsync($"https://api.example.com/price/{ticker}");
-    return JsonSerializer.Deserialize<PriceData>(json).Price;
-}
-decimal[] prices = await Task.WhenAll(tickers.Select(FetchPriceAsync)); // ≈ asyncio.gather
-```
-
-### Pattern matching
-
-```csharp
-string RiskBucket(Instrument inst) => inst switch
-{
-    Equity { Beta: > 1.5 } => "High Beta",
-    Equity { Beta: > 0.8 } => "Market Beta",
-    Equity                 => "Low Beta",
-    Option { Strike: var s } when s > inst.Price * 1.2m => "Deep OTM",
-    Option                 => "Near Money",
-    _                      => "Unknown"
-};
-
-if (instrument is Equity { Ticker: "AAPL", Beta: var beta })   // replaces dynamic_cast checks
-    Console.WriteLine($"Apple beta: {beta}");
-```
-
-### Records (≈ frozen dataclass)
-
-```csharp
-public record TradeRecord(string Ticker, decimal Notional, DateTime TradeDate, string Desk);
-var trade   = new TradeRecord("AAPL", 1_000_000m, DateTime.Today, "Delta One");
-var amended = trade with { Notional = 2_000_000m };  // ≈ dataclasses.replace
-// value equality: records compare by content; classes by reference
-```
-
-### Collections
-
-| C# | Python | C++ |
-|---|---|---|
-| `List<T>` | `list` | `std::vector<T>` |
-| `Dictionary<K,V>` | `dict` | `std::unordered_map<K,V>` |
-| `HashSet<T>` | `set` | `std::unordered_set<T>` |
-| `SortedDictionary<K,V>` | — | `std::map<K,V>` |
-| `Queue<T>` | `collections.deque` | `std::queue<T>` |
-| `ConcurrentDictionary<K,V>` | — | — |
-
-### Delegates, events, exceptions
-
-```csharp
-Func<decimal, decimal, decimal> spread = (bid, ask) => ask - bid;   // ≈ std::function / callable
-Action<string> log = m => Console.WriteLine($"[{DateTime.Now}] {m}");
-
-public event EventHandler<PriceEventArgs>? PriceUpdated;              // built-in observer pattern
-
-try { var p = await FetchPriceAsync("AAPL"); }
-catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound) { /* filtered catch */ }
-catch (Exception ex) { logger.Error(ex, "Unexpected"); throw; }       // `throw;` keeps the stack trace
-finally { }
-```
-
-### Gotchas
-- **From Python:** immutable strings (use `StringBuilder` in loops); no duck typing; braces, not indentation.
-- **From C++:** no manual memory management; no pointers outside `unsafe`; no multiple class inheritance; minimal preprocessor (no macros); `struct` vs `class` is value vs reference type, not just default access (see [[csharp-essentials]]).
-
-### Connections
-- **Deeper:** [[csharp-essentials]] (interface vs abstract, struct/class/record, GC), [[csharp-syntax-cheatsheet]], [[dotnet-concurrency-wpf]] (async in a UI).
-
-<a id="csharp-essentials"></a>
-
-## C# / .NET Essentials for Quant Dev
-<!-- section: csharp-essentials | prerequisites: [oop-pillars] | related: [dotnet-concurrency-wpf, pricing-app-architecture, monte-carlo-pricing, csharp-abstract-classes, csharp-syntax-cheatsheet, csharp-refresher] | sources: [src-rbc-quantdev-prep, src-csharp-syntax-notes, src-quant-finance-study-notes] | tags: [csharp, dotnet, gc, interop] -->
-
-- **Interface vs abstract class:** interface = contract, multiple implementation, no state (default methods since C# 8) → pluggable things (models, data sources). Abstract class = shared state + partial implementation, single inheritance → shared instrument behaviour.
-
-| | `abstract class` | `interface` |
-|---|---|---|
-| Can it have implementation? | Can mix: some methods implemented, some abstract | Usually not (C# 8+ allows default implementations) |
-| Can it have fields? | Yes | No instance fields |
-| How many? | A class can inherit only **one** class | A class can implement **many** interfaces |
-
-- **struct / class / record:** struct = value type, copied on assignment (small immutable data like a tenor, `readonly struct PricePoint { Bid, Ask, Mid }`); class = reference, identity, used for most things (differs from C++, where struct/class differ only in default access); **record** = reference type with value equality + `with` → ideal for immutable trades / market snapshots.
-- **Immutability:** lock-free concurrent pricing, reproducible results, scenarios = `md with { Spot = 105 }`.
-- **GC:** generational (Gen 0/1/2, LOH > 85 KB). In MC hot loops reuse arrays, `Span<T>`, `ArrayPool<T>`. Unsubscribed event handlers leak memory in long-running desktop apps.
-- **Errors:** validate inputs up front (negative vol, past expiry, missing dividend); clear trader-readable error; never silently return 0/NaN; log trade ID + model version.
-- **Generics/LINQ:** `Dictionary<string, Func<Instrument, IPricingModel>>` registry; `trades.GroupBy(t => t.Underlying).Select(g => new { g.Key, Delta = g.Sum(t => t.Delta) })`.
-- **C++ interop:** P/Invoke to a C API, C++/CLI wrapper, COM, or out-of-process service (gRPC/REST). Watch marshalling cost, memory ownership, version pinning.
-- **Python → C#:** ABCs ≈ interfaces, dataclasses ≈ records; add static typing and explicit threading.
-
 <a id="dotnet-concurrency-wpf"></a>
 
 ## .NET Concurrency, WPF & MVVM
 <!-- section: dotnet-concurrency-wpf | prerequisites: [csharp-essentials] | related: [pricing-app-architecture, scenario-risk-grids] | sources: [src-rbc-quantdev-prep] | tags: [async, wpf, mvvm, threading] -->
 
+A desktop pricing app must stay responsive while it fetches data and runs heavy calculations. This section separates I/O-bound from CPU-bound work and describes the MVVM structure of a WPF app.
+
+### Key points
 - **async/await** → I/O-bound (fetch market data, call a pricing service); frees the UI thread.
 - **Parallel.For / PLINQ / Task.Run** → CPU-bound (MC paths, scenario grids).
 - Never `.Result` / `.Wait()` on the UI thread → deadlock with WPF sync context.
 - **500 scenarios, responsive UI:** `await Task.Run(...)`, `IProgress<T>`, `CancellationToken`, batch `ObservableCollection` updates on the Dispatcher, virtualise grids.
 - **MVVM:** Model = domain (trades, pricers); View = XAML; ViewModel = state + commands (`INotifyPropertyChanged`, `ICommand`) → testable without UI. Toolkits: CommunityToolkit.Mvvm, Prism, ReactiveUI.
+
+### Connections
+- **Builds on:** [[csharp-essentials]]. **Used for:** [[scenario-risk-grids]], [[pricing-app-architecture]].

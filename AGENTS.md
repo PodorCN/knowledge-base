@@ -39,17 +39,21 @@ Read this whole file before editing.
 
 ```
 home
-├── Foundations  → prob-stats · stochastic-finance
+├── Foundations  → prob-stats · stochastic-finance · quant-dev
 ├── Buy-side     → signal-research · portfolio-construction
-└── Sell-side    → pricing · black-scholes · quant-models · risk-management · quant-dev
+└── Sell-side    → black-scholes · pricing · risk-management
 ```
+
+Tracks and chapters are in **reading order**: a section's `prerequisites` must come earlier in this order
+(the build warns otherwise). Symbols follow the **Notation & conventions**
+table in `maps/home.md`; a chapter that needs local symbols defines them in its introduction.
 
 Levels: **Group → Track → Chapter → Section**.
 
 | Level | Where it lives | Notes |
 |---|---|---|
 | Group | `maps/map-foundations.md`, `map-buyside.md`, `map-sellside.md` | fixed, 3 groups |
-| Track | `maps/map-<track>.md` | fixed, 9 tracks; lists its chapters in reading order |
+| Track | `maps/map-<track>.md` | fixed, 8 tracks; lists its chapters in reading order |
 | Chapter | `topics/<chapter-id>.md` | one complete document per topic |
 | Section | a block inside a chapter | one idea; has an anchor so `[[section-id]]` jumps to it |
 | Question | `## Q017:` block in `questions/qb-*.md` | links to the sections it tests; **local only** (git-ignored) |
@@ -59,22 +63,21 @@ Levels: **Group → Track → Chapter → Section**.
 
 Ask in this order:
 
-1. **Which interview is it for?** Asked in any quant interview (probability, statistics, stochastic
-   calculus, basic finance) → **Foundations**. Finding signals or building portfolios → **Buy-side**.
-   Pricing, modelling, hedging or building derivatives systems → **Sell-side**.
+1. **Which interview is it for?** Asked in any quant interview (probability, statistics, basic
+   finance, programming / quant dev) → **Foundations**. Finding signals or building portfolios → **Buy-side**.
+   Stochastic calculus, pricing, modelling or hedging derivatives → **Sell-side**.
 2. **Which track?**
 
 | Track | Put here |
 |---|---|
 | `prob-stats` | probability, distributions, expectation/variance, puzzles, estimation, hypothesis tests, linear algebra, calculus / Taylor / mental math |
-| `stochastic-finance` | Brownian motion, Itô, GBM, risk-neutral pricing, returns, no-arbitrage, forwards, bonds |
-| `signal-research` | regression, ML, time series, validation/leakage, signals, IC / alpha, backtests, research process, multi-asset risk premia & macro signals |
-| `portfolio-construction` | Sharpe, diversification, optimisation, risk contribution/budgeting, position sizing |
-| `pricing` | option payoffs, parity, replication, exotic options, structured products, delta one |
-| `black-scholes` | Black–Scholes PDE/formula, N(d1) vs N(d2), Black-76, American exercise; **Greeks** (own chapter) |
-| `quant-models` | implied vol, vol surface construction, local/stochastic vol, numerical methods |
+| `stochastic-finance` | returns, no-arbitrage, forwards, bonds, option payoffs / bounds / put–call parity / binomial & static replication (track title: "Finance Foundations") |
+| `signal-research` | regression, ML, time series, validation/leakage, signals, IC / alpha, multi-asset risk premia & macro signals, research process & backtests |
+| `portfolio-construction` | Sharpe, win rate / expectancy, exposure, diversification, optimisation, risk contribution/budgeting, position sizing |
+| `pricing` | numerical methods, implied vol, vol surface construction, local/stochastic vol; exotic options, structured products, delta one (track title: "Pricing Models") |
+| `black-scholes` | Brownian motion, Itô, GBM, martingales, risk-neutral pricing; Black–Scholes PDE/formula, N(d1) vs N(d2), Black-76, American exercise; **Greeks** (own chapter) (track title: "Stochastic Calculus & Black–Scholes") |
 | `risk-management` | hedging, pin risk, scenarios, VaR/ES, model risk (Greeks themselves live in the `black-scholes` track) |
-| `quant-dev` | OOP, design patterns, C#/.NET, pricing-app architecture, releases, reconciliation, coding questions |
+| `quant-dev` | OOP, design patterns, C#/.NET, MATLAB (vs Python, interop, performance, memory model, config), portfolio optimisation in MATLAB, pricing-app architecture, releases, reconciliation, coding questions |
 
 3. **Which chapter?** Pick the existing chapter below whose subject fits. Only create a new chapter for a
    genuinely new topic (and list it in the track map).
@@ -85,15 +88,17 @@ Current chapters and question banks:
 
 | Track | Chapters (reading order) | Question banks |
 |---|---|---|
-| `prob-stats` | `probability-bayes`, `distributions`, `moments-covariance`, `puzzles-markov`, `calculus-mental-math`, `estimation-testing` | `qb-probability`, `qb-statistics-inference` |
-| `stochastic-finance` | `stochastic-calculus`, `no-arbitrage-finance-basics` | `qb-finance-foundations`, `qb-stochastic-calculus` |
-| `signal-research` | `linear-regression`, `ml-regularisation`, `time-series-validation`, `signals-research-process`, `multi-asset-signals` | `qb-regression-ml`, `qb-research-judgment` |
+| `prob-stats` | `calculus-mental-math`, `probability-bayes`, `distributions`, `moments-covariance`, `puzzles-markov`, `estimation-testing`, `statistical-testing` | `qb-probability`, `qb-statistics-inference` |
+| `stochastic-finance` | `no-arbitrage-finance-basics`, `fixed-income-bonds`, `no-arbitrage-parity` | `qb-finance-foundations` |
+| `quant-dev` | `oop-design`, `csharp-dotnet`, `matlab-quant-dev`, `matlab-portfolio-optimisation`, `production-coding` | `qb-quant-dev-engineering` |
+| `signal-research` | `linear-regression`, `ml-regularisation`, `time-series-validation`, `signals-research-process`, `multi-asset-signals`, `research-backtesting` | `qb-regression-ml`, `qb-research-judgment` |
 | `portfolio-construction` | `measuring-performance`, `portfolio-optimisation`, `risk-budgeting-position-sizing` | `qb-portfolio-performance` |
-| `pricing` | `no-arbitrage-parity`, `exotic-options`, `structured-products-delta-one` | `qb-exotics-structured` |
-| `black-scholes` | `black-scholes`, `black-scholes-call-derivation`, `greeks-sensitivities` | `qb-options-bs-greeks` |
-| `quant-models` | `implied-volatility-skew`, `vol-surface-construction-chapter`, `volatility-models`, `numerical-methods` | `qb-vol-surface` |
+| `black-scholes` | `stochastic-calculus`, `black-scholes`, `black-scholes-call-derivation`, `greeks-sensitivities` | `qb-stochastic-calculus`, `qb-options-bs-greeks` |
+| `pricing` | `numerical-methods`, `implied-volatility-skew`, `vol-surface-construction-chapter`, `volatility-models`, `exotic-options`, `structured-products-delta-one` | `qb-vol-surface`, `qb-exotics-structured` |
 | `risk-management` | `hedging`, `risk-control-governance` | `qb-risk-management` |
-| `quant-dev` | `oop-design`, `csharp-dotnet`, `production-coding` | `qb-quant-dev-engineering` |
+
+Section ids are permanent (local question banks link to them): move sections between chapters freely,
+but never rename or delete a section id.
 
 ## 3. Formats
 
@@ -109,6 +114,12 @@ sources: [src-signal-to-weight]
 ---
 # Risk Budgeting & Position Sizing
 
+One-paragraph overview of what the chapter covers and why.
+
+**Prerequisites:** [[portfolio-variance-diversification]], [[time-series-momentum]].
+
+**Leads to:** [[fx-carry-spot-slide]].
+
 **Sections:** [[risk-contribution]] · [[risk-budgeting]] · [[signal-to-weight]]
 
 <a id="risk-budgeting"></a>
@@ -116,12 +127,15 @@ sources: [src-signal-to-weight]
 ## Risk Budgeting (Bruder & Roncalli 2012)
 <!-- section: risk-budgeting | prerequisites: [risk-contribution] | related: [signal-to-weight] | sources: [src-signal-to-weight] | tags: [risk-parity] -->
 
-$$RC_i(w)=w_i\frac{(\Sigma w)_i}{\sigma(w)}=TE_i\cdot\sigma(w)$$
+One or two sentences stating the idea of the section.
+
+### Formula
+$$RC_i(w)=w_i\frac{(\Sigma w)_i}{\sigma(w)}=b_i\cdot\sigma(w)$$
 
 **Variables:**
 
 - $w_i$ weight of asset $i$
-- $TE_i$ risk budget of asset $i$
+- $b_i$ risk budget of asset $i$
 
 ### Key points
 - …
@@ -131,6 +145,13 @@ $$RC_i(w)=w_i\frac{(\Sigma w)_i}{\sigma(w)}=TE_i\cdot\sigma(w)$$
 ```
 
 Rules:
+- **Chapter intro:** after `# Title`, one overview paragraph, then `**Prerequisites:**` and `**Leads to:**` lines
+  (links to sections in other chapters), then the `**Sections:**` line. Local notation goes in the intro.
+- **Section layout, always in this order:** a 1–3 sentence statement of the idea (restating the user's material,
+  nothing new) → `### Formula` / `### Definition` with `**Variables:**` → `### Key points` →
+  `### Worked example` (if any) → `### Connections` with `**Builds on:**` / `**Used by:**` / `**Related:**` / `**Contrast:**`.
+- Every symbol in a formula appears in its `**Variables:**` list, written `- $symbol$ meaning` (the viewer turns
+  the list into a "where" table). Don't put another bullet list directly after it; add a label such as `**Notes:**` between.
 - The `<a id>` line, the `## ` title and the `<!-- section: … -->` comment go together, in that order;
   the anchor id must equal `section:`. Section ids are kebab-case and unique across the repo.
 - `prerequisites` ("you need X first") and `related` in the comment create the links shown in the wiki.
@@ -185,6 +206,9 @@ One short note per document: title, file path, and the list of sections it fed. 
   `local/index.html`. Never write the password into any file, commit message or chat log.
 
 ## 6. Build outputs
+
+The build also warns when a section's `prerequisites` entry comes later in the reading order (tracks as listed in
+`maps/home.md`, chapters as listed in each track map); keep it at 0 warnings.
 
 `scripts/build_graph.py` validates links and writes the public `docs/` site and the local-only `local/`
 site (a self-contained wiki: sidebar menu, chapter reader, "On this page" rail, chapter graph).
