@@ -125,6 +125,16 @@ $$C^{E}_t\approx DY_t-r_f,\qquad C^{B}_t\approx y^{10}_t-r_f,\qquad C^{E}_t-C^{B
 - Empirically carry predicts returns in time series and cross section across equities, bonds, commodities, credit and options; timing strategies that buy when carry is above its historical mean earn average Sharpe ratios near 0.6 at monthly rebalancing.
 - **Ideal vs feasible inputs:** ideal = futures-implied *forward* yields; feasible public proxies = trailing-twelve-month cash distributions / price for equities and the constant-maturity 10-year nominal yield for bonds.
 - **No look-ahead:** distributions enter on their ex-dates (knowable then and no earlier), are summed by calendar month, and any day uses only past month ends ([[cross-validation-leakage]]).
+
+**Code:** trailing-12-month dividend yield of SPY (`div` = cash distributions indexed by ex-date, `px` = daily close):
+
+```python
+monthly_div = div.resample("ME").sum()       # specials can't spike a daily series
+ttm = monthly_div.rolling(12).sum()          # annualise, remove seasonality
+yld = (ttm / px.resample("ME").last() * 100).dropna()   # DY_t in %
+```
+
+The signal itself is then one subtraction after aligning the daily 10-year yield (`^TNX`, %) onto the month ends: `(div_yield - y10).rename("equity_bond_carry")` (alignment code in [[cross-validation-leakage]]).
 - **Know your proxy error:** since the 1990s US firms have shifted payout from dividends to buybacks, so dividend yield structurally **understates** shareholder yield; trailing and forward carry can disagree for years.
 - **Timing rule:** compare carry with its own history, an expanding z-score capped at ±2 ([[time-series-momentum]]): $z=+2$ → full position, $z=0$ → flat.
 
@@ -135,7 +145,7 @@ $$C^{E}_t\approx DY_t-r_f,\qquad C^{B}_t\approx y^{10}_t-r_f,\qquad C^{E}_t-C^{B
 <a id="stock-bond-carry-case-study"></a>
 
 ## Case Study: Timing US Stocks vs Bonds with Relative Carry
-<!-- section: stock-bond-carry-case-study | prerequisites: [carry-across-assets, timing-signal-evaluation, effective-sample-size, cross-validation-leakage] | related: [information-coefficient, multiple-testing, research-workflow, backtest-pitfalls] | sources: [src-carry-course-notes] | tags: [case-study, carry, pre-registration, overlap, quantile-sort] -->
+<!-- section: stock-bond-carry-case-study | prerequisites: [carry-across-assets, timing-signal-evaluation, effective-sample-size, cross-validation-leakage] | related: [information-coefficient, multiple-testing, research-workflow, backtest-pitfalls, grinold-alpha, black-litterman] | sources: [src-carry-course-notes] | tags: [case-study, carry, pre-registration, overlap, quantile-sort] -->
 
 A pre-registered test of relative carry ($DY-y^{10}$) as a weekly stocks-vs-bonds timing signal. The sign matches theory but the effect is statistically indistinguishable from zero and the quintile shape contradicts linear sizing, so the candidate fails; the diagnosis points mainly at the measurement (dividend-only yield), not the theory.
 
@@ -144,6 +154,15 @@ A pre-registered test of relative carry ($DY-y^{10}$) as a weekly stocks-vs-bond
 - **Target:** 21-trading-day return of the equity basket minus the bond basket, sampled on the last trading day of each week.
 - **Window:** weeks whose forward window ends before 2018: 574 usable weeks, Oct 2006 – Nov 2017.
 - **Pass rule (frozen in advance):** $IC>0$ and $t\ge1.5$.
+- **Registration:** the candidate is one entry in the portfolio config, inside the TAA layer next to two other tactical signals (HY-minus-IG credit appetite, bond time-series momentum). `side` says which asset a high value favours ("equity" adds to the equity-vs-bond score, "bond" subtracts):
+
+```python
+"equity_bond_carry": {
+    "func": equity_bond_carry,
+    "data": {"div_yield": "div_yield", "ten_year": "us10y"},
+    "weight": 1 / 3, "side": "equity",
+},
+```
 
 ### Protocol: what, why, and what was rejected
 Every choice was fixed before results were viewed.
@@ -152,7 +171,7 @@ Every choice was fixed before results were viewed.
 |---|---|---|---|
 | A | **Dividend leg:** Cash distributions of an S&P 500 tracker by ex-date, summed by calendar month; trailing 12 months / month-end price, % | Monthly: distributions arrive quarterly with specials, daily yields spike on noise. 12 months: annualises and removes seasonality. Ex-dates + month-end: knowable on the ex-date and no earlier | Linear interpolation between month ends (draws the next month end into today: look-ahead) |
 | B | **Bond leg:** 10-year nominal close, daily, % (same series as the existing term-spread signal) | No new plumbing, no inconsistent vintages | A longer source (FRED daily 10-year, back to the 1960s): swapping data mid-research is a new registration; recorded as the first upgrade for a round two. Cost: the equity-index feed caps history at 20 years, so the joint sample starts around 2006 |
-| C | **Baskets:** Equal-weight, daily-rebalanced index per sleeve (11 sector funds; 4 bond funds), from long-history US originals converted at spot FX | The neutral, tradable proxy for "the asset class", matching the sleeves the portfolio tilts | The traded (Canadian) funds: they start in 2025, too short to calibrate |
+| C | **Baskets:** Equal-weight, daily-rebalanced index per sleeve (11 sector funds; 4 bond funds), from long-history US originals converted at spot FX; in code `(1 + prices[labels].pct_change().mean(axis=1).dropna()).cumprod()`, assets join once they have prices | The neutral, tradable proxy for "the asset class", matching the sleeves the portfolio tilts | The traded (Canadian) funds: they start in 2025, too short to calibrate |
 | D | **Alignment:** Union of calendars + forward-fill onto trading days | Forward-fill invents no information | Interpolation or resampling touching future month ends |
 | E | **Normalisation:** Expanding z-score vs own past, cap ±2, sign after | The paper's rule "above vs below the historical mean" in volatility units; expanding = no extra parameter; cap = no single freak observation | Rolling window (one more parameter to overfit). Disclosed wart: alignment before normalisation, so the 20-observation minimum counts trading days, and 2006–2008 z-scores rest on thin history |
 | F | **Sampling:** Weekly (last trading day); 21-trading-day forward | Daily drowns in microstructure noise and quintuples overlap; monthly starves the sample; weekly = the live rebalancing clock. 21 days = the paper's one-month holding period, exact | Calendar months (wobble with holidays) |
@@ -185,6 +204,13 @@ Average next-21-day equity-minus-bond return by score quintile:
 - Figures in the original notes (not reproduced here): raw carry and its z-score compress after 2008 (the zero-rate era pins both legs); rolling 52-week IC flips sign around zero; no single regime carries the result (no "crisis alpha"); the decile-mean line bends down at the right end.
 
 **Verdict: fail.** By the pre-committed rule the candidate stops here; later data stays sealed.
+
+**In the portfolio:** the TAA layer as a whole measured IC −0.009 (vs next 21 trading days, weekly samples; SAA layer +0.083), so its weight in the equity-vs-bond score is set to zero and its Black–Litterman IC to 0 ([[grinold-alpha]], [[black-litterman]]); the signals are still computed for the research pages:
+
+```python
+L1_TE_WEIGHTS = {"saa": 1.0, "taa": 0.0}   # TAA IC ~0
+BL_IC_TAA = 0.0
+```
 
 ### Worked example
 **Effective N and the IC needed for $t=1.5$** (574 overlapping weeks, 21-day horizon):

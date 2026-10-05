@@ -107,8 +107,21 @@ Model selection needs data the model has not seen. With time series the split mu
 - Trading at a close you couldn't have observed before deciding.
 - Interpolating a monthly series between month ends: it draws the **next** month end into today. Forward-fill instead (each day inherits the latest known value; it invents no information).
 
+**Code:** aligning a daily series (10-year yield) onto monthly dates point-in-time: union of both calendars → forward-fill (only past values flow forward) → keep the target dates.
+
+```python
+y10 = ten_year.reindex(div_yield.index.union(ten_year.index)).ffill().reindex(div_yield.index)
+```
+
 ### Clean train/test boundary with overlapping forwards
-A sample date belongs to the earlier (selection) window only if its **entire** forward window ends before the boundary; dates whose forward window straddles the boundary belong to **neither** side. A forward return spanning the boundary cannot be attributed to either regime, and assigning it to one side leaks the other side's information. Every layer (signal calibration, tests) uses the same rule, so all are graded on the same dates. Data after the boundary is not loaded at all until its round ("sealed"), not even for a quick look or debugging.
+A sample date belongs to the earlier (selection) window only if its **entire** forward window ends before the boundary; dates whose forward window straddles the boundary belong to **neither** side. A forward return spanning the boundary cannot be attributed to either regime, and assigning it to one side leaks the other side's information. Every layer (signal calibration, tests) uses the same rule, so all are graded on the same dates. In code the evaluation sample is the intersection with the selection weeks, after dropping dates before the score has history:
+
+```python
+df = pd.DataFrame({"z": z.reindex(weeks_all), "fwd": fwd.reindex(weeks_all)}).dropna()
+df = df[df["z"] != 0]                         # before the signal has history
+df = df.loc[df.index.intersection(sel)]       # sel = weeks whose forward window ends before SELECT_END
+```
+ Data after the boundary is not loaded at all until its round ("sealed"), not even for a quick look or debugging.
 
 ### Point-in-time join (no look-ahead)
 Join each price date to the latest fundamental record that was already **available** on that date:

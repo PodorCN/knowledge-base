@@ -80,7 +80,7 @@ $$z_t=\frac{x_t-\bar x_{\le t}}{\hat\sigma_{\le t}},\qquad s_t=\mathrm{clip}(z_t
 **Notes:**
 
 - Comparing a series with its **own** history is the rule "above vs below its historical mean", in units of historical volatility.
-- **Expanding vs rolling:** a rolling window is one more free parameter to overfit; expanding uses all the past and nothing else, so it stays point-in-time.
+- **Expanding vs rolling:** a rolling window is one more free parameter to overfit; expanding uses all the past and nothing else, so it stays point-in-time. In the pipeline this is a single config switch passed to the normaliser: `NORMALIZE_WINDOW = None  # None = expanding window`.
 - **Cap at ±2:** so one freak observation cannot dictate a position.
 - **Pitfall:** if a monthly series is forward-filled onto trading days *before* standardising, a "20-observation minimum" counts repeated daily copies, not months; the early z-scores rest on thin history and their variance is understated.
 
@@ -162,10 +162,28 @@ $$IC^{\text{TS}}=\mathrm{corr}_t\big(\mathrm{rk}(s_t),\ \mathrm{rk}(R_{t\to t+h}
 - $R_{t\to t+h}$ return of the traded spread (e.g. equity basket minus bond basket) from $t$ to $t+h$
 - $\mathrm{corr}_t$ correlation computed over the dates $t$
 
+**Code:** the forward target is built by shifting prices **back** by $h$ days, so the row for date $t$ holds the return from $t$ to $t+h$ (`HORIZON` = 21; `eq`, `fi` are the equity and bond basket price series):
+
+```python
+fwd = (eq.shift(-HORIZON) / eq - 1) - (fi.shift(-HORIZON) / fi - 1)
+```
+
+`shift(-h)` is the only place future data enters, and only as the **target**; it must never feed the score.
+
 **Notes:**
 
 - Benchmarks are lower than for a cross-section: for a single stocks-vs-bonds series, 0.05 is interesting and 0.10 is rare.
 - A one-year (52-week) rolling IC is the shortest window where a rank correlation is not mostly noise; an IC that keeps flipping sign around zero is the visual signature of noise.
+
+**Code:** rolling 52-week rank IC over the weekly sample `df` (columns `z` = score, `fwd` = forward return), and the IC by calendar year with at least 10 weeks:
+
+```python
+zv, fv = df["z"].values, df["fwd"].values
+rolling = pd.Series([_spearman(zv[i-52:i], fv[i-52:i]) if i >= 52 else np.nan
+                     for i in range(1, len(df) + 1)], index=df.index)
+yearly = df.groupby(df.index.year).apply(
+    lambda g: rank_corr(g["z"], g["fwd"]) if len(g) > 10 else np.nan)
+```
 
 ### Significance of an IC
 $$t\approx\frac{IC\,\sqrt{n_{\text{eff}}-2}}{\sqrt{1-IC^2}}\approx IC\,\sqrt{n_{\text{eff}}-2}\quad(\text{small }IC)$$
@@ -179,6 +197,7 @@ $$t\approx\frac{IC\,\sqrt{n_{\text{eff}}-2}}{\sqrt{1-IC^2}}\approx IC\,\sqrt{n_{
 **Notes:**
 
 - Plugging the raw number of dates into $n_{\text{eff}}$ overstates $t$ when forward windows overlap.
+- **Hit rate** (share of dates where score and forward return have the same sign) is a separate, cruder statistic: `(np.sign(df["z"]) == np.sign(df["fwd"])).mean()`. A 56% hit rate can coexist with an IC near zero.
 - Hurdle: $t\ge2$ is a minimum, never a triumph; a new idea needs $t\ge3$ ([[multiple-testing]], Harvey–Liu–Zhu 2016).
 
 ### ICIR
@@ -368,8 +387,16 @@ $$\bar R_q=\frac{1}{|B_q|}\sum_{t\in B_q}R_{t\to t+h},\qquad q=1,\dots,Q$$
 - Positions sized linearly in the score are valid only if $\bar R_q$ rises **monotonically**. A hump or U-shape means the sizing rule is wrong even when the IC is positive: the largest positions land where returns are worst.
 - Five buckets balance resolution against stability; a decile-mean line on the scatter of score vs forward return adds finer shape.
 
+**Code:** ranking first (`method="first"` breaks ties) makes `qcut` give five equal-size buckets even when many scores are identical (e.g. a capped z-score sitting at +2):
+
+```python
+buckets = pd.qcut(df["z"].rank(method="first"), 5,
+                  labels=["Q1 low", "Q2", "Q3", "Q4", "Q5 high"])
+quant = df.groupby(buckets, observed=True)["fwd"].mean()   # = R-bar_q
+```
+
 ### Timing curve
-Hold a position proportional to the score, compound from \$1 and read the annualised return, the drawdown chart and the turnover:
+Hold a position proportional to the score, compound from 1 unit and read the annualised return, the drawdown chart and the turnover:
 
 $$w_t=\mathrm{clip}\Big(\frac{s_t}{2},-1,+1\Big),\qquad V_{t+1}=V_t\big(1+w_t\,R_{t\to t+1}\big),\ V_0=1$$
 
@@ -380,7 +407,7 @@ $$AR=V_T^{\,52/T}-1,\qquad DD_t=\frac{V_t}{\max_{u\le t}V_u}-1,\qquad TO=\frac1T
 - $s_t$ score at $t$ (capped z-score in $[-2,+2]$)
 - $w_t$ position in the spread: $+1$ = 100% long equity / short bonds, $-1$ the reverse; $s_t=\pm2$ (maximum conviction) maps to a full, unlevered position, $s_t=0$ to flat
 - $R_{t\to t+1}$ spread return over one rebalancing period (one week)
-- $V_t$ value of \$1 invested, after $t$ weeks; $T$ number of weeks
+- $V_t$ value after $t$ weeks of 1 unit invested at $t=0$; $T$ number of weeks
 - $AR$ annualised return; $52/T$ converts $T$ weeks into years
 - $DD_t$ drawdown at $t$ (0 at a new high, negative below it); the worst drawdown is $\min_tDD_t$
 - $TO$ turnover: average absolute weekly change in position
@@ -392,6 +419,16 @@ $$AR=V_T^{\,52/T}-1,\qquad DD_t=\frac{V_t}{\max_{u\le t}V_u}-1,\qquad TO=\frac1T
 - Report curves **gross**; costs are applied at the portfolio level, where a slow signal (high autocorrelation of $s_t$, e.g. 0.95) keeps nearly everything it earns.
 - Read the underwater (drawdown) chart before the return chart: depth and duration of losses.
 
+**Code:** the formulas above, one line each (`wks` = weekly dates; `_next_week(px, wks)` = each asset's return over the following week; `_ann` annualises the weekly returns):
+
+```python
+pos = (z.reindex(wks) / 2).clip(-1, 1)                              # w_t
+weekly = (pos * (_next_week(eq, wks) - _next_week(fi, wks))).dropna()  # w_t * R_{t->t+1}
+curve = (1 + weekly).cumprod()                                      # V_t
+under = curve / curve.cummax() - 1                                  # DD_t
+autocorr = z.reindex(wks).corr(z.reindex(wks).shift(1))             # slow signal -> low turnover
+```
+
 ### Independence, out-of-sample and contribution
 - A signal correlated above ~0.7 with an existing one is a duplicate.
 - In-sample statistics never decide; only untouched later data and the **marginal improvement in net portfolio Sharpe** ([[marginal-sharpe-improvement]]) do. Fundamental law: $IR=IC\times\sqrt{BR}\times TC$ ([[information-coefficient]]).
@@ -401,6 +438,12 @@ $$AR=V_T^{\,52/T}-1,\qquad DD_t=\frac{V_t}{\max_{u\le t}V_u}-1,\qquad TO=\frac1T
 - Fix the pass rule (e.g. $IC>0$ and $t\ge1.5$) **before** looking at results, and fix kill criteria (e.g. out-of-sample IC turns negative) at the same time.
 - Changing the registered design after seeing results (a new data source, a longer horizon) is a **new round** with the higher $t\ge3$ hurdle ([[multiple-testing]]): the price of peeking.
 - A failed candidate with clean discipline is a result, not a waste.
+
+**Code:** the rule is written into the test script before it is run, so the verdict is mechanical:
+
+```python
+verdict = "PASS to validate" if (ic > 0 and t >= 1.5) else "FAIL stop"
+```
 
 ### Connections
 - **Builds on:** [[information-coefficient]], [[effective-sample-size]], [[time-series-momentum]] (the capped z-score).
