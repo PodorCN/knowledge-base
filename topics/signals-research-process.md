@@ -3,7 +3,7 @@ id: signals-research-process
 title: "Signals & Research"
 type: topic
 domain: signal-research
-sources: [src-signal-to-weight, src-squarepoint-dqa-workbook, src-quant-finance-study-notes]
+sources: [src-signal-to-weight, src-squarepoint-dqa-workbook, src-quant-finance-study-notes, src-carry-course-notes]
 ---
 # Signals & Research
 
@@ -13,7 +13,7 @@ This chapter goes from "what is alpha" to "how big a return should I forecast". 
 
 **Leads to:** [[signal-to-weight]], [[mean-variance-optimization]], [[black-litterman]], [[multi-asset-signals]], [[sharpe-ratio]] (why a high backtest Sharpe misleads), [[price-reconciliation]] (the same debugging discipline on the sell side).
 
-**Sections:** [[capm-alpha-beta]] · [[time-series-momentum]] · [[information-coefficient]] · [[ic-contribution]] · [[grinold-alpha]] · [[research-workflow]] · [[backtest-pitfalls]]
+**Sections:** [[capm-alpha-beta]] · [[time-series-momentum]] · [[information-coefficient]] · [[ic-contribution]] · [[grinold-alpha]] · [[timing-signal-evaluation]] · [[research-workflow]] · [[backtest-pitfalls]]
 
 <a id="capm-alpha-beta"></a>
 
@@ -45,7 +45,7 @@ $$R_i-r_f=\alpha_i+\beta_i(R_m-r_f)+\varepsilon_i,\qquad \beta_i=\frac{\mathrm{C
 <a id="time-series-momentum"></a>
 
 ## Time-Series Momentum Signal ("Is the trend still up?")
-<!-- section: time-series-momentum | prerequisites: [returns-simple-log] | related: [signal-to-weight, cross-validation-leakage, backtest-pitfalls] | sources: [src-signal-to-weight] | tags: [momentum, signal, z-score] -->
+<!-- section: time-series-momentum | prerequisites: [returns-simple-log] | related: [signal-to-weight, cross-validation-leakage, backtest-pitfalls] | sources: [src-signal-to-weight, src-carry-course-notes] | tags: [momentum, signal, z-score] -->
 
 A worked example of turning a price history into a signal: take the 12-month return, standardise it against its own history, and clip extremes. The result is a unitless score whose sign is the direction and whose size is the conviction.
 
@@ -66,6 +66,24 @@ $$raw_t=\frac{P_t}{P_{t-12}}-1,\qquad z_t=\frac{raw_t-\mu_{raw}}{\sigma_{raw}},\
 - $s=+1.5$: 1.5σ above average → moderately strong uptrend. $s=-2$: the clipped floor (maximum bearish).
 - **Sign = direction, magnitude = conviction.** Being unitless, different raw signals become comparable.
 
+### Expanding vs rolling standardisation
+For timing, the look-back can be **expanding** (all history up to $t$):
+
+$$z_t=\frac{x_t-\bar x_{\le t}}{\hat\sigma_{\le t}},\qquad s_t=\mathrm{clip}(z_t,-2,+2)$$
+
+**Variables:**
+
+- $x_t$ raw signal value at $t$ (e.g. 12-month momentum, relative carry)
+- $\bar x_{\le t}$, $\hat\sigma_{\le t}$ mean and standard deviation of $x_u$ over all dates $u\le t$ (a minimum number of observations, e.g. 20, before the first score)
+- $z_t$ expanding z-score; $s_t$ capped score
+
+**Notes:**
+
+- Comparing a series with its **own** history is the rule "above vs below its historical mean", in units of historical volatility.
+- **Expanding vs rolling:** a rolling window is one more free parameter to overfit; expanding uses all the past and nothing else, so it stays point-in-time.
+- **Cap at ±2:** so one freak observation cannot dictate a position.
+- **Pitfall:** if a monthly series is forward-filled onto trading days *before* standardising, a "20-observation minimum" counts repeated daily copies, not months; the early z-scores rest on thin history and their variance is understated.
+
 ### Connections
 - **Builds on:** [[returns-simple-log]].
 - **Feeds:** [[signal-to-weight]] → [[risk-budgeting]]; the momentum leg of [[fx-carry-spot-slide]].
@@ -73,7 +91,7 @@ $$raw_t=\frac{P_t}{P_{t-12}}-1,\qquad z_t=\frac{raw_t-\mu_{raw}}{\sigma_{raw}},\
 <a id="information-coefficient"></a>
 
 ## Information Coefficient (IC, Rank IC, ICIR) & the Fundamental Law
-<!-- section: information-coefficient | prerequisites: [variance-covariance-correlation, time-series-momentum] | related: [ic-contribution, grinold-alpha, multiple-testing, multicollinearity, sharpe-ratio, cross-validation-leakage] | sources: [src-quant-finance-study-notes] | tags: [ic, rank-ic, icir, breadth, fundamental-law] -->
+<!-- section: information-coefficient | prerequisites: [variance-covariance-correlation, time-series-momentum, effective-sample-size] | related: [ic-contribution, grinold-alpha, multiple-testing, multicollinearity, sharpe-ratio, cross-validation-leakage, timing-signal-evaluation] | sources: [src-quant-finance-study-notes, src-carry-course-notes] | tags: [ic, rank-ic, icir, breadth, fundamental-law] -->
 
 The IC measures a signal's skill as the cross-sectional correlation between today's signal and the next period's returns. Its stability over time (ICIR) and the number of independent bets (breadth) together determine the achievable information ratio.
 
@@ -102,6 +120,66 @@ Timing: the signal at $t$ is compared with returns from $t$ to $t+1$ (anything e
 | Inputs | Raw values | Cross-sectional ranks |
 | Assumes | Linear | Monotonic |
 | Outliers | Sensitive (winsorise at 1/99%) | Robust: the industry default |
+
+### Rank IC (Spearman) step by step
+Replace each value by its rank, then take the ordinary (Pearson) correlation of the ranks. With no ties this equals a closed form in the rank differences:
+
+$$\text{Rank IC}=\mathrm{corr}\big(\mathrm{rk}(s),\mathrm{rk}(r)\big)=1-\frac{6\sum_{j=1}^{n}d_j^2}{n(n^2-1)},\qquad d_j=\mathrm{rk}(s_j)-\mathrm{rk}(r_j)$$
+
+**Variables:**
+
+- $j=1,\dots,n$ observations being correlated (assets on one date for the cross-sectional IC; dates for the time-series IC below)
+- $n$ number of observations
+- $s_j$ signal of observation $j$
+- $r_j$ forward return of observation $j$
+- $\mathrm{rk}(\cdot)$ rank within the sample: 1 = smallest, $n$ = largest (ties get the average rank)
+- $d_j$ rank difference of observation $j$
+
+**Reading it:** Rank IC asks only "does a higher score come with a higher return?" (monotonic, not necessarily linear). $+1$: the score orders the returns perfectly; $0$: no ordering; $-1$: perfectly reversed. Because a rank can move at most from 1 to $n$, one extreme return (a crash week) cannot dominate it, whereas it can dominate a Pearson coefficient. Whether the relation is also *linear* (which linear position sizing needs) is checked separately by a quantile sort ([[timing-signal-evaluation]]): detection first, shape second.
+
+**Example:** five weeks of a timing score and the next-period return (%):
+
+| Week | Score $s$ | $\mathrm{rk}(s)$ | Return $r$ | $\mathrm{rk}(r)$ | $d$ | $d^2$ |
+|---|---|---|---|---|---|---|
+| 1 | 1.2 | 4 | +0.8 | 4 | 0 | 0 |
+| 2 | −0.5 | 2 | −0.2 | 2 | 0 | 0 |
+| 3 | 0.3 | 3 | +1.5 | 5 | −2 | 4 |
+| 4 | 2.0 | 5 | +0.4 | 3 | +2 | 4 |
+| 5 | −1.1 | 1 | −0.6 | 1 | 0 | 0 |
+
+$\sum d^2=8$ → Rank IC $=1-6\cdot8/(5\cdot24)=$ **0.60**; Pearson IC $=0.54$. If week 5 had been a crash ($r=-6.0$ instead of $-0.6$), its rank stays 1, so the Rank IC is still 0.60, while the Pearson IC jumps to 0.68: one outlier week moved it, not new information about the ordering.
+
+### Time-series (timing) IC
+For a single series, for example timing stocks against bonds, there is no cross-section: the IC is the correlation **across dates** between the score and the forward return that follows it.
+
+$$IC^{\text{TS}}=\mathrm{corr}_t\big(\mathrm{rk}(s_t),\ \mathrm{rk}(R_{t\to t+h})\big)$$
+
+**Variables:**
+
+- $t$ sampling dates (e.g. the last trading day of each week)
+- $s_t$ score known at $t$
+- $h$ forecast horizon in trading days
+- $R_{t\to t+h}$ return of the traded spread (e.g. equity basket minus bond basket) from $t$ to $t+h$
+- $\mathrm{corr}_t$ correlation computed over the dates $t$
+
+**Notes:**
+
+- Benchmarks are lower than for a cross-section: for a single stocks-vs-bonds series, 0.05 is interesting and 0.10 is rare.
+- A one-year (52-week) rolling IC is the shortest window where a rank correlation is not mostly noise; an IC that keeps flipping sign around zero is the visual signature of noise.
+
+### Significance of an IC
+$$t\approx\frac{IC\,\sqrt{n_{\text{eff}}-2}}{\sqrt{1-IC^2}}\approx IC\,\sqrt{n_{\text{eff}}-2}\quad(\text{small }IC)$$
+
+**Variables:**
+
+- $t$ t-statistic of the correlation under the null "true IC = 0"
+- $IC$ estimated (rank) IC
+- $n_{\text{eff}}$ effective number of independent observations: with overlapping forward windows it is much smaller than the number of dates ([[effective-sample-size]])
+
+**Notes:**
+
+- Plugging the raw number of dates into $n_{\text{eff}}$ overstates $t$ when forward windows overlap.
+- Hurdle: $t\ge2$ is a minimum, never a triumph; a new idea needs $t\ge3$ ([[multiple-testing]], Harvey–Liu–Zhu 2016).
 
 ### ICIR
 $$\overline{IC}=\frac1T\sum_{t=1}^TIC_t,\qquad \sigma_{IC}=\sqrt{\frac{1}{T-1}\sum_{t=1}^T\big(IC_t-\overline{IC}\big)^2},\qquad \text{ICIR}=\frac{\overline{IC}}{\sigma_{IC}},\qquad t\approx\text{ICIR}\,\sqrt T$$
@@ -254,6 +332,80 @@ $$\alpha_i=IC_{\text{comp}}\,\sigma_i\,z_{\text{comp},i}\ \ \text{(preferred: ca
 ### Connections
 - **Builds on:** [[information-coefficient]], [[ols-regression]].
 - **Feeds:** [[mean-variance-optimization]], [[black-litterman]], [[signal-to-weight]].
+
+<a id="timing-signal-evaluation"></a>
+
+## Evaluating a Timing Signal: Quantile Sorts, Timing Curve & Pass Rules
+<!-- section: timing-signal-evaluation | prerequisites: [information-coefficient, effective-sample-size, time-series-momentum] | related: [research-workflow, backtest-pitfalls, multiple-testing, cross-validation-leakage, marginal-sharpe-improvement, risk-measures, sharpe-ratio, stock-bond-carry-case-study] | sources: [src-carry-course-notes] | tags: [timing, quantile-sort, timing-curve, drawdown, turnover, pre-registration] -->
+
+A timing signal answers one question: does a series known today predict the return of a spread (e.g. equity minus bonds) over the next period? It is judged by a set of diagnostics, never by the IC alone: overlap-adjusted significance, the shape of returns across quantiles, a timing curve with its drawdown and turnover, independence from existing signals, and untouched later data, with pass and kill rules fixed before looking.
+
+### The checklist
+
+| Diagnostic | Question it answers | Pass reading |
+|---|---|---|
+| Rank IC ([[information-coefficient]]) | Is the direction right? | $IC>0$ |
+| Overlap-adjusted $t$ ([[effective-sample-size]]) | Is it distinguishable from noise? | $t\ge2$ minimum; $t\ge3$ for a new idea |
+| Quantile sort | Is the relation monotonic, so linear sizing is valid? | Bucket returns rise from Q1 to Q5 |
+| Timing curve | What would positions proportional to the score have earned? | Positive return, tolerable drawdown, low turnover |
+| Independence | Is it a duplicate of an existing signal? | Correlation with existing signals below ~0.7 |
+| Out-of-sample / contribution | Does it survive later data and improve the portfolio? | Positive IC on sealed data; higher **net** portfolio Sharpe |
+
+### Quantile sort
+Sort the history into $Q$ buckets by score (typically $Q=5$) and average the forward return in each:
+
+$$\bar R_q=\frac{1}{|B_q|}\sum_{t\in B_q}R_{t\to t+h},\qquad q=1,\dots,Q$$
+
+**Variables:**
+
+- $Q$ number of buckets (5 = quintiles)
+- $B_q$ set of dates whose score falls in bucket $q$ (Q1 = lowest scores, bucket $Q$ = highest); $|B_q|$ its size
+- $R_{t\to t+h}$ forward return of the spread over horizon $h$
+- $\bar R_q$ average forward return in bucket $q$
+
+**Notes:**
+
+- Positions sized linearly in the score are valid only if $\bar R_q$ rises **monotonically**. A hump or U-shape means the sizing rule is wrong even when the IC is positive: the largest positions land where returns are worst.
+- Five buckets balance resolution against stability; a decile-mean line on the scatter of score vs forward return adds finer shape.
+
+### Timing curve
+Hold a position proportional to the score, compound from \$1 and read the annualised return, the drawdown chart and the turnover:
+
+$$w_t=\mathrm{clip}\Big(\frac{s_t}{2},-1,+1\Big),\qquad V_{t+1}=V_t\big(1+w_t\,R_{t\to t+1}\big),\ V_0=1$$
+
+$$AR=V_T^{\,52/T}-1,\qquad DD_t=\frac{V_t}{\max_{u\le t}V_u}-1,\qquad TO=\frac1T\sum_{t=1}^{T}|w_t-w_{t-1}|$$
+
+**Variables:**
+
+- $s_t$ score at $t$ (capped z-score in $[-2,+2]$)
+- $w_t$ position in the spread: $+1$ = 100% long equity / short bonds, $-1$ the reverse; $s_t=\pm2$ (maximum conviction) maps to a full, unlevered position, $s_t=0$ to flat
+- $R_{t\to t+1}$ spread return over one rebalancing period (one week)
+- $V_t$ value of \$1 invested, after $t$ weeks; $T$ number of weeks
+- $AR$ annualised return; $52/T$ converts $T$ weeks into years
+- $DD_t$ drawdown at $t$ (0 at a new high, negative below it); the worst drawdown is $\min_tDD_t$
+- $TO$ turnover: average absolute weekly change in position
+
+**Notes:**
+
+- The curve holds one **week** (the live rebalancing clock), even when the IC is measured on a longer forward horizon: the diagnostic mimics the tradable object.
+- The same sizing rule for every signal keeps the curves comparable.
+- Report curves **gross**; costs are applied at the portfolio level, where a slow signal (high autocorrelation of $s_t$, e.g. 0.95) keeps nearly everything it earns.
+- Read the underwater (drawdown) chart before the return chart: depth and duration of losses.
+
+### Independence, out-of-sample and contribution
+- A signal correlated above ~0.7 with an existing one is a duplicate.
+- In-sample statistics never decide; only untouched later data and the **marginal improvement in net portfolio Sharpe** ([[marginal-sharpe-improvement]]) do. Fundamental law: $IR=IC\times\sqrt{BR}\times TC$ ([[information-coefficient]]).
+- Robustness views: rolling 52-week IC, IC by calendar year (a minimum of 10 weeks per year so partial years cannot pose as evidence), IC by regime.
+
+### Pre-registration: pass and kill rules
+- Fix the pass rule (e.g. $IC>0$ and $t\ge1.5$) **before** looking at results, and fix kill criteria (e.g. out-of-sample IC turns negative) at the same time.
+- Changing the registered design after seeing results (a new data source, a longer horizon) is a **new round** with the higher $t\ge3$ hurdle ([[multiple-testing]]): the price of peeking.
+- A failed candidate with clean discipline is a result, not a waste.
+
+### Connections
+- **Builds on:** [[information-coefficient]], [[effective-sample-size]], [[time-series-momentum]] (the capped z-score).
+- **Used by:** [[stock-bond-carry-case-study]].
+- **Related:** [[research-workflow]], [[multiple-testing]], [[risk-measures]] (drawdown), [[cross-validation-leakage]] (clean splits).
 
 <a id="research-workflow"></a>
 
