@@ -195,7 +195,9 @@ One short note per document: title, file path, and the list of sections it fed. 
    one. Only the user's content, in English.
 3. Add the questions to the track's question bank with `**Topics:**` links and the next free number
    (the build prints it). Check first that the question isn't already there.
-4. Build and check: `python3 scripts/build_graph.py --strict` must report **0 errors**.
+4. Build and check: `python3 scripts/build_graph.py --strict` must report **0 errors**. For the course-notes quality bar
+   (every symbol defined, worked examples, why/what was rejected) follow `.claude/skills/course-notes/SKILL.md`
+   and run `python3 scripts/check_variables.py topics/<chapter>.md` (advisory: lists formula symbols missing from **Variables:**).
    Before every published update, increment the patch number in `VERSION` (for example, `1.01` → `1.02`);
    the build injects it into the viewer.
 5. Commit the notes and the regenerated `docs/`.
