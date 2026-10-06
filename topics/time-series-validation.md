@@ -2,7 +2,7 @@
 id: time-series-validation
 title: "Time Series"
 type: topic
-domain: signal-research
+domain: prob-stats
 sources: [src-squarepoint-dqa-workbook, src-rbc-gam-quantdev-notes, src-carry-course-notes]
 ---
 # Time Series

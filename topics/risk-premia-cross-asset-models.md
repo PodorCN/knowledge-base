@@ -1,11 +1,11 @@
 ---
-id: multi-asset-signals
-title: "Multi-Asset Signals"
+id: risk-premia-cross-asset-models
+title: "Risk Premia & Cross-Asset Strategy Models"
 type: topic
 domain: signal-research
 sources: [src-quant-finance-study-notes]
 ---
-# Multi-Asset Signals
+# Risk Premia & Cross-Asset Strategy Models
 
 This chapter applies the signal toolkit across asset classes. It starts with the structural risk premia that systematic strategies harvest, describes the risk-on/risk-off regime that makes them move together, and then walks through two model designs: a relative-value long/short equity-index model and the FX carry–spot–slide model.
 
