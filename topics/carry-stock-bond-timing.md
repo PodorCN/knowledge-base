@@ -23,27 +23,54 @@ A tactical allocator holds a score $s_t$ each week: positive tilts toward equiti
 Carry is the return an asset earns if its price does not move. It is observable **ex ante** with no pricing model, so it can be defined uniformly across asset classes; for timing stocks against bonds, the financing leg cancels and relative carry is dividend yield minus the 10-year yield.
 
 ### Formula
-Koijen, Moskowitz, Pedersen & Vrugt (2018, *Journal of Financial Economics*):
+Koijen, Moskowitz, Pedersen & Vrugt (2018, *Journal of Financial Economics*) split the return of any (futures) position into three parts:
 
-$$r_{t+1}=C_t+E_t[\Delta P]+\text{shock}_{t+1}$$
-
-**Variables:**
-
-- $r_{t+1}$ return of the (futures) position from $t$ to $t+1$
-- $C_t$ carry: the return if the price never moves, known at $t$
-- $E_t[\Delta P]$ expected price change given information at $t$
-- $\text{shock}_{t+1}$ unexpected part of the return
-
-### Carry by asset and the relative carry
-
-$$C^{E}_t\approx DY_t-r_f,\qquad C^{B}_t\approx y^{10}_t-r_f,\qquad C^{E}_t-C^{B}_t=DY_t-y^{10}_t$$
+$$r_{t+1}=\underbrace{C_t}_{\text{carry}}+\underbrace{\frac{E_t\left[P_{t+1}-P_t\right]}{P_t}}_{\text{expected price change}}+\underbrace{u_{t+1}}_{\text{shock}}$$
 
 **Variables:**
 
-- $C^{E}_t$, $C^{B}_t$ equity and bond carry
-- $DY_t$ dividend yield of the equity index (%)
+- $r_{t+1}$ return of the position from $t$ to $t+1$ (e.g. one month)
+- $C_t$ carry: the return earned if the price of the underlying does not move; known at $t$
+- $P_t$ price of the underlying asset at $t$ (equities: the index level; bonds: the bond price)
+- $P_{t+1}-P_t$ price change of the underlying over the period (written $\Delta P$)
+- $E_t[\cdot]$ expectation given the information available at $t$
+- $u_{t+1}$ shock: the unexpected part of the return, $u_{t+1}=\frac{P_{t+1}-P_t}{P_t}-\frac{E_t[P_{t+1}-P_t]}{P_t}$
+
+**Reading it:** of the three parts, only carry is known in advance without a model; the expected price change needs a forecast and the shock is unknowable. The paper writes the price term with the spot price $S$ and the capital $X_t$ posted for the futures position ($X_t=F_t$ when fully collateralised); for a timing signal, read it as "expected percentage price change".
+
+**Example (自己推理, illustrative numbers):** an equity index future, with dividend yield 2% and financing rate 4% a year: carry $C\approx2\%-4\%=-2\%$. If the index was expected to rise 6% but rose only 1%, the year's return is $-2\%+1\%=-1\%$, decomposed as carry $-2\%$ + expected price change $+6\%$ + shock $-5\%$.
+
+### Equity carry
+Holding an equity index future earns the dividends but pays the financing rate (it is built into the futures price):
+
+$$C^{E}_t\approx DY_t-r_f$$
+
+**Variables:**
+
+- $C^{E}_t$ equity carry (% per year)
+- $DY_t$ dividend yield of the equity index: dividends over the next year / price (%)
+- $r_f$ financing (short) rate (%)
+
+### Bond carry
+Holding a bond future earns the bond yield and pays the same financing rate (roll-down ignored):
+
+$$C^{B}_t\approx y^{10}_t-r_f$$
+
+**Variables:**
+
+- $C^{B}_t$ bond carry (% per year)
 - $y^{10}_t$ 10-year government bond yield (%)
-- $r_f$ financing (short) rate, the same for both legs, so it cancels in the difference
+- $r_f$ the same financing rate as for equities
+
+### Relative carry (stocks vs bonds)
+For a position long equities and short bonds, the financing leg cancels:
+
+$$C^{E}_t-C^{B}_t=DY_t-y^{10}_t$$
+
+**Variables:**
+
+- $C^{E}_t-C^{B}_t$ relative carry in percentage points: the score before standardisation
+- $DY_t$, $y^{10}_t$ as above
 
 **Reading it:** high relative carry means equities pay more to hold than bonds → tilt to equity. This is also the dividend-yield variant of the **Fed model**, so carry belongs to the value family without being a price-reversal signal: it finds cheapness in *yields*, not in *past price paths*.
 
@@ -51,16 +78,29 @@ $$C^{E}_t\approx DY_t-r_f,\qquad C^{B}_t\approx y^{10}_t-r_f,\qquad C^{E}_t-C^{B
 - Empirically carry predicts returns in time series and cross section across equities, bonds, commodities, credit and options; timing strategies that buy when carry is above its historical mean earn average Sharpe ratios near 0.6 at monthly rebalancing.
 - **Ideal vs feasible inputs:** ideal = futures-implied *forward* yields; feasible public proxies = trailing-twelve-month cash distributions / price for equities and the constant-maturity 10-year nominal yield for bonds.
 - **No look-ahead:** distributions enter on their ex-dates (knowable then and no earlier), are summed by calendar month, and any day uses only past month ends ([[cross-validation-leakage]]).
-
 - **Know your proxy error:** since the 1990s US firms have shifted payout from dividends to buybacks, so dividend yield structurally **understates** shareholder yield; trailing and forward carry can disagree for years.
 - **Timing rule:** compare carry with its own history, an expanding z-score capped at ±2 ([[time-series-momentum]]): $z=+2$ → full position, $z=0$ → flat.
 
-**Code:** trailing-12-month dividend yield of SPY (`div` = cash distributions indexed by ex-date, `px` = daily close):
+**Code:** where the inputs come from. Both series are free daily data from Yahoo Finance via the `yfinance` package, for SPY (the S&P 500 tracker ETF):
 
 ```python
-monthly_div = div.resample("ME").sum()       # specials can't spike a daily series
-ttm = monthly_div.rolling(12).sum()          # annualise, remove seasonality
-yld = (ttm / px.resample("ME").last() * 100).dropna()   # DY_t in %
+import yfinance as yf
+
+div = yf.Ticker("SPY").dividends            # cash dividend per share, one row per ex-date
+div.index = div.index.tz_localize(None)     # drop the time zone so it joins with other series
+px = yf.Ticker("SPY").history(period="max", interval="1d", auto_adjust=True)["Close"]
+px.index = px.index.tz_localize(None)       # daily closing price
+```
+
+- `div` is a pandas Series of distributions (about four a year, plus specials), indexed by **ex-date**: the first day the buyer no longer gets the payment, so the amount is known on that date and no earlier.
+- `px` is the daily close. With `auto_adjust=True`, Yahoo adjusts past closes downward for dividends paid since, so early prices are below what was actually traded, and a yield computed on them is overstated in early years. **(自己推理)**: the unadjusted close (`auto_adjust=False`) matches the definition "dividends / price".
+
+Then the trailing-12-month dividend yield, at month ends:
+
+```python
+monthly_div = div.resample("ME").sum()       # monthly sum: specials do not spike it
+ttm = monthly_div.rolling(12).sum()          # last 12 months: annual, no seasonality
+yld = (ttm / px.resample("ME").last() * 100).dropna()   # DY_t in %, month-end price
 ```
 
 The signal itself is then one subtraction after aligning the daily 10-year yield (`^TNX`, %) onto the month ends: `(div_yield - y10).rename("equity_bond_carry")` (alignment code in [[cross-validation-leakage]]).
