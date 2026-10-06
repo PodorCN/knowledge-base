@@ -447,7 +447,7 @@ verdict = "PASS to validate" if (ic > 0 and t >= 1.5) else "FAIL stop"
 
 ### Connections
 - **Builds on:** [[information-coefficient]], [[effective-sample-size]], [[time-series-momentum]] (the capped z-score).
-- **Used by:** [[stock-bond-carry-case-study]].
+- **Used by:** [[carry-stock-bond-timing]] (full case study: [[carry-measurement-protocol]], [[stock-bond-carry-case-study]]).
 - **Related:** [[research-workflow]], [[multiple-testing]], [[risk-measures]] (drawdown), [[cross-validation-leakage]] (clean splits).
 
 <a id="research-workflow"></a>
