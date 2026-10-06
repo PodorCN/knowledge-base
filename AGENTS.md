@@ -93,7 +93,7 @@ Current chapters and question banks:
 | `prob-stats` | `calculus-mental-math`, `probability-distributions`, `moments-covariance`, `puzzles-markov`, `estimation-testing`, `statistical-testing` | `qb-probability`, `qb-statistics-inference` |
 | `stochastic-finance` | `no-arbitrage-finance-basics`, `fixed-income-bonds`, `no-arbitrage-parity` | `qb-finance-foundations` |
 | `quant-dev` | `oop-design`, `csharp-dotnet`, `matlab-quant-dev` | `qb-quant-dev-engineering` |
-| `signal-research` | `linear-regression`, `ml-regularisation`, `time-series-validation`, `signals-research-process`, `multi-asset-signals` | `qb-regression-ml`, `qb-research-judgment` |
+| `signal-research` | `linear-regression`, `ml-regularisation`, `time-series-validation`, `signals-research-process`, `multi-asset-signals`, `carry-stock-bond-timing` | `qb-regression-ml`, `qb-research-judgment` |
 | `portfolio-construction` | `measuring-performance`, `portfolio-optimisation`, `risk-budgeting-position-sizing` | `qb-portfolio-performance` |
 | `black-scholes` | `stochastic-calculus`, `black-scholes`, `black-scholes-call-derivation`, `greeks-sensitivities` | `qb-stochastic-calculus`, `qb-options-bs-greeks` |
 | `pricing` | `numerical-methods`, `implied-volatility-skew`, `vol-surface-construction-chapter`, `volatility-models`, `exotic-options`, `structured-products-delta-one` | `qb-vol-surface`, `qb-exotics-structured` |
