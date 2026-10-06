@@ -72,9 +72,9 @@ Ask in this order:
 
 | Track | Put here |
 |---|---|
-| `prob-stats` | probability, distributions, expectation/variance, puzzles, estimation, hypothesis tests, linear algebra, calculus / Taylor / mental math |
+| `prob-stats` | probability, distributions, expectation/variance, puzzles, estimation, hypothesis tests, linear algebra, calculus / Taylor / mental math, regression, ML / regularisation, time series & time-ordered validation/leakage |
 | `stochastic-finance` | returns, no-arbitrage, forwards, bonds, option payoffs / bounds / put–call parity / binomial & static replication (track title: "Finance Foundations") |
-| `signal-research` | regression, ML, time series, validation/leakage, signals, IC / alpha, multi-asset risk premia & macro signals, research process & backtests |
+| `signal-research` | alpha, IC, signal evaluation, combining / weighting signals, research process & backtests, structural risk premia & cross-asset strategy models, case studies |
 | `portfolio-construction` | Sharpe, win rate / expectancy, exposure, diversification, optimisation, risk contribution/budgeting, position sizing |
 | `pricing` | numerical methods, implied vol, vol surface construction, local/stochastic vol; exotic options, structured products, delta one (track title: "Pricing") |
 | `black-scholes` | Brownian motion, Itô, GBM, martingales, risk-neutral pricing; Black–Scholes PDE/formula, N(d1) vs N(d2), Black-76, American exercise; **Greeks** (own chapter) (track title: "Black–Scholes") |
@@ -90,10 +90,10 @@ Current chapters and question banks:
 
 | Track | Chapters (reading order) | Question banks |
 |---|---|---|
-| `prob-stats` | `calculus-mental-math`, `probability-distributions`, `moments-covariance`, `puzzles-markov`, `estimation-testing`, `statistical-testing` | `qb-probability`, `qb-statistics-inference` |
+| `prob-stats` | `calculus-mental-math`, `probability-distributions`, `moments-covariance`, `puzzles-markov`, `estimation-testing`, `statistical-testing`, `linear-regression`, `ml-regularisation`, `time-series-validation` | `qb-probability`, `qb-statistics-inference`, `qb-regression-ml` |
 | `stochastic-finance` | `no-arbitrage-finance-basics`, `fixed-income-bonds`, `no-arbitrage-parity` | `qb-finance-foundations` |
 | `quant-dev` | `oop-design`, `csharp-dotnet`, `matlab-quant-dev` | `qb-quant-dev-engineering` |
-| `signal-research` | `linear-regression`, `ml-regularisation`, `time-series-validation`, `signals-research-process`, `multi-asset-signals`, `carry-stock-bond-timing` | `qb-regression-ml`, `qb-research-judgment` |
+| `signal-research` | `alpha-signal-evaluation`, `signal-weighting`, `research-process-backtesting`, `risk-premia-cross-asset-models`, `carry-stock-bond-timing` | `qb-research-judgment` |
 | `portfolio-construction` | `measuring-performance`, `portfolio-optimisation`, `risk-budgeting-position-sizing` | `qb-portfolio-performance` |
 | `black-scholes` | `stochastic-calculus`, `black-scholes`, `black-scholes-call-derivation`, `greeks-sensitivities` | `qb-stochastic-calculus`, `qb-options-bs-greeks` |
 | `pricing` | `numerical-methods`, `implied-volatility-skew`, `vol-surface-construction-chapter`, `volatility-models`, `exotic-options`, `structured-products-delta-one` | `qb-vol-surface`, `qb-exotics-structured` |

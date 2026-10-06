@@ -1,19 +1,19 @@
 ---
-id: signals-research-process
-title: "Signals & Research"
+id: alpha-signal-evaluation
+title: "Alpha & Signal Evaluation"
 type: topic
 domain: signal-research
 sources: [src-signal-to-weight, src-squarepoint-dqa-workbook, src-quant-finance-study-notes, src-carry-course-notes]
 ---
-# Signals & Research
+# Alpha & Signal Evaluation
 
-This chapter goes from "what is alpha" to "how big a return should I forecast". It defines excess return, alpha and beta, builds a simple time-series signal, measures a signal's skill with the information coefficient, attributes a composite signal's skill to its components, and converts a signal score into an expected-return forecast that a portfolio optimiser can use. It ends with method rather than models: the sequence of steps a research project should follow, how to present it, and how to investigate a strategy whose backtest does not survive contact with live trading.
+This chapter goes from "what is alpha" to "how big a return should I forecast". It defines excess return, alpha and beta, builds a simple time-series signal, measures a signal's skill with the information coefficient, attributes a composite signal's skill to its components, converts a signal score into an expected-return forecast that a portfolio optimiser can use, and sets out the diagnostics a timing signal must pass.
 
-**Prerequisites:** [[ols-regression]], [[returns-simple-log]], [[variance-covariance-correlation]], [[time-series-validation]], [[cross-validation-leakage]], [[multiple-testing]].
+**Prerequisites:** [[ols-regression]], [[returns-simple-log]], [[variance-covariance-correlation]], [[effective-sample-size]], [[cross-validation-leakage]], [[multiple-testing]].
 
-**Leads to:** [[signal-to-weight]], [[mean-variance-optimization]], [[black-litterman]], [[multi-asset-signals]], [[sharpe-ratio]] (why a high backtest Sharpe misleads), [[price-reconciliation]] (the same debugging discipline on the sell side).
+**Leads to:** [[signal-weighting-schools]], [[signal-to-weight]], [[mean-variance-optimization]], [[black-litterman]], [[structural-risk-premia]], [[sharpe-ratio]].
 
-**Sections:** [[capm-alpha-beta]] · [[time-series-momentum]] · [[information-coefficient]] · [[ic-contribution]] · [[grinold-alpha]] · [[timing-signal-evaluation]] · [[research-workflow]] · [[backtest-pitfalls]]
+**Sections:** [[capm-alpha-beta]] · [[time-series-momentum]] · [[information-coefficient]] · [[ic-contribution]] · [[grinold-alpha]] · [[timing-signal-evaluation]]
 
 <a id="capm-alpha-beta"></a>
 
@@ -237,7 +237,7 @@ IC = 0.03, BR = 1000 (with $TC=1$) → IR ≈ 0.95. **A low IC is fine if breadt
 <a id="ic-contribution"></a>
 
 ## IC Contribution of a Composite Signal
-<!-- section: ic-contribution | prerequisites: [information-coefficient, variance-covariance-correlation] | related: [grinold-alpha, risk-contribution, multicollinearity] | sources: [src-quant-finance-study-notes] | tags: [composite-signal, attribution, signal-redundancy] -->
+<!-- section: ic-contribution | prerequisites: [information-coefficient, variance-covariance-correlation] | related: [grinold-alpha, risk-contribution, multicollinearity, signal-weighting-schools] | sources: [src-quant-finance-study-notes] | tags: [composite-signal, attribution, signal-redundancy] -->
 
 When several z-scored signals are blended into a composite, the composite's IC splits exactly into one contribution per component: effective weight × stand-alone IC.
 
@@ -281,7 +281,7 @@ $$\sigma_S^2=3\,(1/3)^2+2\,(1/3)^2\,(0.1+0.3+0)=0.422\ \Rightarrow\ \sigma_S=0.6
 
 ### Key points
 - A contribution depends on the correlation structure and weights (a property within a composite, not of the signal alone); it can be negative; Rank IC is not additive (use the Pearson approximation, Shapley values or leave-one-out); the marginal contribution ≠ $IC^{(k)}$.
-- **Weighting schemes:** equal · IC-weighted · ICIR-weighted · full mean–variance on the IC covariance.
+- **Weighting schemes:** equal · IC-weighted · ICIR-weighted · full mean–variance on the IC covariance; which one to use: [[signal-weighting-schools]].
 
 ### Connections
 - **Builds on:** [[information-coefficient]].
@@ -355,7 +355,7 @@ $$\alpha_i=IC_{\text{comp}}\,\sigma_i\,z_{\text{comp},i}\ \ \text{(preferred: ca
 <a id="timing-signal-evaluation"></a>
 
 ## Evaluating a Timing Signal: Quantile Sorts, Timing Curve & Pass Rules
-<!-- section: timing-signal-evaluation | prerequisites: [information-coefficient, effective-sample-size, time-series-momentum] | related: [research-workflow, backtest-pitfalls, multiple-testing, cross-validation-leakage, marginal-sharpe-improvement, risk-measures, sharpe-ratio, stock-bond-carry-case-study] | sources: [src-carry-course-notes] | tags: [timing, quantile-sort, timing-curve, drawdown, turnover, pre-registration] -->
+<!-- section: timing-signal-evaluation | prerequisites: [information-coefficient, effective-sample-size, time-series-momentum] | related: [research-workflow, backtest-pitfalls, multiple-testing, cross-validation-leakage, marginal-sharpe-improvement, risk-measures, sharpe-ratio, stock-bond-carry-case-study, correlated-signals-drop-or-merge] | sources: [src-carry-course-notes] | tags: [timing, quantile-sort, timing-curve, drawdown, turnover, pre-registration] -->
 
 A timing signal answers one question: does a series known today predict the return of a spread (e.g. equity minus bonds) over the next period? It is judged by a set of diagnostics, never by the IC alone: overlap-adjusted significance, the shape of returns across quantiles, a timing curve with its drawdown and turnover, independence from existing signals, and untouched later data, with pass and kill rules fixed before looking.
 
@@ -430,7 +430,7 @@ autocorr = z.reindex(wks).corr(z.reindex(wks).shift(1))             # slow signa
 ```
 
 ### Independence, out-of-sample and contribution
-- A signal correlated above ~0.7 with an existing one is a duplicate.
+- A signal correlated above ~0.7 with an existing one is a duplicate (drop it or merge it: [[correlated-signals-drop-or-merge]]).
 - In-sample statistics never decide; only untouched later data and the **marginal improvement in net portfolio Sharpe** ([[marginal-sharpe-improvement]]) do. Fundamental law: $IR=IC\times\sqrt{BR}\times TC$ ([[information-coefficient]]).
 - Robustness views: rolling 52-week IC, IC by calendar year (a minimum of 10 weeks per year so partial years cannot pose as evidence), IC by regime.
 
@@ -449,64 +449,3 @@ verdict = "PASS to validate" if (ic > 0 and t >= 1.5) else "FAIL stop"
 - **Builds on:** [[information-coefficient]], [[effective-sample-size]], [[time-series-momentum]] (the capped z-score).
 - **Used by:** [[carry-stock-bond-timing]] (full case study: [[carry-measurement-protocol]], [[stock-bond-carry-case-study]]).
 - **Related:** [[research-workflow]], [[multiple-testing]], [[risk-measures]] (drawdown), [[cross-validation-leakage]] (clean splits).
-
-<a id="research-workflow"></a>
-
-## Research Workflow & Project Storytelling
-<!-- section: research-workflow | prerequisites: [cross-validation-leakage] | related: [backtest-pitfalls, multiple-testing] | sources: [src-squarepoint-dqa-workbook] | tags: [research, communication] -->
-
-A research project should move from a stated hypothesis to a documented, monitored deployment, checking at each step that only information available at decision time is used.
-
-### Workflow
-1. Hypothesis + an economic or operational reason.
-2. What information is available **at decision time**.
-3. A simple baseline.
-4. Chronological validation + uncertainty ([[cross-validation-leakage]]).
-5. Costs and feasibility.
-6. Stability across periods, instruments and parameters.
-7. Document failure modes; monitor the deployment.
-
-### One project at three depths
-- **30 s:** problem, your contribution, result.
-- **2 min:** data, baseline, method, validation, result, limitation.
-- **10 min:** assumptions, features, model choice, failed experiments, uncertainty, debugging, improvements.
-- Be ready to explain every technical noun on your résumé.
-
-### Answering technique
-1. Clarify the setup.
-2. Define the variables.
-3. Name the principle.
-4. Write the first equation.
-5. Solve and check a limiting case.
-6. Interpret, and state when it breaks.
-
-If stuck: say what you know and simplify (e.g. solve the equal-vol case first).
-
-### Connections
-- **Builds on:** [[cross-validation-leakage]].
-- **Selection risk:** [[multiple-testing]]. **When it goes wrong:** [[backtest-pitfalls]].
-
-<a id="backtest-pitfalls"></a>
-
-## Backtest Pitfalls & Live Underperformance
-<!-- section: backtest-pitfalls | prerequisites: [research-workflow, multiple-testing] | related: [cross-validation-leakage, sharpe-ratio, price-reconciliation, conditional-probability-bayes] | sources: [src-squarepoint-dqa-workbook] | tags: [backtest, overfitting, survivorship] -->
-
-A strategy that looked excellent in a backtest and loses money live is investigated from the most mechanical explanations to the most statistical ones: first check the implementation, then execution, then the research process, and only then ask whether the loss is actually surprising.
-
-### "Sharpe 4 in backtest, loses immediately live" — investigation order
-1. **Reconcile the implementation:** inputs, signal timing, target positions, fills, costs, P&L accounting; timestamps, corporate actions, duplicates, look-ahead data.
-2. **Execution realism:** spread, slippage, delay, participation limits, borrow, financing.
-3. **Research process:** selection across many trials ([[multiple-testing]]), out-of-sample evidence.
-4. **Is the loss surprising** given the sample length, exposures and return distribution? Has the regime, liquidity or crowding changed?
-
-### Key points
-- Don't explain a bug as a regime change.
-- A bad first week alone doesn't prove failure.
-- Signal precision vs base rate: a rare true edge makes even good-looking detectors imprecise ([[conditional-probability-bayes]]).
-
-### Usual suspects
-Future information / leakage, bad corporate-action adjustment, unrealistic execution, duplicated rows, survivorship bias, strategy selection, stale prices, ignored costs.
-
-### Connections
-- **Builds on:** [[research-workflow]], [[multiple-testing]].
-- **Related:** [[cross-validation-leakage]], [[sharpe-ratio]] (why a high SR misleads), [[price-reconciliation]] (the same "diff the inputs first" discipline).

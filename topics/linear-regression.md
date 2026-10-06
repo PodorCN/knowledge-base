@@ -2,7 +2,7 @@
 id: linear-regression
 title: "Linear Regression"
 type: topic
-domain: signal-research
+domain: prob-stats
 sources: [src-squarepoint-dqa-workbook, src-quant-finance-study-notes]
 ---
 # Linear Regression

@@ -2,7 +2,7 @@
 id: ml-regularisation
 title: "ML & Regularisation"
 type: topic
-domain: signal-research
+domain: prob-stats
 sources: [src-squarepoint-dqa-workbook]
 ---
 # ML & Regularisation

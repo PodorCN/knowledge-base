@@ -108,7 +108,7 @@ Uncorrelated assets with vols 10% / 20% → weights 0.8 / 0.2; 10% / 30% → 0.9
 <a id="mean-variance-optimization"></a>
 
 ## Mean–Variance Optimisation & Tangency Portfolio
-<!-- section: mean-variance-optimization | prerequisites: [minimum-variance-portfolio, taylor-expansions] | related: [marginal-sharpe-improvement, risk-budgeting, ridge-regression, eigen-svd-psd, black-litterman, grinold-alpha] | sources: [src-squarepoint-dqa-workbook, src-quant-finance-study-notes, src-rbc-gam-quantdev-notes] | tags: [markowitz, tangency, max-sharpe, estimation-error] -->
+<!-- section: mean-variance-optimization | prerequisites: [minimum-variance-portfolio, taylor-expansions] | related: [marginal-sharpe-improvement, risk-budgeting, ridge-regression, eigen-svd-psd, black-litterman, grinold-alpha, equal-weight-estimation-error] | sources: [src-squarepoint-dqa-workbook, src-quant-finance-study-notes, src-rbc-gam-quantdev-notes] | tags: [markowitz, tangency, max-sharpe, estimation-error] -->
 
 Markowitz optimisation trades expected return against variance. Its solution is proportional to $\Sigma^{-1}\mu$, which also gives the maximum-Sharpe (tangency) portfolio — and which is very sensitive to errors in $\mu$ and $\Sigma$.
 
@@ -151,7 +151,7 @@ $$SE(\hat\mu_{\text{ann}})\approx\frac{\sigma_{\text{ann}}}{\sqrt Y}=\frac{16\%}
 **Notes:**
 
 - Worked example (a 3-year sample in which the estimated means are far from the true ones and max-Sharpe goes 100% into one asset): [[matlab-portfolio-object]].
-- Fixes: shrink means/covariance (cf. [[ridge-regression]]), constraints, turnover penalties, comparison with equal-weight / min-var baselines, or skip $\mu$ entirely via [[risk-budgeting]] — or start from an equilibrium prior ([[black-litterman]]).
+- Fixes: shrink means/covariance (cf. [[ridge-regression]]), constraints, turnover penalties, comparison with equal-weight / min-var baselines ([[equal-weight-estimation-error]]), or skip $\mu$ entirely via [[risk-budgeting]] — or start from an equilibrium prior ([[black-litterman]]).
 
 ### Connections
 - **Builds on:** [[minimum-variance-portfolio]], [[taylor-expansions]].
