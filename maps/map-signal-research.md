@@ -7,13 +7,14 @@ tags: [map, track]
 ---
 # Signal Research
 
-Part of [[map-buyside]]. Finding and validating predictive signals: regression and its assumptions, regularisation, time-series validation, alpha and the information coefficient, multi-asset signals, the research process, and a complete carry case study (stocks vs bonds).
+Part of [[map-buyside]]. Finding and validating predictive signals: regression and its assumptions, regularisation, time-series validation, signal evaluation (information coefficient, diagnostics, research process), alpha and return forecasts, multi-asset signals, and a complete carry case study (stocks vs bonds).
 
 ## Topics (in reading order)
 
 - [[linear-regression]]
 - [[ml-regularisation]]
 - [[time-series-validation]]
-- [[signals-research-process]]
+- [[signal-evaluation]]
+- [[alpha-forecasting]]
 - [[multi-asset-signals]]
 - [[carry-stock-bond-timing]]

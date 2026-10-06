@@ -1,46 +1,19 @@
 ---
-id: signals-research-process
-title: "Signals & Research"
+id: signal-evaluation
+title: "Signal Evaluation"
 type: topic
 domain: signal-research
 sources: [src-signal-to-weight, src-squarepoint-dqa-workbook, src-quant-finance-study-notes, src-carry-course-notes]
 ---
-# Signals & Research
+# Signal Evaluation
 
-This chapter goes from "what is alpha" to "how big a return should I forecast". It defines excess return, alpha and beta, builds a simple time-series signal, measures a signal's skill with the information coefficient, attributes a composite signal's skill to its components, and converts a signal score into an expected-return forecast that a portfolio optimiser can use. It ends with method rather than models: the sequence of steps a research project should follow, how to present it, and how to investigate a strategy whose backtest does not survive contact with live trading.
+This chapter builds a simple time-series signal, measures its skill with the information coefficient, attributes a composite signal's skill to its components, and judges a timing signal with a fixed set of diagnostics. It ends with method rather than models: the sequence of steps a research project should follow, how to present it, and how to investigate a strategy whose backtest does not survive contact with live trading.
 
-**Prerequisites:** [[ols-regression]], [[returns-simple-log]], [[variance-covariance-correlation]], [[time-series-validation]], [[cross-validation-leakage]], [[multiple-testing]].
+**Prerequisites:** [[returns-simple-log]], [[variance-covariance-correlation]], [[effective-sample-size]], [[time-series-validation]], [[cross-validation-leakage]], [[multiple-testing]].
 
-**Leads to:** [[signal-to-weight]], [[mean-variance-optimization]], [[black-litterman]], [[multi-asset-signals]], [[sharpe-ratio]] (why a high backtest Sharpe misleads), [[price-reconciliation]] (the same debugging discipline on the sell side).
+**Leads to:** [[grinold-alpha]], [[signal-to-weight]], [[black-litterman]], [[multi-asset-signals]], [[marginal-sharpe-improvement]], [[sharpe-ratio]] (why a high backtest Sharpe misleads), [[price-reconciliation]] (the same debugging discipline on the sell side).
 
-**Sections:** [[capm-alpha-beta]] · [[time-series-momentum]] · [[information-coefficient]] · [[ic-contribution]] · [[grinold-alpha]] · [[timing-signal-evaluation]] · [[research-workflow]] · [[backtest-pitfalls]]
-
-<a id="capm-alpha-beta"></a>
-
-## Excess Return, Alpha, Beta & CAPM
-<!-- section: capm-alpha-beta | prerequisites: [ols-regression, returns-simple-log] | related: [omitted-variable-bias, exposure-neutrality, sharpe-ratio, linear-regression-assumptions] | sources: [src-squarepoint-dqa-workbook] | tags: [beta, alpha, factor] -->
-
-Regressing an asset's excess return on the market's excess return splits it into market exposure (beta) and an intercept (alpha). CAPM is the equilibrium claim that, in expectation, the intercept is zero.
-
-### Formulas
-$$R_i-r_f=\alpha_i+\beta_i(R_m-r_f)+\varepsilon_i,\qquad \beta_i=\frac{\mathrm{Cov}(R_i,R_m)}{\mathrm{Var}(R_m)},\qquad \text{CAPM: }E[R_i]-r_f=\beta_i\big(E[R_m]-r_f\big)$$
-
-**Variables:**
-
-- $R_i$ return of asset $i$
-- $R_m$ market return
-- $r_f$ risk-free return over the same period
-- $\alpha_i$ intercept (alpha)
-- $\beta_i$ market beta (OLS slope)
-- $\varepsilon_i$ residual (idiosyncratic return)
-
-### Key points
-- Beta is the OLS slope ([[ols-regression]]). A positive alpha may be noise, an omitted factor ([[omitted-variable-bias]]) or selection bias ([[multiple-testing]]).
-- CAPM is an equilibrium model, not a definition of realised returns.
-
-### Connections
-- **Builds on:** [[ols-regression]], [[returns-simple-log]].
-- **Used by:** [[exposure-neutrality]], [[structural-risk-premia]], [[relative-value-long-short]], [[grinold-alpha]] (residual volatility).
+**Sections:** [[time-series-momentum]] · [[information-coefficient]] · [[ic-contribution]] · [[timing-signal-evaluation]] · [[research-workflow]] · [[backtest-pitfalls]]
 
 <a id="time-series-momentum"></a>
 
@@ -287,71 +260,6 @@ $$\sigma_S^2=3\,(1/3)^2+2\,(1/3)^2\,(0.1+0.3+0)=0.422\ \Rightarrow\ \sigma_S=0.6
 - **Builds on:** [[information-coefficient]].
 - **Used by:** [[grinold-alpha]] (composite IC), [[relative-value-long-short]], [[fx-carry-spot-slide]].
 
-<a id="grinold-alpha"></a>
-
-## Grinold: Alpha Score → Return Forecast
-<!-- section: grinold-alpha | prerequisites: [information-coefficient, ols-regression] | related: [mean-variance-optimization, black-litterman, signal-to-weight, ic-contribution] | sources: [src-quant-finance-study-notes] | tags: [alpha, forecasting, grinold, mvo-inputs] -->
-
-A signal score is not an expected return. Grinold's rule rescales it: forecast = skill × volatility × score.
-
-### Formula
-$$\alpha_i=IC\cdot\sigma_i\cdot z_i$$
-
-**Variables:**
-
-- $\alpha_i$ expected excess return of asset $i$
-- $IC$ signal skill
-- $\sigma_i$ **residual** (idiosyncratic) volatility of asset $i$: the opportunity
-- $z_i$ cross-sectional z-score of the signal: the signal strength
-
-### Derivation
-$$r_{i,t+1}=a+b\,z_{i,t}+\varepsilon,\qquad b=\frac{\mathrm{Cov}(z,r)}{\mathrm{Var}(z)}=\mathrm{corr}(z,r)\,\sigma_r=IC\cdot\sigma_r$$
-
-**Variables:**
-
-- $a,b$ intercept and slope of the predictive regression
-- $\sigma_r$ standard deviation of returns
-- $\mathrm{Var}(z)=1$ for a z-score
-
-Replacing $\sigma_r$ with the asset's own $\sigma_i$ gives $\alpha_i=IC\,\sigma_i\,z_i$.
-
-### Worked example
-IC = 0.04, $z$ = +1.2: AAPL with $\sigma$ = 22%: $0.04\times0.22\times1.2=$ **106 bps/yr**; a biotech with $\sigma$ = 55%: $0.04\times0.55\times1.2=$ **264 bps/yr**.
-
-### Feeding mean–variance optimisation
-$$\max_{w}\ w^\top\alpha-\frac\gamma2\,w^\top\Sigma w,\qquad w_i^*\propto\frac{\alpha_i}{\gamma\,\sigma_i^2}=\frac{IC\cdot z_i}{\gamma\,\sigma_i}\quad\text{(diagonal }\Sigma)$$
-
-**Variables:**
-
-- $w$ portfolio weights
-- $\alpha$ vector of alphas
-- $\Sigma$ covariance matrix (diagonal with entries $\sigma_i^2$ for the proportionality)
-- $\gamma$ risk aversion
-
-→ The optimal weight is **inversely** proportional to vol (alpha ∝ σ, risk ∝ σ²) — the same shape as $w\propto s/\sigma$ in [[signal-to-weight]].
-
-### Which IC?
-Historical mean (simple) · **shrunk toward 0 by 30–50% (standard)** · rolling · forward-looking · ICIR-based. Use an IC estimated on a strictly prior window.
-
-### Multi-signal
-$$\alpha_i=IC_{\text{comp}}\,\sigma_i\,z_{\text{comp},i}\ \ \text{(preferred: captures correlation)}\qquad\text{vs.}\qquad \alpha_i=\sigma_i\sum_kIC_k\,w_k\,z_{k,i}\ \ \text{(assumes orthogonal signals)}$$
-
-**Variables:**
-
-- $IC_{\text{comp}}$ IC of the composite signal
-- $z_{\text{comp},i}$ z-score of the composite for asset $i$
-- $IC_k,w_k,z_{k,i}$ IC, weight and z-score of component $k$
-
-### Key points
-- **Caveats:** residual, not total, vol; match the IC horizon to the alpha horizon; z-score within the cross-section; robust z (median/MAD, winsorise); assumes a linear conditional mean; conditional ICs by segment.
-- **Properties:** alphas sum to ≈ 0 (long-short by construction); their dispersion ≈ IC·σ̄; aggregating recovers IR ≈ IC√BR.
-- Don't believe the signal? Shrink the IC toward 0.
-- **Relation to Black–Litterman:** Grinold is the front end (signal → alpha / view $Q$); BL is the back end (views + prior → portfolio) → [[black-litterman]].
-
-### Connections
-- **Builds on:** [[information-coefficient]], [[ols-regression]].
-- **Feeds:** [[mean-variance-optimization]], [[black-litterman]], [[signal-to-weight]].
-
 <a id="timing-signal-evaluation"></a>
 
 ## Evaluating a Timing Signal: Quantile Sorts, Timing Curve & Pass Rules
@@ -359,16 +267,27 @@ $$\alpha_i=IC_{\text{comp}}\,\sigma_i\,z_{\text{comp},i}\ \ \text{(preferred: ca
 
 A timing signal answers one question: does a series known today predict the return of a spread (e.g. equity minus bonds) over the next period? It is judged by a set of diagnostics, never by the IC alone: overlap-adjusted significance, the shape of returns across quantiles, a timing curve with its drawdown and turnover, independence from existing signals, and untouched later data, with pass and kill rules fixed before looking.
 
-### The checklist
+### Six questions, in order
+Example column: the original stock-vs-bond carry signal ([[stock-bond-carry-case-study]]), corrected numbers, training period.
 
-| Diagnostic | Question it answers | Pass reading |
-|---|---|---|
-| Rank IC ([[information-coefficient]]) | Is the direction right? | $IC>0$ |
-| Overlap-adjusted $t$ ([[effective-sample-size]]) | Is it distinguishable from noise? | $t\ge2$ minimum; $t\ge3$ for a new idea |
-| Quantile sort | Is the relation monotonic, so linear sizing is valid? | Bucket returns rise from Q1 to Q5 |
-| Timing curve | What would positions proportional to the score have earned? | Positive return, tolerable drawdown, low turnover |
-| Independence | Is it a duplicate of an existing signal? | Correlation with existing signals below ~0.7 |
-| Out-of-sample / contribution | Does it survive later data and improve the portfolio? | Positive IC on sealed data; higher **net** portfolio Sharpe |
+| # | Question | Where to look | What "good" looks like | Carry signal |
+|---|---|---|---|---|
+| 1 | Does it point the right way? | IC ([[information-coefficient]]) | Above 0. For one stock-vs-bond signal, 0.05–0.10 is already decent | +0.04, weak |
+| 2 | Could it just be luck? | $t$ ([[effective-sample-size]]) | 2 or more is the usual standard (we set 1.5 here) | 0.49, can't rule out luck |
+| 3 | Does more signal mean more return? | Bucket chart (quantile sort) | A staircase rising from Q1 to Q5 | Flat in the middle, drops at Q5 |
+| 4 | Does it work steadily? | IC by year, rolling IC | Positive in most years, not carried by one or two | Worth checking on the report |
+| 5 | Does it make money after costs? | Timing curve, how fast the signal changes | Curve rises steadily; return clearly above trading costs | +2.3% a year, slow-moving so costs are low |
+| 6 | Does it hold up on data it hasn't seen? | Same numbers on the later period | Same sign, similar size | IC +0.12, $t$ 1.02: same direction, still under the bar |
+
+### How to read them together
+- **1 and 2 are the gate.** If the IC is tiny or the $t$ is low, nothing else matters much, because you can't tell the signal from noise.
+- **3 tells you whether you can size positions by it.** A signal with a hump can have a positive IC and still hurt you when it is at its strongest.
+- **4 protects you from one lucky episode.** A signal that made all its money in 2009 is a bet on 2009.
+- **6 is the one that counts most.** Everything in 1–5 can be made to look good by tinkering, as seen with the hump and rate rules. Unseen data is the only check tinkering can't fake.
+
+### Two more that matter once a signal passes
+- **Is there a reason it should work?** A signal with a sensible economic story (and a paper behind it) deserves more trust than a pattern found by searching.
+- **Does it add anything new?** If it moves in step with a signal you already have (correlation above about 0.7), it is the same bet twice.
 
 ### Quantile sort
 Sort the history into $Q$ buckets by score (typically $Q=5$) and average the forward return in each:
@@ -430,7 +349,6 @@ autocorr = z.reindex(wks).corr(z.reindex(wks).shift(1))             # slow signa
 ```
 
 ### Independence, out-of-sample and contribution
-- A signal correlated above ~0.7 with an existing one is a duplicate.
 - In-sample statistics never decide; only untouched later data and the **marginal improvement in net portfolio Sharpe** ([[marginal-sharpe-improvement]]) do. Fundamental law: $IR=IC\times\sqrt{BR}\times TC$ ([[information-coefficient]]).
 - Robustness views: rolling 52-week IC, IC by calendar year (a minimum of 10 weeks per year so partial years cannot pose as evidence), IC by regime.
 
