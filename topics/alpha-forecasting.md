@@ -101,6 +101,7 @@ $$\alpha_i=IC_{\text{comp}}\,\sigma_i\,z_{\text{comp},i}\ \ \text{(preferred: ca
 - **Caveats:** residual, not total, vol; match the IC horizon to the alpha horizon; z-score within the cross-section; robust z (median/MAD, winsorise); assumes a linear conditional mean; conditional ICs by segment.
 - **Properties:** alphas sum to ≈ 0 (long-short by construction); their dispersion ≈ IC·σ̄; aggregating recovers IR ≈ IC√BR.
 - Don't believe the signal? Shrink the IC toward 0.
+- **Never feed raw z-scores to the optimiser as $\alpha$:** a z-score has unit variance, so it behaves as if IC = 1 (perfect foresight) and the optimiser bets the farm. The $\sigma_i$ factor also means a volatile stock needs a larger expected return to earn the same score.
 - **Relation to Black–Litterman:** Grinold is the front end (signal → alpha / view $Q$); BL is the back end (views + prior → portfolio) → [[black-litterman]].
 
 ### Connections

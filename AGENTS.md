@@ -75,7 +75,7 @@ Ask in this order:
 | `prob-stats` | probability, distributions, expectation/variance, puzzles, estimation, hypothesis tests, linear algebra, calculus / Taylor / mental math |
 | `stochastic-finance` | returns, no-arbitrage, forwards, bonds, option payoffs / bounds / put–call parity / binomial & static replication (track title: "Finance Foundations") |
 | `signal-research` | regression, ML, time series, validation/leakage, signals, IC / alpha, multi-asset risk premia & macro signals, research process & backtests |
-| `portfolio-construction` | Sharpe, win rate / expectancy, exposure, diversification, optimisation, risk contribution/budgeting, position sizing |
+| `portfolio-construction` | Sharpe, win rate / expectancy, exposure, diversification, optimisation (Lagrange/KKT, constraints, infeasibility), risk contribution/budgeting, position sizing, the construction process (mandate/TE, covariance estimation, transaction costs, validation) |
 | `pricing` | numerical methods, implied vol, vol surface construction, local/stochastic vol; exotic options, structured products, delta one (track title: "Pricing") |
 | `black-scholes` | Brownian motion, Itô, GBM, martingales, risk-neutral pricing; Black–Scholes PDE/formula, N(d1) vs N(d2), Black-76, American exercise; **Greeks** (own chapter) (track title: "Black–Scholes") |
 | `risk-management` | hedging, pin risk, scenarios, VaR/ES, model risk (Greeks themselves live in the `black-scholes` track) |
@@ -94,7 +94,7 @@ Current chapters and question banks:
 | `stochastic-finance` | `no-arbitrage-finance-basics`, `fixed-income-bonds`, `no-arbitrage-parity` | `qb-finance-foundations` |
 | `quant-dev` | `oop-design`, `csharp-dotnet`, `matlab-quant-dev` | `qb-quant-dev-engineering` |
 | `signal-research` | `linear-regression`, `ml-regularisation`, `time-series-validation`, `signal-evaluation`, `alpha-forecasting`, `multi-asset-signals`, `carry-stock-bond-timing` | `qb-regression-ml`, `qb-research-judgment` |
-| `portfolio-construction` | `measuring-performance`, `portfolio-optimisation`, `risk-budgeting-position-sizing` | `qb-portfolio-performance` |
+| `portfolio-construction` | `measuring-performance`, `portfolio-optimisation`, `risk-budgeting-position-sizing`, `portfolio-construction-process` | `qb-portfolio-performance` |
 | `black-scholes` | `stochastic-calculus`, `black-scholes`, `black-scholes-call-derivation`, `greeks-sensitivities` | `qb-stochastic-calculus`, `qb-options-bs-greeks` |
 | `pricing` | `numerical-methods`, `implied-volatility-skew`, `vol-surface-construction-chapter`, `volatility-models`, `exotic-options`, `structured-products-delta-one` | `qb-vol-surface`, `qb-exotics-structured` |
 | `risk-management` | `hedging`, `risk-control-governance` | `qb-risk-management` |

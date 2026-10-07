@@ -64,6 +64,9 @@ $$RC_i(w)=w_i\,\frac{(\Sigma w)_i}{\sigma(w)}=b_i\cdot\sigma(w),\qquad \sum_ib_i
 - The paper takes $b_i$ as given; [[signal-to-weight]] shows how to feed a signal into $b_i$.
 - No expected returns are needed (compare [[mean-variance-optimization]] and [[minimum-variance-portfolio]]).
 
+### When risk parity equals the max-Sharpe portfolio
+The equal-risk-contribution (ERC) portfolio coincides with the tangency portfolio ([[mean-variance-optimization]]) when every asset has the **same Sharpe ratio** and all pairwise **correlations are equal**; with zero correlation it reduces to inverse-volatility weights. Risk parity is therefore an implicit bet that all assets have equal Sharpe — say this out loud in an interview.
+
 **References:**
 
 - Bruder, B. & Roncalli, T. (2012), *Managing Risk Exposures Using the Risk Budgeting Approach*.
