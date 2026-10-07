@@ -201,6 +201,10 @@ One short note per document: title, file path, and the list of sections it fed. 
    Before every published update, increment the patch number in `VERSION` (for example, `1.01` → `1.02`);
    the build injects it into the viewer.
 5. Commit the notes and the regenerated `docs/`.
+6. **The website follows `main`.** GitHub Pages serves `docs/` from the `main` branch. When the user OKs an
+   upload (rule 0), merge the finished work into `main` (bring `main` into your working branch first and
+   resolve any conflicts, then rebuild `docs/`) and push `main`; a push that doesn't reach `main` doesn't
+   update the site.
 
 ## 5. Where the questions show up
 
