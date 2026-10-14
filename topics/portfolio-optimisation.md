@@ -50,6 +50,7 @@ $$\text{Two equal strategies: }\ \sigma_p=\sigma\sqrt{\tfrac{1+\rho}{2}},\quad S
 - **Builds on:** [[variance-covariance-correlation]].
 - **Leads to:** [[marginal-sharpe-improvement]], [[minimum-variance-portfolio]], [[mean-variance-optimization]], [[risk-contribution]].
 - **Correlation as a traded risk:** [[worst-of-correlation]]. **When correlations jump:** [[risk-on-risk-off]].
+- **Applied to multi-asset policy:** [[capital-market-assumptions]], [[strategic-multi-asset-allocation]].
 
 <a id="marginal-sharpe-improvement"></a>
 
