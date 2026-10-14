@@ -39,6 +39,7 @@ $$\sigma_p=\sqrt{w^\top\Sigma w},\qquad \frac{\partial\sigma_p}{\partial w_i}=\f
 ### Connections
 - **Builds on:** [[portfolio-variance-diversification]].
 - **Inverted to solve for weights in:** [[risk-budgeting]]. **Same additive idea:** [[ic-contribution]].
+- **Applied to capital versus risk allocation:** [[strategic-multi-asset-allocation]].
 
 <a id="risk-budgeting"></a>
 
@@ -74,6 +75,7 @@ The equal-risk-contribution (ERC) portfolio coincides with the tangency portfoli
 ### Connections
 - **Builds on:** [[risk-contribution]] (turned around to solve for $w_i$).
 - **Fed by:** [[signal-to-weight]].
+- **Used in portfolio design:** [[robust-allocation-refinement]].
 
 <a id="signal-to-weight"></a>
 
