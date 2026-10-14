@@ -51,17 +51,18 @@
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html, body { height: 100%; }
+html, body { height: 100%; overflow: hidden; }
 body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--font-ui); font-size: 14.5px; }
 button { font: inherit; color: inherit; }
 a { color: var(--accent); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-.shell { height: 100%; display: grid; grid-template-columns: 320px minmax(0, 1fr); min-width: 0; transition: grid-template-columns .22s ease; }
+.shell { height: 100vh; max-height: 100vh; display: grid; grid-template-columns: 320px minmax(0, 1fr); min-width: 0; overflow: hidden; transition: grid-template-columns .22s ease; }
 .shell.nav-collapsed { grid-template-columns: 0 minmax(0, 1fr); }
 
-.side { width: 320px; background: var(--surface); border-right: 1px solid var(--rule); display: flex; flex-direction: column; min-height: 0; overflow: hidden; transform: translateX(0); opacity: 1; transition: transform .22s ease, opacity .15s ease; }
+.side { width: 320px; height: 100vh; max-height: 100vh; position: sticky; top: 0; background: var(--surface); border-right: 1px solid var(--rule); display: flex; flex-direction: column; min-height: 0; overflow: hidden; transform: translateX(0); opacity: 1; transition: transform .22s ease, opacity .15s ease; }
 .shell.nav-collapsed > .side { transform: translateX(-100%); opacity: 0; pointer-events: none; }
+
 .side-head { padding: 18px 16px 14px; display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid var(--rule); }
 .brand { display: flex; flex-direction: column; gap: 3px; }
 .brand a { font-weight: 600; font-size: 15.5px; color: var(--ink); text-decoration: none; }
@@ -170,6 +171,9 @@ a { color: var(--accent); }
 .prose tbody tr + tr td { border-top: 1px solid var(--rule); }
 .r2-figure { margin: 24px 0 18px; padding: 16px 18px 12px; border: 1px solid var(--rule); border-radius: 5px; background: var(--surface); }
 .r2-figure svg { display: block; width: 100%; height: auto; }
+.prose img { display: block; max-width: 100%; height: auto; margin: 18px auto 12px; }
+.prose details:not(.qa) { margin: 14px 0; }
+.prose details:not(.qa) > summary { color: var(--accent); font-family: var(--font-ui); font-size: 14px; cursor: pointer; }
 .r2-figure figcaption { margin-top: 10px; color: var(--muted); font-family: var(--font-ui); font-size: 13px; line-height: 1.55; }
 .r2-grid { stroke: var(--rule); stroke-width: 1; }
 .r2-axis { stroke: var(--muted); stroke-width: 1.5; }
@@ -193,8 +197,10 @@ a { color: var(--accent); }
 .chapter-toc .num, .toc .num, .rail .num { font-family: var(--font-mono); font-size: 0.85em; color: var(--faint); margin-right: 8px; font-variant-numeric: tabular-nums; }
 .chapter-toc ol { list-style: none; padding-left: 0; }
 .box { border: 1px solid var(--rule); border-left: 4px solid var(--dcolor, var(--accent)); background: var(--surface); border-radius: 4px; padding: 6px 24px 18px; margin: 24px 0; overflow: hidden; }
-.box.def::before { content: "Formula"; display: block; font-family: var(--font-ui); font-size: 11.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dcolor, var(--accent)); margin: 12px 0 4px; }
-.box.def > h3 { display: none; }
+.box.def::before, .box.formula::before { content: "Formula"; display: block; font-family: var(--font-ui); font-size: 11.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dcolor, var(--accent)); margin: 12px 0 4px; }
+.box.def > h3, .box.formula > h3 { display: none; }
+.box.definition::before { content: "Definition"; display: block; font-family: var(--font-ui); font-size: 11.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dcolor, var(--accent)); margin: 12px 0 4px; }
+.box.definition > h3 { display: none; }
 .box.titled > h3 { color: var(--dcolor, var(--accent)); margin: 12px 0 4px; font-size: 11.5px; }
 .box.example { border-left-style: dashed; background: transparent; }
 .box.example-inline::before { content: "Example"; display: block; font-family: var(--font-ui); font-size: 11.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 12px 0 4px; }
@@ -203,11 +209,11 @@ a { color: var(--accent); }
 .block.seealso h3 { margin-bottom: 6px; }
 .vars { margin: 10px 0 14px; }
 .vars-h { display: block; font-family: var(--font-read); font-style: italic; color: var(--muted); margin-bottom: 4px; }
-.vars table { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 34px; border: 0; margin-top: 0; font-size: 16px; }
+.vars table { width: fit-content; max-width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 320px)); column-gap: 24px; border: 0; margin-top: 0; font-size: 15.5px; }
 .vars tbody { display: contents; }
-.vars tr { display: grid; grid-template-columns: minmax(76px, .3fr) minmax(0, 1fr); column-gap: 14px; padding: 5px 0; border-bottom: 1px solid color-mix(in srgb, var(--rule) 72%, transparent); }
+.vars tr { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 10px; padding: 4px 0; border-bottom: 1px solid color-mix(in srgb, var(--rule) 72%, transparent); }
 .vars td { padding: 0; border: 0; }
-.vars td.sym { white-space: nowrap; text-align: right; }
+.vars td.sym { white-space: nowrap; text-align: right; min-width: 28px; }
 .vars tr.full { grid-template-columns: minmax(0, 1fr); }
 .exercise { margin: 16px 0; }
 .lockbox { display: flex; flex-direction: column; gap: 8px; padding: 16px 18px; margin: 10px 0; border: 1px dashed var(--rule); border-radius: 6px; font-size: 14.5px; color: var(--muted); }
@@ -289,10 +295,11 @@ a.wl.broken { color: var(--muted); border-bottom-style: dashed; cursor: default;
   .vars table { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 860px) {
-  .shell, .shell.nav-collapsed { display: block; height: auto; }
-  html, body { height: auto; }
-  .main { overflow-x: hidden; overflow-y: visible; width: 100%; }
-  .side, .shell.nav-collapsed > .side { position: fixed; z-index: 40; top: 0; bottom: 0; left: 0; width: min(340px, 88vw); transform: translateX(-100%); opacity: 1; pointer-events: auto; transition: transform .2s ease; padding-top: env(safe-area-inset-top, 0px); }
+  .shell, .shell.nav-collapsed { display: block; height: auto; max-height: none; overflow: visible; }
+  html, body { height: auto; overflow: auto; }
+  .main { overflow-x: hidden; overflow-y: visible; width: 100%; height: auto; }
+  .side, .shell.nav-collapsed > .side { position: fixed; z-index: 40; top: 0; bottom: 0; left: 0; width: min(340px, 88vw); height: 100%; max-height: none; transform: translateX(-100%); opacity: 1; pointer-events: auto; transition: transform .2s ease; padding-top: env(safe-area-inset-top, 0px); }
+
   .side.open, .shell.nav-collapsed > .side.open { transform: none; box-shadow: 0 0 40px rgba(0,0,0,0.25); }
   .scrim.open { display: block; position: fixed; inset: 0; z-index: 35; background: rgba(0,0,0,0.3); }
   .topbar { padding: 10px 16px; top: env(safe-area-inset-top, 0px); }
@@ -425,7 +432,7 @@ function md(src, eq) {
   // keep code spans/blocks away from math and wikilink parsing
   src = src.replace(/```[\s\S]*?```|`[^`\n]+`/g, m => `@@CODE${code.push(m) - 1}@@`);
   // protect currency amounts such as $6.25 and $1,000 from inline-math pairing
-  src = src.replace(/(?<!\\)\$\d+(?:,\d{3})*(?:\.\d{1,2})?(?![\w$^_{}\\=+\-*/(|<>]|\.\d)/g, m => `@@CURRENCY${currency.push(m) - 1}@@`);
+  src = src.replace(/(?<!\\)\$\d+(?:,\d{3})*(?:\.\d{1,2})?(?!\s*[\w$^_{}\\=+\-*/(|<>,~\[\]]|(?:\.\d))/g, m => `@@CURRENCY${currency.push(m) - 1}@@`);
   src = src.replace(/\$\$([\s\S]+?)\$\$/g, (m, body) => {
     if (eq && !/\\tag/.test(body)) m = `$$${body}\\tag{${eq.prefix}.${++eq.n}}$$`;
     return `@@MATH${math.push(m) - 1}@@`;
@@ -508,8 +515,8 @@ function enhance(root) {
     const st = p && p.firstElementChild;
     return !!(st && st.tagName === "STRONG" && p.firstChild === st && /^Variables:?$/.test(st.textContent.trim()));
   };
-  const boxEquation = (equation, includeVariables = true) => {
-    const box = document.createElement("div"); box.className = "box def";
+  const boxEquation = (equation, includeVariables = true, kind = "formula") => {
+    const box = document.createElement("div"); box.className = `box ${kind}`;
     equation.before(box); box.appendChild(equation);
     if (includeVariables) {
       const label = box.nextElementSibling;
@@ -523,7 +530,8 @@ function enhance(root) {
   };
   const kindOf = h => {
     const t = h.textContent.toLowerCase().replace(/\s+/g, " ").trim().replace(/[.!:]+$/, "");
-    if (/^(formula|formulas|definition|definitions)$/.test(t)) return "def";
+    if (/^(formula|formulas)$/.test(t)) return "formula";
+    if (/^(definition|definitions)$/.test(t)) return "definition";
     if (/^(example|examples|worked example|worked examples|quick example|quick examples|usage example|usage examples)$/.test(t)) return "example";
     if (/^connections?$/.test(t)) return "seealso";
     return "plain";
@@ -545,7 +553,7 @@ function enhance(root) {
         const kind = kindOf(el);
         group = document.createElement("div");
         group.className = kind === "plain" ? "block plain" : `block ${kind}`;
-        if (kind === "def") group.classList.add("box");
+        if (kind === "formula" || kind === "definition") group.classList.add("box", kind);
         if (kind === "example") group.classList.add("box", "example-titled");
         if (kind === "seealso") el.textContent = "See also";
         el.before(group); group.appendChild(el);
@@ -611,7 +619,7 @@ function enhance(root) {
       if (remainder.length) {
         const rest = document.createElement("ul");
         remainder.forEach(li => rest.appendChild(li));
-        const box = p.closest(".box.def");
+        const box = p.closest(".box.def, .box.formula, .box.definition");
         if (box) box.after(rest); else p.after(rest);
       }
       next.remove(); items = variables;

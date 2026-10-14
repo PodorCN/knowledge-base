@@ -77,6 +77,35 @@ def parse_note(path: Path):
     return meta, m.group(2)
 
 
+def embed_note_figures(body: str, note_path: Path) -> str:
+    """Inline finished figures so both generated viewers remain portable.
+
+    Only assets/figures is eligible: raw sources and interview material must
+    never be copied into a public page through an image reference.
+    """
+    figure_root = (ROOT / "assets" / "figures").resolve()
+    media_types = {".svg": "image/svg+xml", ".png": "image/png",
+                   ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+                   ".webp": "image/webp"}
+
+    def inline(match):
+        alt, reference = match.groups()
+        if reference.startswith(("https://", "http://", "data:")):
+            return match.group(0)
+        figure = (note_path.parent / reference).resolve()
+        if not figure.is_relative_to(figure_root):
+            raise ValueError("local figures must live in assets/figures")
+        media_type = media_types.get(figure.suffix.lower())
+        if not media_type:
+            raise ValueError(f"unsupported figure format: {figure.suffix}")
+        if not figure.is_file():
+            raise ValueError(f"missing figure: {reference}")
+        encoded = base64.b64encode(figure.read_bytes()).decode("ascii")
+        return f"![{alt}](data:{media_type};base64,{encoded})"
+
+    return re.sub(r"!\[([^\]\n]*)\]\(([^)\n]+)\)", inline, body)
+
+
 ONE_LINER = re.compile(r"\*\*In one line:\*\*\s*(.+)")
 
 
@@ -162,6 +191,10 @@ def main() -> int:
             if meta is None:
                 errors.append(f"{rel}: missing YAML frontmatter")
                 continue
+            try:
+                body = embed_note_figures(body, path)
+            except ValueError as exc:
+                errors.append(f"{rel}: {exc}")
             nid = meta.get("id")
             if nid != path.stem:
                 errors.append(f"{rel}: id '{nid}' must equal filename '{path.stem}'")
@@ -206,6 +239,10 @@ def main() -> int:
                         "tags": as_list(smeta.get("tags")), "path": rel, "content": block,
                         "summary": summarize(block), "topic": nid,
                     }
+                    for aid in as_list(smeta.get("alias")):
+                        if aid in nodes:
+                            errors.append(f"{rel}: duplicate alias id '{aid}'")
+                        nodes[aid] = nodes[sid]
                     node["sections"].append(sid)
                     raw_edges.append((nid, sid, "contains"))
                     for target in WIKILINK.findall(block):

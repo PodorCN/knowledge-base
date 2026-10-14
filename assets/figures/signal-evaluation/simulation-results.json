@@ -1,0 +1,30 @@
+{
+  "good": {
+    "final_value": 2.3650885600687164,
+    "annualised_return": 0.08989520207777968,
+    "max_drawdown": -0.14993048438233636,
+    "mean_weekly_turnover": 0.5629921709902441
+  },
+  "noise": {
+    "final_value": 0.7973036165704176,
+    "annualised_return": -0.022397342665867126,
+    "max_drawdown": -0.3556697310918622,
+    "mean_weekly_turnover": 0.5159445565263886
+  },
+  "costly": {
+    "final_value": 0.6337196781296283,
+    "annualised_return": -0.04459013927707878,
+    "max_drawdown": -0.5017878656881536,
+    "mean_weekly_turnover": 0.5629921709902441
+  },
+  "gross": {
+    "final_value": 2.736895403001489,
+    "annualised_return": 0.10592536769135807,
+    "max_drawdown": -0.12613332854684034,
+    "mean_weekly_turnover": 0.5629921709902441
+  },
+  "seed": 20261014,
+  "weeks": 520,
+  "good_rank_ic": 0.1655686596474099,
+  "noise_rank_ic": -0.006643515693475196
+}

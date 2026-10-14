@@ -32,7 +32,10 @@ it: a reader who knows only the sections listed as prerequisites must be able to
 
 Content you add beyond the user's material (derivations, examples, explanations the user asked for) must be
 standard and correct; mark genuine own inference **(自己推理)**. Keep numbers, tables, references and
-(自己推理) marks from the source. Figures cannot be embedded: summarise what each figure shows in one line.
+(自己推理) marks from the source. When the user asks for visual explanations, embed finished explanatory
+figures beside the relevant idea, with a short caption and explicit simulation assumptions where applicable.
+Keep raw source figures private. Store reproducible generated figures in `assets/figures/`; the build embeds
+them in both viewers so local reading does not depend on separate image paths.
 
 ## 3. Verify
 

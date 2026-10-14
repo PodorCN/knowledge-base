@@ -13,7 +13,7 @@ This chapter applies the signal toolkit across asset classes. It starts with the
 
 **Leads to:** [[portfolio-variance-diversification]] (why premia are combined), [[risk-budgeting]] (weighting components), [[carry-stock-bond-timing]] (a full carry case study).
 
-**Sections:** [[structural-risk-premia]] · [[risk-on-risk-off]] · [[relative-value-long-short]] · [[fx-carry-spot-slide]]
+**Sections:** [[structural-risk-premia]] · [[risk-on-risk-off]] · [[time-series-momentum]] · [[relative-value-long-short]] · [[fx-carry-spot-slide]]
 
 <a id="structural-risk-premia"></a>
 
@@ -65,6 +65,36 @@ Markets alternate between risk appetite and risk aversion, and in the risk-off s
 ### Connections
 - **Builds on:** [[variance-covariance-correlation]].
 - **Crash risk of carry:** [[fx-carry-spot-slide]].
+
+<a id="time-series-momentum"></a>
+
+## Time-Series Momentum Signal ("Is the trend still up?")
+<!-- section: time-series-momentum | prerequisites: [returns-simple-log] | related: [structural-risk-premia, fx-carry-spot-slide, relative-value-long-short] | sources: [src-signal-to-weight, src-carry-course-notes] | tags: [momentum, signal, z-score, trend-following] -->
+
+A quantitative rule for trend following across asset classes: take the 12-month return, standardise it against its own history, and clip extremes to prevent runaway exposure.
+
+### Formula
+$$raw_t=\frac{P_t}{P_{t-12}}-1,\qquad z_t=\frac{raw_t-\mu_{raw}}{\sigma_{raw}},\qquad s_t=\mathrm{clip}(z_t,-2,+2)$$
+
+**Variables:**
+
+- $P_t$ price or index level at month $t$
+- $P_{t-12}$ price 12 months earlier
+- $raw_t$ raw 12-month momentum
+- $\mu_{raw},\sigma_{raw}$ mean and standard deviation of $raw$ over historical look-back window
+- $z_t$ standardised momentum
+- $s_t$ signal, $z_t$ clipped to $[-2,+2]$
+
+### Key points
+- $s_t=0$: momentum at its historical average → zero conviction, flat position.
+- $s_t=+1.5$: 1.5 standard deviations above average → strong uptrend.
+- $s_t=-2$: clipped floor (maximum bearish).
+- **Sign = direction, magnitude = conviction.** Being unitless, different raw signals become directly comparable across assets.
+
+### Connections
+- **Builds on:** [[returns-simple-log]].
+- **Feeds:** [[fx-carry-spot-slide]], [[relative-value-long-short]].
+
 
 <a id="relative-value-long-short"></a>
 
