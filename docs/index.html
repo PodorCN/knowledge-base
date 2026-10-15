@@ -257,6 +257,10 @@ a.wl.broken { color: var(--muted); border-bottom-style: dashed; cursor: default;
 .prep-answer { border-top: 1px solid var(--rule); padding-top: 8px; }
 .prep-answer p { margin: 20px 0; line-height: 1.85; }
 .prep-answer p:last-child { margin-bottom: 0; }
+.prep-notes { max-width: 850px; margin-top: 48px; }
+.prep-notes h2 { margin: 44px 0 20px; padding-top: 24px; border-top: 1px solid var(--rule); font-size: 25px; }
+.prep-notes h3 { margin-top: 28px; font-size: 21px; }
+.prep-notes li { margin: 10px 0; }
 @media (max-width: 600px) { .prep-question { padding: 24px 20px; } .prep-question h3 { font-size: 24px; } }
 
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin: 20px 0 10px; }
@@ -484,6 +488,7 @@ function qBlock(title, qs, big, prefix) {
 }
 function kicker(n) {
   const t = TRACKS[n.domain];
+  if (n.tags.includes("interview-preparation")) return `<div class="kicker">${esc(t.group.name)} · Interview Preparation</div>`;
   return `<div class="kicker">${t ? `<span class="swatch" style="background:var(--d-${n.domain})"></span>${esc(t.group.name)} · ${esc(t.name)} · ` : ""}${TYPE_LABEL[n.type]}</div>`;
 }
 function header(n) { return kicker(n) + `<h1 class="title">${esc(cleanTitle(n.title))}</h1>`; }
@@ -657,7 +662,8 @@ function renderBank(n) {
       if (!categories.has(category)) categories.set(category, []);
       categories.get(category).push(q);
     }
-    return header(n) + [...categories].map(([category, qs]) => {
+    const [overview, ...studyNotes] = intro.split("<!-- study-notes -->");
+    return header(n) + (overview ? `<div class="prose intro">${md(overview)}</div>` : "") + [...categories].map(([category, qs]) => {
       if (qs.some(q => q.locked)) return `<section class="prep-category"><h2>${esc(category)}</h2>${lockBox(n.id)}</section>`;
       return `<section class="prep-category"><h2>${esc(category)}</h2>${qs.map(q => {
         const body = q.content.replace(/^## Q\d*:.*\n?/, "")
@@ -665,7 +671,7 @@ function renderBank(n) {
           .replace(/\*\*Answer\.\*\*\s*/, "").trim();
         return `<article class="prep-question" id="q-${esc(q.id.split("/")[1])}"><span class="ex-label">${esc(q.qno)}</span><h3>${mdInline(q.title)}</h3><div class="prep-answer prose">${md(body)}</div></article>`;
       }).join("")}</section>`;
-    }).join("");
+    }).join("") + (studyNotes.length ? `<div class="prose prep-notes">${md(studyNotes.join("\n"))}</div>` : "");
   }
   return header(n) + (intro ? `<div class="prose">${md(intro)}</div>` : "") + qBlock("Questions", questionsOf(n.id), true, "");
 }
@@ -703,6 +709,11 @@ function railList(label, ids) {
 }
 function renderRail(n) {
   let out = "";
+  if (n.type === "question-bank" && n.tags.includes("interview-preparation")) {
+    const headings = [...article.querySelectorAll(".prep-notes h2")];
+    headings.forEach((h, i) => h.id = `study-${i}`);
+    out += `<div class="rail-group"><h4>On this page</h4><ul class="rail-links">${headings.map(h => `<li><a href="#${h.id}" data-study-anchor="${h.id}">${esc(h.textContent)}</a></li>`).join("")}</ul></div>`;
+  }
   if (n.type === "topic") {
     out += `<div class="rail-group onpage-group"><h4>On this page</h4><ol class="rail-index">${n.sections.map(s => `<li><a href="#${s}" data-id="${s}" data-sec-link="${s}"><span class="num">${secNo(s)}</span><span>${esc(cleanTitle(byId.get(s).title))}</span></a></li>`).join("")}</ol></div>`;
     const mine = new Set(n.sections);
@@ -739,7 +750,8 @@ const toc = document.getElementById("toc");
         ${tr.banks.filter(b => !byId.get(b).tags.includes("interview-preparation")).map(b => `<a class="qb" href="#${b}" data-id="${b}">Questions · ${esc(cleanTitle(byId.get(b).title).replace(/^Questions: /, ""))} <span class="n">${questionsOf(b).length}</span></a>`).join("")}
       </div></details>`;
     }
-    h += preparationBanks(g).map(b => `<a class="qb" href="#${b}" data-id="${b}">${esc(cleanTitle(byId.get(b).title))}<span class="n">${questionsOf(b).length}</span></a>`).join("");
+    const banks = preparationBanks(g);
+    if (banks.length) h += `<details class="track" data-preparation="${g.id}"><summary>Interview Preparation<span class="n">${banks.length}</span></summary><div class="lvl">${banks.map(b => `<a class="qb" href="#${b}" data-id="${b}">${esc(cleanTitle(byId.get(b).title))}</a>`).join("")}</div></details>`;
   }
   toc.innerHTML = h;
 })();
@@ -747,7 +759,9 @@ function syncToc(pageId) {
   const n = byId.get(pageId);
   toc.querySelectorAll("a.current").forEach(a => a.classList.remove("current"));
   toc.querySelectorAll("ul.secs").forEach(u => u.hidden = u.dataset.secs !== pageId);
-  if (n.domain) toc.querySelectorAll("details.track").forEach(d => d.open = d.dataset.track === n.domain);
+  const preparation = n.tags.includes("interview-preparation");
+  if (n.domain) toc.querySelectorAll("details[data-track]").forEach(d => d.open = !preparation && d.dataset.track === n.domain);
+  toc.querySelectorAll("details[data-preparation]").forEach(d => d.open = preparation && d.dataset.preparation === TRACKS[n.domain]?.group.id);
   const a = toc.querySelector(`a[data-id="${CSS.escape(pageId)}"]`);
   if (a) { a.classList.add("current"); a.scrollIntoView({ block: "nearest" }); }
 }
@@ -761,7 +775,8 @@ function crumbsFor(n) {
   if (n.id !== "home") {
     const t = TRACKS[n.domain];
     if (t) parts.push(`<a href="#${t.group.id}" data-id="${t.group.id}">${t.group.name}</a>`);
-    if (t && t.map.id !== n.id) parts.push(`<a href="#${t.map.id}" data-id="${t.map.id}">${esc(t.name)}</a>`);
+    if (n.tags.includes("interview-preparation")) parts.push(`<span>Interview Preparation</span>`);
+    else if (t && t.map.id !== n.id) parts.push(`<a href="#${t.map.id}" data-id="${t.map.id}">${esc(t.name)}</a>`);
     parts.push(`<span>${esc(cleanTitle(n.title))}</span>`);
   }
   return parts.join('<span class="sep">/</span>');
@@ -819,6 +834,8 @@ function watchSections() {
 }
 
 document.addEventListener("click", e => {
+  const studyLink = e.target.closest("a[data-study-anchor]");
+  if (studyLink) { e.preventDefault(); scrollToAnchor(studyLink.dataset.studyAnchor); return; }
   const expand = e.target.closest("[data-expand]");
   if (expand) {
     const sec = expand.closest("section");

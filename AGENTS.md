@@ -202,6 +202,16 @@ The wiki typesets this like course notes automatically: numbered chapters/sectio
   metadata belongs in the Markdown files, not between the question and its answer.
 - Use `tags: [interview, interview-preparation]` on preparation banks. Rebuild both the wiki and the
   standalone local handout; never hand-edit generated HTML. Check desktop and mobile readability.
+- Preparation navigation is **group → Interview Preparation → named study chapter**. A preparation
+  bank's title is its study chapter (for example, Inflation / Recession Scenario), while each question's
+  category remains its subject (for example, Asset Allocation). Reuse permanent bank/question IDs.
+- When the user requests study notes, organise a concise overview, the existing numbered question and
+  answer, a scenario comparison, mechanisms, limitations and a final recall checklist. Explain the
+  reasoning instead of copying the chat. In the bank introduction, put the overview before
+  `<!-- study-notes -->` and the detailed Markdown notes after it; keep numbered questions after the
+  notes. The build displays overview → questions → notes and renders tables in the offline handout.
+  These notes stay in the ignored preparation bank. Link existing foundations instead of duplicating
+  them as new public chapters. Store raw chat retrievals and any retrieval limitations in `inbox/` and `sources/`.
 
 ### Source (`sources/src-*.md`)
 One short note per document: title, file path, and the list of sections it fed. Raw PDF in `sources/pdfs/`.

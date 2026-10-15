@@ -26,6 +26,7 @@ Under each track: **chapters** (`topics/*.md`), each one complete document on a 
 
 ## Adding material
 
+- Install the build dependencies once: `python3 -m pip install -r requirements.txt`.
 - Drop a PDF into `inbox/` (or send it to Claude) and ask it to ingest it. Claude follows
   the workflow in [`AGENTS.md`](AGENTS.md): it reuses existing concepts, adds only new ones,
   and wires the links.

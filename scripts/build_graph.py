@@ -181,38 +181,54 @@ def write_interview_handout(graph: dict, password: str) -> None:
     if password:
         output.unlink(missing_ok=True)
         return
-    banks = {n["id"] for n in graph["nodes"]
-             if n["type"] == "question-bank" and "interview-preparation" in n["tags"]}
-    categories: dict[str, list[dict]] = {}
-    for n in graph["nodes"]:
-        if n["type"] == "question" and n["id"].split("/")[0] in banks:
-            categories.setdefault(n["category"], []).append(n)
-    if not categories:
+    banks = [n for n in graph["nodes"]
+             if n["type"] == "question-bank" and "interview-preparation" in n["tags"]]
+    if not banks:
         output.unlink(missing_ok=True)
         return
+    import markdown
+
+    by_id = {n["id"]: n for n in graph["nodes"]}
+
+    def render(text: str, contents: bool = False) -> str:
+        text = WIKILINK.sub(lambda m: by_id.get(m.group(1), {}).get("title", m.group(1)), text)
+        renderer = markdown.Markdown(extensions=["tables", "fenced_code", "toc"], extension_configs={"toc": {"toc_depth": "2-2"}})
+        html = renderer.convert(text)
+        if contents:
+            html = '<nav class="study-nav" aria-label="Study notes contents">' + renderer.toc + '</nav>' + html
+        return html.replace("<table>", '<div class="table-wrap"><table>').replace("</table>", "</table></div>")
+
     sections = []
-    for category, questions in categories.items():
+    for bank in banks:
+        overview, _, notes = re.sub(r"^# .*\n?", "", bank["content"]).partition("<!-- study-notes -->")
         cards = []
+        questions = [n for n in graph["nodes"] if n["type"] == "question" and n["id"].split("/")[0] == bank["id"]]
         for q in questions:
             body = re.sub(r"^## Q\d+:.*\n?", "", q["content"])
             body = re.sub(r"^\*\*(?:Category|Topics|Seen in):\*\*.*\n?", "", body, flags=re.M)
             body = re.sub(r"\*\*Answer\.\*\*\s*", "", body).strip()
-            paragraphs = "\n".join(f"<p>{escape(p)}</p>" for p in re.split(r"\n\s*\n", body))
-            cards.append(f'<article><span class="number">{escape(q["qno"])}</span>'
-                         f'<h3>{escape(q["title"])}</h3><div class="answer">{paragraphs}</div></article>')
-        sections.append(f'<section><h2>{escape(category)}</h2>{"".join(cards)}</section>')
+            cards.append(f'<article><span class="number">{escape(q["category"])} · {escape(q["qno"])}</span>'
+                         f'<h3>{escape(q["title"])}</h3><div class="answer">{render(body)}</div></article>')
+        sections.append(f'<section id="{escape(bank["id"])}"><h2 class="chapter-title">{escape(bank["title"])}</h2>'
+                        f'<div class="lead">{render(overview)}</div>{"".join(cards)}'
+                        f'<div class="study-notes">{render(notes, contents=bool(notes.strip()))}</div></section>')
     css = """*{box-sizing:border-box}body{margin:0;background:#f6f5f1;color:#24322f;font-family:Georgia,serif}
 main{max-width:900px;margin:auto;padding:64px 36px 90px}header{margin-bottom:60px}header p{font:13px/1.5 system-ui;color:#63716b;letter-spacing:.1em;text-transform:uppercase}
-h1{font-size:38px;line-height:1.2;margin:16px 0}h2{font:600 15px/1.5 system-ui;color:#3e6556;letter-spacing:.05em;margin:0 0 22px}
+h1{font-size:38px;line-height:1.2;margin:16px 0}.chapter-title{font-size:31px;line-height:1.3;margin:0 0 20px}.lead{font-size:18px;line-height:1.8;color:#58665e;margin-bottom:34px}
 article{padding:36px 40px 40px;background:#fff;border:1px solid #e1e5de;border-radius:10px;margin-bottom:32px}
 .number{font:12px/1.5 system-ui;color:#7b8881}h3{font-size:30px;line-height:1.35;font-weight:600;margin:12px 0 30px;overflow-wrap:break-word}
 .answer{border-top:1px solid #e3e7e0;padding-top:10px;font-size:18px;line-height:1.85}.answer p{margin:20px 0}.answer p:last-child{margin-bottom:0}
+.study-notes{font-size:17px;line-height:1.85}.study-notes h2{font:600 24px/1.4 Georgia,serif;color:#2a5141;margin:48px 0 22px;padding-top:24px;border-top:1px solid #dce2d9}.study-notes h3{font:600 20px/1.5 Georgia,serif;margin:30px 0 16px}.study-notes li{margin:10px 0}.study-notes a{color:#326b61;overflow-wrap:anywhere}
+.table-wrap{overflow-x:auto;margin:24px 0}table{border-collapse:collapse;width:100%;font:14px/1.65 system-ui;background:#fff}th,td{text-align:left;vertical-align:top;padding:14px 16px;border:1px solid #dce2d9;min-width:155px}th{background:#edf1ea;font-weight:600}nav{font:14px/1.6 system-ui;margin:26px 0}nav a{color:#326b61}
+.study-nav{padding:18px 22px;background:#edf1ea;border-radius:8px}.study-nav ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px 20px}.study-nav li{margin:0}
 @media(max-width:600px){main{padding:32px 18px 48px}header{margin-bottom:38px}h1{font-size:30px}article{padding:26px 22px}h3{font-size:25px}.answer{font-size:17px}}
 @media print{body{background:white}main{padding:0;max-width:none}article{break-inside:avoid;border:0;padding:20px 0}}"""
     output.write_text('<!doctype html><html lang="en"><head><meta charset="utf-8">'
                       '<meta name="viewport" content="width=device-width, initial-scale=1">'
                       '<title>Interview Preparation</title><style>' + css + '</style></head>'
-                      '<body><main><header><p>Buy-side</p><h1>Interview Preparation</h1></header>'
+                      '<body><main><header><p>Buy-side</p><h1>Interview Preparation</h1>'
+                      '<nav>' + ' · '.join(f'<a href="#{escape(b["id"])}">{escape(b["title"])}</a>' for b in banks)
+                      + '</nav></header>'
                       + "".join(sections) + '</main></body></html>\n', encoding="utf-8")
 
 
