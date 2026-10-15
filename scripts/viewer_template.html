@@ -415,6 +415,7 @@ const CHAPTER_NO = {};
 { let k = 0; for (const g of GROUPS) for (const t of g.tracks) for (const id of TRACKS[t].topics) CHAPTER_NO[id] = ++k; }
 const secNo = sid => { const n = byId.get(sid); const t = byId.get(n.topic); return `${CHAPTER_NO[t.id]}.${t.sections.indexOf(sid) + 1}`; };
 const questionsOf = bank => DATA.nodes.filter(n => n.type === "question" && n.id.startsWith(bank + "/"));
+const preparationBanks = g => g.tracks.flatMap(t => TRACKS[t].banks).filter(id => byId.get(id).tags.includes("interview-preparation"));
 const testsOf = sid => (adj.get(sid) || []).filter(a => a.type === "tests").map(a => byId.get(a.other));
 const topicQuestions = tid => byId.get(tid).sections.reduce((s, sid) => s + testsOf(sid).length, 0);
 const counts = {};
@@ -651,7 +652,11 @@ function renderMap(n) {
       homeNotes(n);
   }
   const g = GROUPS.find(g => g.id === n.id);
-  if (g) return header(n) + `<div class="cards">${g.tracks.map(trackCard).join("")}</div>`;
+  if (g) {
+    const banks = preparationBanks(g);
+    return header(n) + `<div class="cards">${g.tracks.map(trackCard).join("")}</div>` +
+      (banks.length ? `<section class="qsection"><h2>Interview Preparation</h2>${topicList(banks)}</section>` : "");
+  }
   const t = TRACKS[n.domain];
   const intro = n.content.split(/^## /m)[0].replace(/^# .*\n?/, "");
   return header(n) + `<div class="prose">${md(intro)}</div>` +
@@ -701,9 +706,10 @@ const toc = document.getElementById("toc");
       h += `<details class="track" data-track="${t}"><summary><span class="swatch" style="background:var(--d-${t})"></span>${esc(tr.name)}<span class="n">${tr.topics.length}</span></summary><div class="lvl">
         <a class="ov" href="#${tr.map.id}" data-id="${tr.map.id}">Overview</a>
         ${tr.topics.map(id => `<a class="tp" href="#${id}" data-id="${id}"><span class="num">${CHAPTER_NO[id]}</span>${esc(cleanTitle(byId.get(id).title))}</a><ul class="secs" data-secs="${id}" hidden>${byId.get(id).sections.map(s => `<li><a href="#${s}" data-id="${s}" data-sec-link="${s}"><span class="num">${secNo(s)}</span>${esc(cleanTitle(byId.get(s).title))}</a></li>`).join("")}</ul>`).join("")}
-        ${tr.banks.map(b => `<a class="qb" href="#${b}" data-id="${b}">Questions · ${esc(cleanTitle(byId.get(b).title).replace(/^Questions: /, ""))} <span class="n">${questionsOf(b).length}</span></a>`).join("")}
+        ${tr.banks.filter(b => !byId.get(b).tags.includes("interview-preparation")).map(b => `<a class="qb" href="#${b}" data-id="${b}">Questions · ${esc(cleanTitle(byId.get(b).title).replace(/^Questions: /, ""))} <span class="n">${questionsOf(b).length}</span></a>`).join("")}
       </div></details>`;
     }
+    h += preparationBanks(g).map(b => `<a class="qb" href="#${b}" data-id="${b}">${esc(cleanTitle(byId.get(b).title))}<span class="n">${questionsOf(b).length}</span></a>`).join("");
   }
   toc.innerHTML = h;
 })();
