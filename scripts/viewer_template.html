@@ -245,6 +245,15 @@ a.wl.broken { color: var(--muted); border-bottom-style: dashed; cursor: default;
 .qa[open] > summary { border-bottom: 1px solid var(--rule); }
 .qa .qbody { padding: 6px 18px 16px 43px; font-size: 16px; }
 .qtools { display: flex; gap: 8px; margin: 0 0 10px; }
+.prep-category { margin-top: 42px; max-width: 850px; }
+.prep-category > h2 { font: 600 15px/1.5 var(--font-ui); color: var(--accent); margin: 0 0 20px; }
+.prep-question { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 30px 34px; margin: 0 0 30px; }
+.prep-question .ex-label { display: block; margin-bottom: 12px; color: var(--muted); }
+.prep-question h3 { font: 600 28px/1.4 var(--font-read); margin: 0 0 28px; overflow-wrap: break-word; }
+.prep-answer { border-top: 1px solid var(--rule); padding-top: 8px; }
+.prep-answer p { margin: 20px 0; line-height: 1.85; }
+.prep-answer p:last-child { margin-bottom: 0; }
+@media (max-width: 600px) { .prep-question { padding: 24px 20px; } .prep-question h3 { font-size: 24px; } }
 
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin: 20px 0 10px; }
 .card { background: var(--surface); border: 1px solid var(--rule); border-radius: 5px; padding: 18px 20px; display: flex; flex-direction: column; gap: 9px; border-top: 3px solid var(--dcolor, var(--accent)); }
@@ -637,6 +646,23 @@ function enhance(root) {
 }
 function renderBank(n) {
   const intro = n.content.replace(/^# .*\n?/, "").trim();
+  if (n.tags.includes("interview-preparation")) {
+    const categories = new Map();
+    for (const q of questionsOf(n.id)) {
+      const category = q.category || "General";
+      if (!categories.has(category)) categories.set(category, []);
+      categories.get(category).push(q);
+    }
+    return header(n) + [...categories].map(([category, qs]) => {
+      if (qs.some(q => q.locked)) return `<section class="prep-category"><h2>${esc(category)}</h2>${lockBox(n.id)}</section>`;
+      return `<section class="prep-category"><h2>${esc(category)}</h2>${qs.map(q => {
+        const body = q.content.replace(/^## Q\d*:.*\n?/, "")
+          .replace(/^\*\*(?:Category|Topics|Seen in):\*\*.*\n?/gm, "")
+          .replace(/\*\*Answer\.\*\*\s*/, "").trim();
+        return `<article class="prep-question" id="q-${esc(q.id.split("/")[1])}"><span class="ex-label">${esc(q.qno)}</span><h3>${mdInline(q.title)}</h3><div class="prep-answer prose">${md(body)}</div></article>`;
+      }).join("")}</section>`;
+    }).join("");
+  }
   return header(n) + (intro ? `<div class="prose">${md(intro)}</div>` : "") + qBlock("Questions", questionsOf(n.id), true, "");
 }
 // Home: everything in home.md from the first "## " heading on (reading guide, notation table).

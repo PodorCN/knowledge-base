@@ -171,6 +171,7 @@ The wiki typesets this like course notes automatically: numbered chapters/sectio
 
 ```markdown
 ## Q017: <question text in English>
+**Category:** Asset Allocation
 **Topics:** [[section-id]] · [[another-section-id]]
 **Seen in:** [[src-some-source]]
 
@@ -183,6 +184,24 @@ The wiki typesets this like course notes automatically: numbered chapters/sectio
 - `**Topics:**` must link the sections the question tests; that is how it appears under those sections.
 - If the question already exists, add the new source to `**Seen in:**` instead of duplicating it.
 - `**Seen in:**` is kept in the files but hidden in the wiki.
+
+#### Interview preparation: extract, classify and format
+
+- Identify the actual question in pasted material and put only that question in the numbered heading.
+  Separate the answer from surrounding chat, praise and presentation instructions.
+- Give every question a concise `**Category:**` based on its subject. Reuse an existing category when
+  it fits, such as **Asset Allocation**, Fixed Income, Portfolio Risk or Derivatives; do not place
+  unrelated questions in Asset Allocation or create a new track for each category.
+- Remove decorative stars/emoji, timing estimates (for example, "Approximately 1 Minute"),
+  redundant "Interview Answer" headings, and quotation marks enclosing the whole answer.
+  This cleanup is authorised formatting, not a change to the financial meaning. Keep the raw original in `inbox/`.
+- Preserve the substantive question and answer. Do not invent extra explanations or shorten the answer
+  unless requested. Split the answer into readable paragraphs or lists where appropriate.
+- The preparation reader groups questions by category, displays each question as a prominent heading,
+  and separates the answer with generous spacing. Keep answers visible for reading. Source and section-link
+  metadata belongs in the Markdown files, not between the question and its answer.
+- Use `tags: [interview, interview-preparation]` on preparation banks. Rebuild both the wiki and the
+  standalone local handout; never hand-edit generated HTML. Check desktop and mobile readability.
 
 ### Source (`sources/src-*.md`)
 One short note per document: title, file path, and the list of sections it fed. Raw PDF in `sources/pdfs/`.

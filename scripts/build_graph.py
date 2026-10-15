@@ -25,6 +25,7 @@ import os
 import re
 import secrets
 import sys
+from html import escape
 from pathlib import Path
 
 import yaml
@@ -174,6 +175,47 @@ def as_list(value) -> list[str]:
     return [str(v) for v in value]
 
 
+def write_interview_handout(graph: dict, password: str) -> None:
+    """Write a script-free reading copy from the local preparation banks."""
+    output = LOCAL_DIR / "interview-preparation.html"
+    if password:
+        output.unlink(missing_ok=True)
+        return
+    banks = {n["id"] for n in graph["nodes"]
+             if n["type"] == "question-bank" and "interview-preparation" in n["tags"]}
+    categories: dict[str, list[dict]] = {}
+    for n in graph["nodes"]:
+        if n["type"] == "question" and n["id"].split("/")[0] in banks:
+            categories.setdefault(n["category"], []).append(n)
+    if not categories:
+        output.unlink(missing_ok=True)
+        return
+    sections = []
+    for category, questions in categories.items():
+        cards = []
+        for q in questions:
+            body = re.sub(r"^## Q\d+:.*\n?", "", q["content"])
+            body = re.sub(r"^\*\*(?:Category|Topics|Seen in):\*\*.*\n?", "", body, flags=re.M)
+            body = re.sub(r"\*\*Answer\.\*\*\s*", "", body).strip()
+            paragraphs = "\n".join(f"<p>{escape(p)}</p>" for p in re.split(r"\n\s*\n", body))
+            cards.append(f'<article><span class="number">{escape(q["qno"])}</span>'
+                         f'<h3>{escape(q["title"])}</h3><div class="answer">{paragraphs}</div></article>')
+        sections.append(f'<section><h2>{escape(category)}</h2>{"".join(cards)}</section>')
+    css = """*{box-sizing:border-box}body{margin:0;background:#f6f5f1;color:#24322f;font-family:Georgia,serif}
+main{max-width:900px;margin:auto;padding:64px 36px 90px}header{margin-bottom:60px}header p{font:13px/1.5 system-ui;color:#63716b;letter-spacing:.1em;text-transform:uppercase}
+h1{font-size:38px;line-height:1.2;margin:16px 0}h2{font:600 15px/1.5 system-ui;color:#3e6556;letter-spacing:.05em;margin:0 0 22px}
+article{padding:36px 40px 40px;background:#fff;border:1px solid #e1e5de;border-radius:10px;margin-bottom:32px}
+.number{font:12px/1.5 system-ui;color:#7b8881}h3{font-size:30px;line-height:1.35;font-weight:600;margin:12px 0 30px;overflow-wrap:break-word}
+.answer{border-top:1px solid #e3e7e0;padding-top:10px;font-size:18px;line-height:1.85}.answer p{margin:20px 0}.answer p:last-child{margin-bottom:0}
+@media(max-width:600px){main{padding:32px 18px 48px}header{margin-bottom:38px}h1{font-size:30px}article{padding:26px 22px}h3{font-size:25px}.answer{font-size:17px}}
+@media print{body{background:white}main{padding:0;max-width:none}article{break-inside:avoid;border:0;padding:20px 0}}"""
+    output.write_text('<!doctype html><html lang="en"><head><meta charset="utf-8">'
+                      '<meta name="viewport" content="width=device-width, initial-scale=1">'
+                      '<title>Interview Preparation</title><style>' + css + '</style></head>'
+                      '<body><main><header><p>Buy-side</p><h1>Interview Preparation</h1></header>'
+                      + "".join(sections) + '</main></body></html>\n', encoding="utf-8")
+
+
 def main() -> int:
     strict = "--strict" in sys.argv
     errors: list[str] = []
@@ -269,11 +311,13 @@ def main() -> int:
                     if f"Q{qnum}" in qnumbers:
                         errors.append(f"{rel}: duplicate question number Q{qnum} (also in {qnumbers[f'Q{qnum}']})")
                     qnumbers[f"Q{qnum}"] = rel
+                    category = re.search(r"^\*\*Category:\*\*[ \t]*(.+)$", block, re.M)
                     nodes[qid] = {
                         "id": qid,
                         "title": qtext,
                         "type": "question",
                         "qno": f"Q{qnum}",
+                        "category": category.group(1).strip() if category else "General",
                         "domain": node["domain"],
                         "tags": [],
                         "path": rel,
@@ -386,6 +430,7 @@ def main() -> int:
         local_graph = lock_questions(local_graph, password)
         print("questions: encrypted with KB_QUESTIONS_PASSWORD in local/index.html")
     write_site(local_graph, LOCAL_DIR)
+    write_interview_handout(local_graph, password)
     print(f"wrote {OUT_DIR.name}/index.html (public, no questions) and {LOCAL_DIR.name}/index.html (local only, with questions)")
 
     if qnumbers:
