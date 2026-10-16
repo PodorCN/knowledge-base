@@ -13,7 +13,7 @@ Linear regression is the workhorse of signal research: betas, factor loadings, a
 
 **Leads to:** [[ridge-regression]], [[capm-alpha-beta]], [[grinold-alpha]], [[implied-forward-regression]].
 
-**Sections:** [[ols-regression]] · [[r-squared]] · [[gauss-markov-assumptions]] · [[prediction-vs-confidence-interval]] · [[linear-regression-assumptions]] · [[robust-standard-errors]] · [[omitted-variable-bias]] · [[multicollinearity]] · [[regression-invariances]]
+**Sections:** [[ols-regression]] · [[r-squared]] · [[gauss-markov-assumptions]] · [[prediction-vs-confidence-interval]] · [[linear-regression-assumptions]] · [[robust-standard-errors]] · [[omitted-variable-bias]] · [[multicollinearity]] · [[regression-invariances]] · [[fama-macbeth-cross-sectional-regression]]
 
 Notation for this chapter: $n$ observations, $p$ coefficients including the intercept, $y$ the $n\times1$ response, $X$ the $n\times p$ design matrix, $\beta$ true coefficients, $\varepsilon$ errors, $e$ residuals.
 
@@ -168,11 +168,12 @@ $$t_j=\frac{\hat\beta_j-b_0}{SE(\hat\beta_j)}\sim t_{n-p},\qquad F=\frac{(SSE_R-
 
 **Variables:**
 
-- $\beta$ true coefficients; $\hat\beta$ OLS estimate
+- $y, X$ response vector and $n\times p$ design matrix ($x_i, \bar x$: simple-regression observations and sample mean)
+- $\beta$ true coefficients; $\hat\beta, \hat\beta_1$ OLS estimate and simple-regression slope
 - $\varepsilon$ errors, with variance $\sigma^2$ under homoskedasticity
 - $\hat\sigma^2$ estimated error variance ($\hat\sigma$: residual standard error)
 - $SE(\cdot)$ standard error
-- $t_j$ t-statistic for coefficient $j$
+- $t_j, F$ t-statistic for coefficient $j$ and joint F-statistic
 - $b_0$ value of $\beta_j$ under the null
 - $SSE_R,SSE_U$ residual sums of squares of the restricted and unrestricted models
 - $J$ number of restrictions tested
@@ -347,7 +348,7 @@ $$\text{VIF}_j=\frac{1}{1-R_j^2},\qquad x_j=\alpha+\sum_{k\ne j}\beta_kx_k+\vare
 **Variables:**
 
 - $\text{VIF}_j$ variance inflation factor of regressor $j$
-- $R_j^2$ $R^2$ of the auxiliary regression of regressor $x_j$ on all the other regressors $x_k$
+- $R_j^2$ $R^2$ of the auxiliary regression of regressor $x_j$ on all the other regressors $x_k$ ($\alpha, \beta_k, \varepsilon$: intercept, slopes, and error of that auxiliary regression)
 - $\sigma^2$ error variance of the main regression
 - $n$ number of observations
 - $\mathrm{Var}(x_j)$ sample variance of regressor $j$
@@ -415,3 +416,37 @@ Here $c$ is any nonzero constant.
 ### Connections
 - **Builds on:** [[gauss-markov-assumptions]].
 - **Related:** [[effective-sample-size]] (correlated rows ≈ fewer real observations), [[ridge-regression]].
+
+<a id="fama-macbeth-cross-sectional-regression"></a>
+
+## Cross-Sectional vs Time-Series Regression (Fama–MacBeth)
+<!-- section: fama-macbeth-cross-sectional-regression | prerequisites: [ols-regression, robust-standard-errors] | related: [information-coefficient, capm-alpha-beta, effective-sample-size] | sources: [src-squarepoint-dqa-workbook, src-quant-finance-study-notes] | tags: [fama-macbeth, cross-sectional, factor-premia, panel] -->
+
+In panel equity research ($N$ assets over $T$ periods), a **time-series regression** estimates each asset's factor loadings $\beta_i$, whereas a **Fama–MacBeth (1973) two-step cross-sectional regression** estimates the market price of risk $\lambda_t$ (factor return) earned per unit of exposure and accounts for strong cross-sectional return correlation at each date $t$.
+
+### Formulas
+$$\text{Step 1 (for each date }t=1,\dots,T\text{ across }i=1,\dots,N\text{):}\quad R_{i,t} = \alpha_t + \lambda_t^\top X_{i,t-1} + \varepsilon_{i,t}\ \Rightarrow\ \hat\lambda_t = \big(X_{t-1}^\top X_{t-1}\big)^{-1}X_{t-1}^\top R_t$$
+$$\text{Step 2 (time-series average & SE across }T\text{ dates):}\quad \bar\lambda = \frac1T\sum_{t=1}^T \hat\lambda_t,\qquad SE(\bar\lambda_k) = \frac{s(\hat\lambda_{k,t})}{\sqrt T},\qquad t(\bar\lambda_k) = \frac{\bar\lambda_k}{SE(\bar\lambda_k)}$$
+$$\text{Univariate standardised signal }\tilde x_{i,t-1}\text{ (mean }0\text{, SD }1\text{):}\quad \hat\lambda_t = \frac1N\sum_{i=1}^N \tilde x_{i,t-1} R_{i,t} = \mathrm{IC}_t \cdot \sigma_t(R)$$
+
+**Variables:**
+
+- $N, T$ number of cross-sectional assets ($i=1,\dots,N$) and time periods ($t=1,\dots,T$)
+- $R_{i,t}, R_t$ return of asset $i$ in period $t$ and $N\times 1$ cross-sectional return vector at date $t$
+- $X_{i,t-1}, X_{t-1}$ $K\times 1$ vector of lagged characteristics/exposures for asset $i$ and $N\times K$ matrix across assets (including an intercept column)
+- $\alpha_t, \varepsilon_{i,t}$ cross-sectional intercept (equal-weighted market return when characteristics are demeaned) and idiosyncratic residual at date $t$
+- $\lambda_t, \hat\lambda_t$ true and OLS-estimated $K\times 1$ vector of cross-sectional factor returns in period $t$ ($\hat\lambda_{k,t}$: $k$-th factor return at date $t$)
+- $\bar\lambda, \bar\lambda_k$ time-series average factor premium vector and its $k$-th component
+- $s(\hat\lambda_{k,t}), SE(\bar\lambda_k), t(\bar\lambda_k)$ time-series sample standard deviation of $\hat\lambda_{k,t}$, Fama–MacBeth standard error, and $t$-statistic
+- $\tilde x_{i,t-1}$ cross-sectionally z-scored signal at $t-1$
+- $\mathrm{IC}_t, \sigma_t(R)$ period-$t$ Pearson Information Coefficient and cross-sectional return dispersion
+
+### Key points
+- **Why pooled panel OLS standard errors fail catastrophically in finance:** At any given date $t$, all $N$ stocks are hit by the same market and sector shocks ($\mathrm{Corr}(\varepsilon_{i,t}, \varepsilon_{j,t}) \gg 0$). Pooled OLS pretends $NT$ observations are independent, understating standard errors by $O(\sqrt{N})$. Fama–MacBeth runs a separate cross-sectional regression each period $t$ and takes the standard error from the **time-series variability of $\hat\lambda_t$ across the $T$ dates**, automatically absorbing cross-sectional correlation within each date $t$.
+- **Portfolio interpretation of $\hat\lambda_t$:** Because $\hat\lambda_t = (X_{t-1}^\top X_{t-1})^{-1} X_{t-1}^\top R_t$ is linear in $R_t$, the $k$-th Fama–MacBeth slope $\hat\lambda_{k,t}$ is the exact period-$t$ return of a **zero-cost factor-mimicking portfolio** with unit exposure to characteristic $k$ and **zero exposure to all other characteristics $j\ne k$** (by Frisch–Waugh–Lovell, [[ols-regression]]).
+- **Link to IC and ICIR:** For a single cross-sectionally standardised signal $\tilde x_{t-1}$, $\hat\lambda_t = \mathrm{IC}_t\,\sigma_t(R)$. If cross-sectional return dispersion $\sigma_t(R)$ is constant across time, the Fama–MacBeth $t$-stat equals $\mathrm{ICIR}\sqrt{T}$ ([[information-coefficient]]). When $\sigma_t(R)$ varies across regimes, weighting or standardising returns by $\sigma_t(R)$ (or WLS by $1/\sigma_{i,t}^2$) prevents high-volatility crash months from dominating $\bar\lambda$.
+- **Serial correlation in $\hat\lambda_t$:** Fama–MacBeth fixes *cross-sectional* correlation ($i\leftrightarrow j$ at fixed $t$), not *time-series* autocorrelation ($t\leftrightarrow t+1$, e.g. overlapping multi-period returns). Apply **Newey–West (HAC)** standard errors to the time series $\{\hat\lambda_t\}_{t=1}^T$ ([[robust-standard-errors]]).
+
+### Connections
+- **Builds on:** [[ols-regression]], [[robust-standard-errors]].
+- **Bridges to:** [[information-coefficient]] ($\hat\lambda_t = \mathrm{IC}_t\,\sigma_t(R)$), [[capm-alpha-beta]] (time-series vs cross-sectional factor tests), [[effective-sample-size]].

@@ -165,27 +165,29 @@ On 574 weeks (Oct 2006 – Nov 2017) the sign matches theory but the effect is s
 
 ### Results
 
-| Statistic | Result | Reading |
-|---|---|---|
-| Rank IC | +0.0252 | Right sign, negligible size |
-| $t$ (overlap-adjusted) | +0.29 | 5× below the bar: noise |
-| Hit rate | 56% | Uninformative, near a coin flip |
-| Timing curve, annualised | +1.6% | Faintly positive, gross of costs |
-| Worst drawdown | −27.7% | |
-| Autocorrelation of the score | 0.95 | Slow-moving; nearly free to trade |
+| Statistic | Baseline Registered (`auto_adjust=True`) | Unadjusted-Close Check (`auto_adjust=False`) | Reading |
+|---|---|---|---|
+| Rank IC | $+0.0252$ | $+0.0423$ | Right sign, negligible size |
+| $t$ (overlap-adjusted) | $+0.29$ | $+0.49$ | $3\text{–}5\times$ below the $1.5$ bar: noise |
+| Hit rate | $56\%$ | $60\%$ | Nominal $>50\%$, masks tail losses |
+| Timing curve, annualised | $+1.6\%$ | $+2.3\%$ | Faintly positive, gross of costs |
+| Worst drawdown | $-27.7\%$ | $-27.7\%$ | Deep multi-year underwater period |
+| Autocorrelation of the score | $0.95$ | $0.95$ | Slow-moving; nearly free to trade ($\sim 21\text{ bps/yr}$) |
 
-Average next-21-day equity-minus-bond return by score quintile:
+Average next-21-day equity-minus-bond return by score quintile (baseline / unadjusted-close check):
 
-| Q1 (low) | Q2 | Q3 | Q4 | Q5 (high) |
-|---|---|---|---|---|
-| −0.26% | +0.73% | +1.32% | +0.63% | −0.09% |
+| Run | Q1 (low) | Q2 | Q3 | Q4 | Q5 (high) |
+|---|---|---|---|---|---|
+| Baseline (`auto_adjust=True`) | $-0.26\%$ | $+0.73\%$ | $+1.32\%$ | $+0.63\%$ | **$-0.09\%$** |
+| Unadjusted close (`auto_adjust=False`) | $-0.10\%$ | $+0.41\%$ | $+0.95\%$ | $+0.72\%$ | **$-0.09\%$** |
 
 **Notes:**
 
-- The quintiles hump: the strongest buy signals (Q5) lost money, so linear sizing puts the largest positions where returns are worst.
+- **Why both runs fail:** Even after fixing the dividend-adjusted close denominator (which overstated 2006 SPY yield as $2.48\%$ vs true $1.73\%$, see [[broker-research-replication]] and [[eval-three-stage-protocol]]), the overlap-adjusted $t$-statistic rises only from $+0.29$ to $+0.49$—still far below the pre-registered $1.5$ hurdle.
+- **The quintiles hump in both runs:** the strongest buy signals (Q5) lost money ($-0.09\%$), so linear sizing puts the largest positions where returns are worst.
 - Figures in the original notes (not reproduced here): raw carry and its z-score compress after 2008 (the zero-rate era pins both legs); rolling 52-week IC flips sign around zero; no single regime carries the result (no "crisis alpha"); the decile-mean line bends down at the right end.
 
-**Verdict: fail.** By the pre-committed rule the candidate stops here; later data stays sealed.
+**Verdict: fail.** By the pre-committed rule the candidate stops here; later data stays sealed (see [[eval-three-stage-protocol]] for the post-mortem unsealing of the 2018–2023 Validate period).
 
 ### Worked example
 **Effective N and the IC needed for $t=1.5$** (574 overlapping weeks, 21-day horizon):

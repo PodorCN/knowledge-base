@@ -13,12 +13,12 @@ OLS is unbiased but can have large variance when regressors are many or correlat
 
 **Leads to:** [[cross-validation-leakage]] (measuring test error), [[mean-variance-optimization]] (shrinkage in portfolios).
 
-**Sections:** [[bias-variance-tradeoff]] · [[ridge-regression]] · [[lasso-elastic-net]] · [[logistic-regression]] · [[pca]]
+**Sections:** [[bias-variance-tradeoff]] · [[ridge-regression]] · [[lasso-elastic-net]] · [[logistic-regression]] · [[pca]] · [[tree-ensembles-finance]]
 
 <a id="bias-variance-tradeoff"></a>
 
 ## Bias–Variance Trade-off
-<!-- section: bias-variance-tradeoff | prerequisites: [estimator-properties] | related: [ridge-regression, lasso-elastic-net, cross-validation-leakage, r-squared, conditional-expectation-best-predictor] | sources: [src-squarepoint-dqa-workbook] | tags: [generalisation, overfitting] -->
+<!-- section: bias-variance-tradeoff | prerequisites: [estimator-properties] | related: [ridge-regression, lasso-elastic-net, tree-ensembles-finance, cross-validation-leakage, r-squared, conditional-expectation-best-predictor] | sources: [src-squarepoint-dqa-workbook] | tags: [generalisation, overfitting] -->
 
 The expected test error of a fitted model splits into irreducible noise, squared bias and variance — the prediction version of MSE = variance + bias².
 
@@ -38,7 +38,7 @@ $$E\big[(Y-\hat f(x))^2\big]=\sigma^2+\mathrm{Bias}\big(\hat f(x)\big)^2+\mathrm
 
 ### Connections
 - **Builds on:** [[estimator-properties]] (MSE = Var + Bias²).
-- **Levers:** [[ridge-regression]], [[lasso-elastic-net]]. **Measured by:** [[cross-validation-leakage]].
+- **Levers:** [[ridge-regression]], [[lasso-elastic-net]], [[tree-ensembles-finance]]. **Measured by:** [[cross-validation-leakage]].
 
 <a id="ridge-regression"></a>
 
@@ -83,8 +83,9 @@ $$\text{Elastic net: }\ \|y-X\beta\|^2+\lambda_1\|\beta\|_1+\lambda_2\|\beta\|_2
 
 **Variables:**
 
-- $\hat\beta_L$ lasso coefficients
-- $\|\beta\|_1=\sum_j|\beta_j|$ L1 norm
+- $\hat\beta_L, \beta$ lasso and candidate coefficient vectors
+- $y, X, I$ response vector, design matrix, and identity matrix
+- $\|\beta\|_1=\sum_j|\beta_j|$ L1 norm ($\|\beta\|_2^2$: squared L2 norm)
 - $\lambda,\lambda_1,\lambda_2$ penalty strengths
 - $z_j$ OLS coefficient under an orthonormal design ($X^\top X=I$)
 - $(\cdot)^+$ positive part (soft-thresholding)
@@ -150,3 +151,39 @@ $\Sigma=\begin{pmatrix}1&0.8\\0.8&1\end{pmatrix}$ → eigenvectors $(1,1)/\sqrt2
 ### Connections
 - **Builds on:** [[eigen-svd-psd]], [[variance-covariance-correlation]].
 - **Remedy for:** [[multicollinearity]]. **Leakage risk:** [[cross-validation-leakage]].
+
+<a id="tree-ensembles-finance"></a>
+
+## Tree Ensembles in Finance (Bagging, Random Forest, GBDT)
+<!-- section: tree-ensembles-finance | prerequisites: [bias-variance-tradeoff, variance-covariance-correlation] | related: [ridge-regression, cross-validation-leakage] | sources: [src-squarepoint-dqa-workbook] | tags: [random-forest, gbdt, xgboost, lightgbm, trees] -->
+
+Decision trees partition the feature space into axis-aligned boxes to capture non-linearities and feature interactions without scaling. Bagging/Random Forests average deep trees in parallel to cut **variance**, whereas Gradient Boosted Decision Trees (GBDT) sum shallow trees sequentially to cut **bias**.
+
+### Formulas
+$$\text{Bagging / Random Forest variance (}B\text{ trees, pairwise correlation }\rho\text{, tree variance }\sigma_T^2\text{):}\quad \mathrm{Var}\!\left(\frac1B\sum_{b=1}^B T_b(x)\right) = \rho\sigma_T^2 + \frac{1-\rho}{B}\sigma_T^2$$
+$$\text{GBDT additive update:}\quad \hat f_m(x) = \hat f_{m-1}(x) + \eta\,h_m(x),\qquad r_{im} = -\left.\frac{\partial \ell(y_i, f(x_i))}{\partial f(x_i)}\right|_{f=\hat f_{m-1}}$$
+$$\text{XGBoost / LightGBM optimal leaf weight }w_j^*\text{ and split gain:}\quad w_j^* = -\frac{G_j}{H_j + \lambda},\qquad \mathcal G_{\text{split}} = \frac12\left[\frac{G_L^2}{H_L+\lambda} + \frac{G_R^2}{H_R+\lambda} - \frac{(G_L+G_R)^2}{H_L+H_R+\lambda}\right] - \gamma$$
+
+**Variables:**
+
+- $B, b$ number of trees in the forest and tree index
+- $T_b(x)$ prediction of tree $b$ at feature vector $x$
+- $\sigma_T^2, \rho$ variance of a single tree and average pairwise correlation between trees
+- $\hat f_m(x), h_m(x)$ boosted ensemble after $m$ stages and the $m$-th regression tree fitted to pseudo-residuals
+- $\eta\in(0,1]$ learning rate (shrinkage factor)
+- $r_{im}$ negative gradient (pseudo-residual) for observation $i$ at stage $m$ under loss $\ell(y_i, f(x_i))$
+- $w_j^*$ optimal prediction weight on leaf $j$
+- $G_j = \sum_{i\in I_j} g_i,\ H_j = \sum_{i\in I_j} h_i$ sums of first derivatives $g_i = \partial_{\hat y}\ell(y_i,\hat y_i)$ and second derivatives $h_i = \partial_{\hat y}^2\ell(y_i,\hat y_i)$ in leaf $I_j$ (subscripts $L,R$ denote left and right child nodes)
+- $\lambda, \gamma \ge 0$ L2 penalty on leaf weights and minimum complexity cost per split
+- $\mathcal G_{\text{split}}$ objective reduction (gain) from splitting a node into $L$ and $R$
+
+### Key points
+- **Random Forest vs GBDT in one table:**
+  - **Random Forest (parallel):** Averages $B$ deep, low-bias, high-variance trees grown on bootstrap samples. As $B\to\infty$, the $(1-\rho)\sigma_T^2/B$ term vanishes, leaving the correlation floor $\rho\sigma_T^2$ — random feature subsampling (`max_features` $= \sqrt{p}$ or $p/3$) lowers $\rho$. Cannot overfit purely by increasing $B$.
+  - **GBDT (sequential):** Sums shallow, high-bias, low-variance trees (depth 2–6), each correcting the gradient/Hessian errors of the previous ensemble. Easily overfits noisy financial returns if $m$ is too large or trees are too deep — regularise heavily with small learning rate $\eta \le 0.05$, shallow `max_depth`, large `min_child_weight` ($H_j$), column/row subsampling, L2 leaf shrinkage $\lambda$, and walk-forward early stopping ([[cross-validation-leakage]]).
+- **Critical finance failure mode — trees cannot extrapolate trends:** A regression tree predicts a piecewise-constant weighted average of training targets inside each leaf. If a feature or target breaks out above its historical training range, a tree predicts no higher than its outermost leaf mean. Always detrend/difference non-stationary levels or combine linear models ([[ridge-regression]]) with boosted trees on residuals.
+- **Feature importance trap:** Default split-impurity (MDI) importance inflates high-cardinality, continuous, and noisy features; use out-of-sample permutation importance or SHAP values on walk-forward test folds.
+
+### Connections
+- **Builds on:** [[bias-variance-tradeoff]], [[variance-covariance-correlation]] (equicorrelated portfolio/ensemble variance floor $\rho\sigma_T^2$).
+- **Contrast:** [[ridge-regression]] (linear, extrapolates smoothly, low variance on low-SNR financial data). **Validated via:** [[cross-validation-leakage]].

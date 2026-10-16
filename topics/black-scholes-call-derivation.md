@@ -20,46 +20,68 @@ Setting of this chapter: no dividends ($q=0$), constant $r$ and $\sigma$, valuat
 <a id="bs-call-setup-risk-neutral"></a>
 
 ## Setup and Risk-Neutral Pricing
-<!-- section: bs-call-setup-risk-neutral | prerequisites: [no-arbitrage, option-payoffs-moneyness, risk-neutral-pricing] | related: [black-scholes-formula] | sources: [src-bs-derivation-study-notes] | tags: [black-scholes, risk-neutral, ftap] -->
+<!-- section: bs-call-setup-risk-neutral | prerequisites: [no-arbitrage, option-payoffs-moneyness, risk-neutral-pricing, martingales-ito-isometry] | related: [black-scholes-formula] | sources: [src-bs-derivation-study-notes] | tags: [black-scholes, risk-neutral, ftap] -->
 
-The call's price today is its discounted expected payoff under $\mathbb Q$. This is the only place $\mathbb Q$ enters as an assumption.
+The call's price today is its discounted expected payoff under the risk-neutral measure $\mathbb Q$. This is the foundational assumption from which the closed-form Black–Scholes formula is derived.
 
 ### Setup
+A European call on a non-dividend-paying stock with strike $K$ and maturity $T$ pays at expiry:
+
 $$C_T=(S_T-K)^+=\max(S_T-K,0)$$
 
 **Variables:**
 
-- $C_T$ call value at maturity
+- $C_T$ call value at maturity $T$
 - $S_T$ stock price at maturity
-- $K$ strike
-- $C_0$ today's call price (to be found)
+- $K$ strike price
+- $C_0$ today's call price ($t=0$, to be derived)
 
-### Step 1 — Risk-neutral pricing formula
-The fundamental theorem of asset pricing (FTAP) says that no arbitrage implies the existence of a measure $\mathbb Q$, equivalent to the real-world measure $\mathbb P$, under which the discounted price of every traded asset is a martingale:
+### Fundamental Theorem of Asset Pricing (FTAP)
+The First Fundamental Theorem of Asset Pricing states that a market is arbitrage-free if and only if there exists an equivalent martingale measure (risk-neutral measure) $\mathbb Q \sim \mathbb P$ under which the discounted price of every traded asset is a martingale ([[martingales-ito-isometry]]):
 
-$$e^{-rt}S_t=E^{\mathbb Q}\!\left[e^{-rT}S_T\mid\mathcal F_t\right],\qquad V_0=e^{-rT}E^{\mathbb Q}[X_T]\ \ \text{for any payoff }X_T$$
+$$e^{-rt}S_t=E^{\mathbb Q}\!\left[e^{-rT}S_T\mid\mathcal F_t\right]$$
 
 **Variables:**
 
-- $r$ constant risk-free rate
-- $S_t$ stock price at $t\le T$
-- $\mathcal F_t$ information at time $t$
-- $X_T$ payoff at maturity
-- $V_0$ today's price of that payoff
+- $r$ constant risk-free interest rate
+- $S_t$ stock price at time $t$
+- $S_T$ terminal stock price at maturity $T$
+- $\mathcal F_t$ filtration (information known up to time $t$)
+- $\mathbb Q$ risk-neutral pricing measure
 
-**Martingale:** $E[X_T\mid\mathcal F_t]=X_t$ — the best forecast of the future is today's value ([[martingales-ito-isometry]]).
+By the definition of a martingale ([[martingales-ito-isometry]]), the best forecast of any future discounted price given current information is its current discounted price.
 
-Applying this to $X_T=(S_T-K)^+$:
+### Risk-Neutral Pricing Formula
+Because the discounted value of any replicable derivative portfolio $e^{-rt}V_t$ must likewise be a $\mathbb Q$-martingale to eliminate arbitrage, today's price $V_0$ of any contingent claim with maturity payoff $X_T$ equals its discounted expectation under $\mathbb Q$:
+
+$$V_0=e^{-rT}E^{\mathbb Q}[X_T]$$
+
+**Variables:**
+
+- $V_0$ derivative price today ($t=0$)
+- $X_T$ terminal payoff at maturity $T$
+- $r$ risk-free rate
+- $T$ time to maturity
+
+Applying this pricing formula to the call payoff $X_T = C_T = (S_T-K)^+$ gives today's call price:
 
 $$C_0=e^{-rT}E^{\mathbb Q}\big[(S_T-K)^+\big]$$
 
-Every step after this computes the same expectation.
+**Variables:**
+
+- $C_0$ today's call price
+- $S_T$ terminal stock price
+- $K$ strike
+- $r$ risk-free rate
+- $T$ time to maturity
+
+Every subsequent section of this chapter evaluates this single expectation.
 
 ### Why $\mathbb Q$ and not $\mathbb P$?
-Under $\mathbb P$ the stock's expected return is $\mu$, which is unobservable and subjective. The option price must be unique and objective, so it cannot depend on $\mu$. $\mathbb Q$ is constructed in Step 2 so that $\mu$ cancels and only $r$ and $\sigma$ remain.
+Under the physical measure $\mathbb P$, the stock drift is its expected return $\mu$, which is subjective, unobservable, and varies across investors. Because the option can be dynamically replicated by trading the underlying stock and the bond, no-arbitrage enforces a unique price that cannot depend on $\mu$. Under $\mathbb Q$, the drift becomes $r$, so $\mu$ completely cancels out of the pricing formula.
 
 ### Connections
-- **Builds on:** [[risk-neutral-pricing]], [[option-payoffs-moneyness]].
+- **Builds on:** [[risk-neutral-pricing]], [[martingales-ito-isometry]], [[option-payoffs-moneyness]].
 
 <a id="girsanov-risk-neutral-dynamics"></a>
 
@@ -73,7 +95,9 @@ $$dS_t=\mu S_t\,dt+\sigma S_t\,dW_t^{\mathbb P}$$
 
 **Variables:**
 
+- $S_t$ stock price at time $t$
 - $\mu$ real-world expected return
+- $r$ risk-free interest rate
 - $\sigma$ constant volatility
 - $W_t^{\mathbb P}$ Brownian motion under $\mathbb P$
 
@@ -128,9 +152,11 @@ $$S_T=S_0\exp\left[\left(r-\frac12\sigma^2\right)T+\sigma\sqrt{T}\,Z\right],\qqu
 
 **Variables:**
 
-- $S_0$ spot today
+- $f(t,S), f_t, f_S, f_{SS}$ smooth function of $(t,S)$ and its partial derivatives
+- $S, S_t, S_T, S_0$ stock price, at time $t$, at maturity $T$, and today ($t=0$)
+- $r, \sigma, T$ risk-free rate, volatility, and maturity
+- $W, W_t^{\mathbb Q}$ standard Brownian motion under $\mathbb Q$
 - $Z$ standard normal random variable
-- $T$ maturity
 
 Thus $S_T$ is lognormal under $\mathbb Q$ ([[lognormal-distribution]]).
 
@@ -153,6 +179,16 @@ By linearity of expectation ([[expectation-linearity-indicators]]):
 
 $$C_0=e^{-rT}\left(E^{\mathbb Q}\big[S_T\mathbf 1_{\{S_T>K\}}\big]-K\,E^{\mathbb Q}\big[\mathbf 1_{\{S_T>K\}}\big]\right)$$
 
+**Variables:**
+
+- $C_0$ today's European call price
+- $S_T$ terminal stock price at maturity $T$
+- $K$ strike price
+- $r, T$ risk-free rate and time to maturity
+- $\mathbf 1_{\{S_T>K\}}$ indicator random variable ($1$ if $S_T>K$, $0$ otherwise)
+
+**Notes:**
+
 - **Term A:** $E^{\mathbb Q}[S_T\mathbf 1_{\{S_T>K\}}]$ — the stock leg (an asset-or-nothing payoff).
 - **Term B:** $K\,E^{\mathbb Q}[\mathbf 1_{\{S_T>K\}}]$ — the strike leg (a cash-or-nothing payoff, [[digital-options]]).
 
@@ -173,6 +209,13 @@ $$S_T>K\iff Z>\frac{-\ln(S_0/K)-(r-\frac12\sigma^2)T}{\sigma\sqrt T}=-d_2,\qquad
 By symmetry of the normal distribution, $\mathbb Q(Z>-x)=N(x)$:
 
 $$\text{Term B}=K\,\mathbb Q(S_T>K)=K\,N(d_2)$$
+
+**Variables:**
+
+- $S_T, S_0$ terminal and initial stock prices
+- $K, r, \sigma, T$ strike, risk-free rate, volatility, and maturity
+- $Z\sim N(0,1)$ standard normal variable under $\mathbb Q$
+- $d_2$ Black–Scholes moneyness term; $N(\cdot)$ standard normal CDF
 
 $N(d_2)$ is the risk-neutral probability that the call finishes in the money.
 
@@ -202,6 +245,7 @@ $$\text{Term A}=S_0e^{rT}\int_{-d_1}^{\infty}\phi(y)\,dy=S_0e^{rT}N(d_1),\qquad 
 
 **Variables:**
 
+- $S_0, r, \sigma, T$ initial stock price, risk-free rate, volatility, and maturity
 - $z$ integration variable (value of $Z$)
 - $y$ shifted integration variable
 - $d_1,d_2$ as in [[black-scholes-formula]] with $q=0$, $\tau=T$
@@ -221,8 +265,13 @@ $$\frac{d\mathbb Q^N}{d\mathbb Q}=\frac{N_T/B_T}{N_0/B_0}$$
 **Variables:**
 
 - $N_t$ numeraire asset price
-- $\mathbb Q^N$ measure associated with numeraire $N$
+- $\mathbb Q^N, \mathbb Q^S$ measure associated with numeraire $N$ (and stock numeraire $S$)
 - $B_t=e^{rt}$ money-market account ($B_0=1$), the numeraire of $\mathbb Q$
+- $S_t, S_T, S_0$ stock price at $t$, $T$, and $0$
+- $K, r, \sigma, T$ strike, risk-free rate, volatility, and maturity
+- $W_T^{\mathbb Q}, W_t^S$ standard Brownian motions under $\mathbb Q$ and $\mathbb Q^S$
+- $Z\sim N(0,1)$ standard normal variable under $\mathbb Q^S$
+- $d_1$ Black–Scholes $d_1$ term
 
 ✏️ Correction: the original notes wrote the density as a product $\frac{N_T}{B_T}\frac{N_0}{B_0}$; it is the ratio shown (it must equal 1 at $T=0$).
 
@@ -272,6 +321,13 @@ Putting Term A and Term B back into Step 4 recovers the Black–Scholes formula.
 
 ### Step 7 — Combine
 $$C_0=e^{-rT}\Big(S_0e^{rT}N(d_1)-K\,N(d_2)\Big)=S_0N(d_1)-Ke^{-rT}N(d_2)$$
+
+**Variables:**
+
+- $C_0, S_0, K, r, T$ call price at $t=0$, initial spot, strike, risk-free rate, and maturity
+- $d_1, d_2, N(\cdot)$ Black–Scholes moneyness terms and standard normal CDF
+
+**Notes:**
 
 - $S_0N(d_1)$ is the present value of receiving the stock when exercise occurs.
 - $Ke^{-rT}N(d_2)$ is the present value of paying $K$ when exercise occurs.

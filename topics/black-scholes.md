@@ -103,6 +103,7 @@ $$C=D\,[F\,N(d_1)-K\,N(d_2)],\qquad P=D\,[K\,N(-d_2)-F\,N(-d_1)],\qquad d_{1,2}=
 
 **Variables:**
 
+- $C, P$ European call and put prices
 - $D$ discount factor to expiry
 - $F$ forward price for expiry $T$
 - $K$ strike

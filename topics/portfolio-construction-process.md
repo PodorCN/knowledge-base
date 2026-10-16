@@ -118,9 +118,9 @@ $$TE=\sqrt{(w-b)^\top\Sigma\,(w-b)},\qquad IR=\frac{E[r_p-r_b]}{TE},\qquad E[r_p
 
 ### Worked example
 
-An illustrative investor has USD 10 million, a ten-year horizon, USD 400,000 of known payments over the next year and a 3% annual real return target net of fees. At assumed inflation of 2%, the corresponding nominal net target is **1.03 × 1.02 − 1 = 5.06%**. The known payments equal **4% of starting assets**, before adding any liquidity buffer. That 4% cash requirement is separate from the return target; it is not automatically an extra 4% return requirement.
-
-Specify a liquid payment reserve and stress buffer first, then assess how much risk the remaining assets can bear. The long horizon alone does not justify putting the whole portfolio into private assets. Separately, for a benchmark-relative mandate, a TE budget of 4% and expected IR of 0.5 imply expected active return of **0.5 × 4% = 2% per year**; neither return is guaranteed.
+An institutional endowment has USD 10 million, a 10-year horizon, USD 400,000 of scheduled distributions over the next year (4% of starting assets), and a 3% annual real return target net of fees. At 2% expected inflation, the required nominal net compound return is $1.03 \times 1.02 - 1 = \mathbf{5.06\%/\text{yr}}$.
+- **Liquidity carving:** Carve out the 4% near-term distribution plus a stress cash buffer in short-duration bills first; only the remaining capital can bear illiquidity or equity drawdown risk.
+- **Benchmark-relative translation:** For an active mandate with tracking-error budget $TE = 4\%$ and target $IR = 0.50$, expected active return is $E[r_p - r_b] = 0.50 \times 4\% = \mathbf{2.0\%/\text{yr}}$.
 
 ### Connections
 - **Builds on:** [[portfolio-construction-pipeline]] (stage 1), [[information-coefficient]].
@@ -132,40 +132,34 @@ Specify a liquid payment reserve and stress buffer first, then assess how much r
 ## Step 2: Forward-Looking Capital Market Assumptions
 <!-- section: capital-market-assumptions | prerequisites: [mandate-tracking-error, portfolio-variance-diversification, structural-risk-premia] | related: [covariance-estimation, black-litterman, carry-across-assets, strategic-multi-asset-allocation] | sources: [src-multi-asset-portfolio-framework] | tags: [capital-market-assumptions, expected-returns, multi-asset, scenarios] -->
 
-Capital market assumptions (CMAs) describe expected returns, volatilities, correlations and scenario behaviour for each investable asset class. They are forward-looking estimates over a stated horizon, with uncertainty, rather than a ranking of recent winners.
+Capital market assumptions (CMAs) specify forward-looking expected returns, volatilities, correlations, and scenario payoffs for each investable asset class over the mandate horizon, anchored by current yields and structural building blocks rather than trailing sample means.
 
 ### Definition
 
-A usable CMA set specifies the estimation date, investment horizon, base currency, currency-hedging policy, total-versus-excess return convention and treatment of fees. Estimates must be internally consistent across assets and with the mandate.
+A consistent CMA set fixes the estimation date, horizon, base currency, FX-hedging policy, excess-vs-total return convention, and fee basis across all asset classes.
 
 ### Key points
 
-| Asset class | Starting point for expected return | Main qualifications |
+| Asset class | Forward-looking building blocks | Key adjustments & pitfalls |
 |---|---|---|
-| Equities | Income yield, sustainable earnings growth and an explicit valuation-change assumption | Avoid extrapolating recent multiple expansion; be consistent about inflation, buybacks and per-share growth |
-| Government bonds | Starting yield, cash-flow reinvestment and the assumed path of the yield curve | Yield is an anchor, not a guaranteed holding-period return; duration creates mark-to-market risk ([[bond-duration]]) |
-| Credit | Government bond return plus spread income, less expected defaults, recoveries, migration and costs | A high quoted spread is not all excess return; credit risk can overlap with equity risk |
-| Real assets | Rental or operating income, growth, valuation changes and financing costs; for commodity futures, collateral return, spot changes and roll effects | Inflation sensitivity depends on the asset, financing and shock; property and infrastructure remain exposed to real rates |
-| Alternatives | Identify the underlying strategy, economic risk premium and manager contribution, then subtract fees and financing | Private equity, private credit, market-neutral strategies and trend following are not one homogeneous exposure |
-| Cash | Short-rate and reinvestment assumptions in the liability currency | Low price volatility does not remove inflation or long-run reinvestment risk |
-
-Use long historical samples to understand behaviour, current yields and valuations to anchor starting conditions, and economic reasoning to judge what can persist. Do not use a short sample mean as a precise long-run forecast; [[mean-variance-optimization]] explains why mean estimates are especially noisy. [[black-litterman]] provides one way to combine a prior with views and confidence.
-
-For the risk assumptions, align return frequency, calendars, currency treatment and horizons. Model the exposures the investor will actually hold: unhedged foreign bonds include FX risk, while a hedged estimate must reflect hedging costs. Appraisal-based private-asset returns can look artificially smooth; low reported volatility and correlation need not imply low economic risk. Detailed covariance estimation belongs in [[covariance-estimation]].
-
-Evaluate at least a base case, stronger growth, recession/disinflation, an inflation shock and a liquidity shock. Specify joint changes in growth, inflation, rates, spreads and market liquidity; do not combine individually convenient assumptions that are economically inconsistent. Scenario results are conditional outcomes, not probabilities unless probabilities have been explicitly modelled.
+| **Equities** | Cash payout yield (dividends + net buybacks) + real earnings growth + inflation + valuation multiple reversion | Do not extrapolate recent P/E expansion; adjust payout yield for net share issuance/buybacks ([[carry-across-assets]]). |
+| **Government bonds** | Starting yield-to-maturity + roll-down + expected yield-curve shift reinvestment | Starting yield anchors 7–10yr nominal returns, but duration creates mark-to-market loss when rates rise ([[bond-duration]]). |
+| **Credit (IG / HY)** | Government bond return + credit spread − $\text{PD}\times\text{LGD}$ (expected default + downgrade migration loss) − illiquidity cost | Quoted spread is an upper bound, not expected excess return; HY spread widens sharply during equity selloffs. |
+| **Real assets** | Net operating income yield + inflation pass-through − cap-rate expansion and leverage financing cost | Levered real estate and infrastructure carry heavy real-rate duration exposure in rising-rate regimes. |
+| **Alternatives** | Underlying factor risk premia + idiosyncratic manager alpha − management/performance fees and financing spread | Decompose private equity/credit into levered public beta + illiquidity premium; unsmooth appraisal returns before estimating $\Sigma$. |
+| **Cash** | Expected path of central-bank policy rate in the liability currency | Zero mark-to-market volatility, but high reinvestment and inflation erosion risk over long horizons. |
 
 ### Worked example
 
-Suppose illustrative annual **excess-return** assumptions are 5% for equities and 1% for government bonds, with annual volatilities of 16% and 6% and zero correlation. Using the formulas in [[portfolio-variance-diversification]], a 60/40 allocation has expected excess return **3.4%** and volatility **9.90%**. Compare an absolute nominal target with expected total return on a consistent basis, not directly with this excess return.
-
-Keeping the volatilities and weights fixed but changing correlation to +0.5 raises modelled volatility to **11.00%**. This is a sensitivity check, not an estimate that correlation will become +0.5; a full stress test would also change volatilities, asset returns and liquidity together.
+Suppose forward excess-return CMAs are $\mu_E = 5.0\%$ ($\sigma_E = 16\%$) for equities and $\mu_B = 1.0\%$ ($\sigma_B = 6\%$) for government bonds:
+- Under baseline correlation $\rho_{EB} = 0.0$, a 60/40 portfolio has expected excess return $0.6(5\%) + 0.4(1\%) = \mathbf{3.40\%}$ and volatility $\sqrt{(0.6\times 16\%)^2 + (0.4\times 6\%)^2} = \sqrt{92.16 + 5.76}\% = \mathbf{9.90\%}$ ([[portfolio-variance-diversification]]).
+- Under an inflation-shock regime where stock–bond correlation flips to $\rho_{EB} = +0.50$, portfolio volatility jumps to $\sqrt{97.92 + 2(0.5)(9.6)(2.4)}\% = \mathbf{11.00\%}$ even before accounting for higher standalone volatilities.
 
 ### Connections
 
 - **Builds on:** [[mandate-tracking-error]], [[portfolio-variance-diversification]], [[structural-risk-premia]].
 - **Used by:** [[strategic-multi-asset-allocation]], [[robust-allocation-refinement]].
-- **Related:** [[covariance-estimation]], [[black-litterman]], [[carry-across-assets]] (carry is one return component, not the entire forecast).
+- **Related:** [[covariance-estimation]], [[black-litterman]], [[carry-across-assets]].
 
 <a id="covariance-estimation"></a>
 
@@ -216,6 +210,7 @@ $$\big[(1-\sqrt q)^2,\ (1+\sqrt q)^2\big],\qquad q=\frac NT$$
 **Variables:**
 
 - $q$ ratio of assets to observations
+- $N$ number of assets; $T$ number of observations
 
 **Example (computed):** $N=500$, $T=1000$, $q=0.5$ → roughly $[0.086,\ 2.91]$ although every true eigenvalue is 1. The optimiser hunts for exactly the lucky low-variance directions (selection bias): it believes that portfolio's vol is $\sqrt{0.086}\approx0.29$ of the truth, so realised risk comes in about **3.4× higher** than predicted. $\Sigma^{-1}$ amplifies these directions — the "error maximiser" of [[mean-variance-optimization]].
 
@@ -231,7 +226,7 @@ $$\hat\Sigma=\delta F+(1-\delta)S$$
 - $\hat\Sigma$ shrunk estimate
 - $S$ sample covariance (unbiased, noisy)
 - $F$ structured target (biased, stable): e.g. constant correlation, single-factor model, or the diagonal of variances
-- $\delta\in[0,1]$ shrinkage intensity; Ledoit–Wolf give an analytical formula minimising expected (Frobenius) estimation error
+- $\delta\in[0,1]$ shrinkage intensity; Ledoit & Wolf (2004, *Journal of Multivariate Analysis*) give an analytical formula minimising expected Frobenius estimation error
 
 **Example (computed):** in the 3-stock case with $F=\mathrm{diag}(1,4,4)$ and $\delta=0.5$, the magic portfolio's variance becomes $0.5\times0+0.5\times(2^2\cdot1+1^2\cdot4+1^2\cdot4)=6$: no longer riskless, and $\hat\Sigma$ is invertible. In correlation terms: a sample correlation of 0.9 against an average of 0.3, shrunk with $\delta=0.5$, becomes 0.6. A bias–variance trade-off, the same idea as [[ridge-regression]].
 
@@ -251,15 +246,13 @@ The factor model $\Sigma=BFB^\top+D$ is defined in [[eigen-svd-psd]] ($B$ exposu
 ### Alpha–risk misalignment (Lee & Stefek 2008)
 **Symptom:** the optimiser keeps building a big position in an odd combination of stocks that looks low-risk.
 
-**Cause:** part of the alpha lies outside the span of the risk model's factors. The optimiser prices that part only by the small specific variance $D$, treats it as nearly risk-free and levers it up. The other usual cause is an underestimated small eigenvalue.
+**Cause:** part of the alpha lies outside the span of the risk model's factors ($\alpha = B\alpha_F + \alpha_\perp$). The optimiser prices the orthogonal component $\alpha_\perp$ only by the small specific variance $D$, treats an unmodelled common factor as diversifiable idiosyncratic noise, and levers it up (Lee & Stefek 2008, *"Do Risk Factors Eat Alpha?"*, *Journal of Portfolio Management*, 34(4), 12–24).
 
 **Fixes:**
 
-- Add an "alpha factor" to the risk model, or penalise the component of $\alpha$ the factors don't span.
+- Add the missing systematic driver (or an explicit "alpha factor") to the risk model, or penalise the residual component $\alpha_\perp$ not spanned by $B$.
 - Constrain exposure along the misaligned direction.
 - Inspect the eigen-portfolios behind the position ([[pca]]).
-
-(Reference cited from memory — verify.)
 
 ### Interview answer
 *"No. With 250 observations the sample covariance has rank at most 249, so for 500 stocks it is singular: hundreds of long-short portfolios had exactly zero variance in-sample and the optimiser would treat them as arbitrage. Even with more data than assets, the smallest eigenvalues are biased down and the optimiser loads onto exactly those directions, so realised risk comes in well above predicted. I'd use a factor risk model, or Ledoit–Wolf shrinkage toward a structured target."*
@@ -274,36 +267,23 @@ The factor model $\Sigma=BFB^\top+D$ is defined in [[eigen-svd-psd]] ($B$ exposu
 ## Step 3: Strategic Asset Allocation & Risk-Factor Diversification
 <!-- section: strategic-multi-asset-allocation | prerequisites: [capital-market-assumptions, covariance-estimation, risk-contribution, risk-budgeting] | related: [risk-on-risk-off, portfolio-variance-diversification, robust-allocation-refinement, bond-duration] | sources: [src-multi-asset-portfolio-framework] | tags: [strategic-allocation, multi-asset, diversification, factors] -->
 
-Strategic asset allocation (SAA) is the long-run combination of asset classes designed to meet the mandate. Diversification depends on the underlying economic exposures and their joint behaviour, as well as on the number of asset-class labels.
+Strategic asset allocation (SAA) establishes long-run policy weights and risk budgets across asset classes, while tactical asset allocation (TAA) takes bounded deviations within delegated tracking-error limits. True diversification requires looking through asset-class labels to underlying **macroeconomic risk factors**.
 
-### Definition
+### Asset sleeves vs underlying factor exposures
 
-The **strategic allocation** sets policy weights and permitted ranges. **Tactical asset allocation** takes shorter-term deviations based on views, within delegated risk limits. **Security or manager selection** chooses how each allocation is implemented. Keeping these decisions distinct makes their risks and results easier to attribute.
-
-### Key points
-
-| Sleeve | Intended portfolio role | Exposure to check |
+| Sleeve | Primary Portfolio Role | Underlying Factor Exposures to Audit |
 |---|---|---|
-| Global equities | Long-run growth and participation in corporate profits | Growth, equity beta, geography, sectors, valuation and FX |
-| High-quality government bonds | Contractual income, liability matching and possible recession protection | Duration, real rates, inflation and sovereign quality; nominal bonds can lose during an inflation shock |
-| Investment-grade and high-yield credit | Income and credit risk premium | Spread and default risk, duration and liquidity; high yield often shares growth exposure with equities |
-| Inflation-linked bonds and real assets | Exposure suited to inflation-linked needs and selected real cash flows | Linker real-rate duration; property financing and valuations; commodity-specific supply and demand |
-| Alternative strategies | Additional return sources or risk diversification where supported by evidence | Hidden equity or credit beta, leverage, short-volatility exposure, manager risk and redemption terms |
-| Cash and short-term instruments | Payments, collateral and capacity to rebalance under stress | Currency matching, counterparty exposure and inflation erosion |
+| **Global equities** | Long-run real growth & corporate profit participation | Growth beta, equity vol, valuation duration, FX |
+| **Nominal government bonds** | Deflation/recession hedge & liability duration matching | Real rates, breakeven inflation (loses alongside equities in supply/inflation shocks, [[risk-on-risk-off]]) |
+| **IG & HY credit** | Carry & credit risk premium | Corporate default/spread beta ($\sim 0.5\text{–}0.7$ correlated with equity drawdown + illiquidity) |
+| **TIPS & real assets** | Inflation protection & real cash-flow matching | Real-rate duration (TIPS), cap-rate/financing sensitivity (REITs/infrastructure), spot supply shocks (commodities) |
+| **Liquid alternatives / Trend** | Uncorrelated alpha & convex crisis diversification | Hidden equity/credit beta, short-volatility tail skew, leverage financing risk |
+| **Cash & T-bills** | Liquidity reserve, margin collateral & dry powder | Reinvestment risk, negative real carry under high inflation |
 
-Start from the required roles: fund liabilities and liquidity, then allocate the risk-bearing capital among return sources. Assess global equity diversification by region, sector and style; assess bonds by duration, issuer quality and currency rather than treating every bond as defensive. A policy benchmark should represent this long-run allocation, not be chosen afterward to flatter realised results.
-
-Look through fund labels to **risk factors**: equity/growth risk, nominal and real-rate duration, credit spreads, inflation, currency, liquidity and style premia such as value, momentum and carry ([[structural-risk-premia]]). A portfolio with public equities, private equity, high-yield bonds and private credit may still make one large bet on growth and easy financing. A market-neutral label likewise does not establish neutrality to all factors ([[exposure-neutrality]]).
-
-Use asset and factor risk contributions to identify concentration ([[risk-contribution]]). Factor exposures show sensitivity to a driver; risk contributions additionally depend on driver volatility and covariance. Equal capital weights therefore do not imply equal risk, and asset-level risk parity does not automatically imply factor-level diversification.
-
-Test the combination across regimes. Government duration can help in a recession with falling inflation, yet nominal bonds and equities can both fall when inflation pushes rates up. The risk-on/risk-off framework ([[risk-on-risk-off]]) is useful, but correlations and the identity of the defensive assets depend on the shock. No asset is a universal hedge.
-
-### Worked example
-
-With the illustrative 60/40 equity–government-bond allocation, volatilities of 16% and 6%, and zero correlation from [[capital-market-assumptions]], weighted volatilities are **9.6%** and **2.4%**. Applying [[risk-contribution]], equities contribute **94.12% of portfolio volatility risk** and bonds **5.88%**. The allocation is balanced by capital far more than by modelled risk.
-
-Under the same two-asset assumptions, equal risk contributions would require equity weight **6 / (16 + 6) = 27.27%** and bond weight **72.73%**. This illustrates risk budgeting, not a recommended allocation: expected return, liability needs, duration concentration and financing constraints must still be checked. Adding an illiquid equity fund would not automatically solve the original growth-risk concentration.
+### Capital weights vs risk contributions (60/40 vs Risk Parity)
+Using the 2-asset CMAs from [[capital-market-assumptions]] ($\sigma_E = 16\%, \sigma_B = 6\%, \rho_{EB} = 0$) and the Euler decomposition in [[risk-contribution]] ($\%RC_i = w_i^2 \sigma_i^2 / \sigma_p^2$ when $\rho=0$):
+- **Traditional 60/40 capital allocation:** $w_E \sigma_E = 9.6\%$, $w_B \sigma_B = 2.4\%$, $\sigma_p = 9.90\%$. Equities account for $9.6^2 / (9.6^2 + 2.4^2) = \mathbf{94.12\%}$ of portfolio variance (and volatility risk contribution), while bonds contribute only **5.88%**.
+- **Unlevered 2-asset Risk Parity ([[risk-budgeting]]):** Equalising risk contributions ($w_E \sigma_E = w_B \sigma_B$) sets $w_E = \frac{6}{16+6} = \mathbf{27.27\%}$ and $w_B = \mathbf{72.73\%}$. To restore equity-like expected returns without equity concentration, institutional risk-parity books apply portfolio-level leverage (via futures/repos) to the 27/73 mix—which introduces **funding liquidity risk** and **positive stock–bond correlation risk** (as in 2022 when both legs fell simultaneously).
 
 ### Connections
 
@@ -316,36 +296,20 @@ Under the same two-asset assumptions, equal risk contributions would require equ
 ## Step 4: Robust Optimisation & Allocation Refinement
 <!-- section: robust-allocation-refinement | prerequisites: [strategic-multi-asset-allocation, mean-variance-optimization, constraints-shadow-prices, risk-budgeting] | related: [black-litterman, covariance-estimation, transaction-costs-no-trade, portfolio-validation-attribution, optimiser-infeasibility] | sources: [src-multi-asset-portfolio-framework] | tags: [robustness, optimisation, uncertainty, risk-budgeting] -->
 
-Optimisation refines a policy allocation into feasible weights, using an objective aligned with the mandate. The useful result is an allocation whose behaviour remains acceptable under uncertain inputs and realistic trading conditions, rather than a precise maximum built on fragile estimates.
+Choosing an allocation rule depends on which input you trust more: expected returns ($\mu$), the covariance matrix ($\Sigma$), or a market-equilibrium prior ($w_{\mathrm{eq}}$).
 
-### Definition
+### Choosing the construction framework
 
-**Constrained mean–variance optimisation** trades expected return against risk within a feasible set ([[mean-variance-optimization]]). **Risk budgeting** instead sets desired risk contributions and solves for the weights ([[risk-budgeting]]). Both need a credible risk model; they express different starting objectives rather than interchangeable definitions of an optimal portfolio.
+| Framework | Required Inputs | When to Use | Primary Failure Mode & Safeguard |
+|---|---|---|---|
+| **Constrained MVO** ([[mean-variance-optimization]]) | $\alpha$ (or $\mu$), $\hat\Sigma$, linear/quadratic constraints | High-breadth cross-sectional signals or explicit active-risk mandates | Amplifies $\mu$ estimation error into corner weights; requires shrunk $\hat\Sigma$, Grinold scaling $\alpha = \sigma\cdot IC\cdot z$, and box/sector bounds ([[constraints-shadow-prices]]). |
+| **Black–Litterman** ([[black-litterman]]) | Market-cap prior $\Pi = \gamma\Sigma w_{\mathrm{mkt}}$, views $P, Q$, uncertainty $\Omega$ | Multi-asset SAA/TAA with a few macro or relative views | Sensitive to $\tau$ and view confidence $\Omega$; audit implied posterior tilts against view conviction. |
+| **Risk Budgeting / ERC** ([[risk-budgeting]]) | $\hat\Sigma$ and risk budgets $b_i$ (no $\mu$ required) | Strategic asset allocation when mean return forecasts have low power | Concentrates capital in low-vol duration assets; vulnerable to synchronous rate + equity selloffs. |
+| **1/N or Policy Baseline** | Universe definition only | Benchmark baseline & sanity check | Ignores valuation and volatility shifts; any complex optimiser must beat $1/N$ net of costs out-of-sample. |
 
-### Key points
-
-| Approach | When it helps | Main limitation and safeguard |
-|---|---|---|
-| Constrained mean–variance | Credible return forecasts and a clear risk–return trade-off | Sensitive to means and covariance; shrink inputs and impose economically justified limits |
-| Risk budgeting | The investor can state desired risk shares more confidently than expected returns | Avoids estimating means but still depends on covariance; can concentrate capital in low-volatility duration assets |
-| Black–Litterman | A defensible prior plus explicit investment views | The prior, covariance and view confidence remain assumptions; inspect the resulting tilts ([[black-litterman]]) |
-| Simple policy or equal-weight baseline | Transparent comparison requiring few estimated inputs | Ignores some economic differences; use it to establish whether added complexity earns its cost |
-
-The operational objective in [[portfolio-construction-pipeline]] already includes return, risk and trading costs. For an absolute mandate use total portfolio risk; for a benchmark-relative mandate use active risk but retain any required total-risk controls. For a liability-aware mandate also test funding and cash-flow outcomes: an asset-only variance minimum may not minimise the investor's shortfall risk.
-
-Translate the IPS into constraints: budget and allocation ranges, concentration, leverage, factor exposures, liquidity, turnover and permitted instruments. Separate binding legal or contractual limits from preferences. Soft penalties can express preferences, but should never silently relax a binding investment restriction. If constraints conflict, diagnose the conflict using [[optimiser-infeasibility]].
-
-Address **estimation uncertainty** by shrinking covariance ([[covariance-estimation]]), using cautious return estimates or a prior, and solving under alternative assumptions. Constraints and turnover penalties can stabilise weights ([[constraints-shadow-prices]], [[transaction-costs-no-trade]]). Inspect how much the recommendation changes when expected returns, correlations, costs and starting weights are perturbed; a large weight change from a small forecast change needs an economic explanation.
-
-Address **implementation uncertainty** by including spreads, impact, fees, taxes where applicable, financing and currency hedging on consistent horizons. A one-off trading cost must not be compared directly with an annual expected benefit without allowing for the intended holding period. Private assets also need commitment schedules, capital-call reserves, redemption restrictions and uncertain exit values; a daily turnover constraint alone cannot describe them.
-
-Compare feasible candidates on expected net return, risk contributions, concentration, stress losses, liquidity and stability. Optimisation does not eliminate the trade-offs: the highest estimated Sharpe portfolio may violate the spending objective or require a degree of forecast confidence that the investor does not have.
-
-### Worked example
-
-Suppose a small increase in the estimated return of one equity region moves a candidate allocation from 40% to 80% in that region. Re-estimate with a more cautious return, apply the agreed concentration cap, and compare against the original policy allocation. If the supposed advantage disappears after plausible estimation changes or trading costs, the extreme tilt is poorly supported; a high in-sample objective value alone does not justify it.
-
-The 27.27/72.73 equal-risk allocation in [[strategic-multi-asset-allocation]] is another candidate to assess, not a final answer. It can diversify the two modelled asset risks while leaving an unacceptable concentration in nominal duration or an insufficient expected return. Record which mandate requirements determine the final choice.
+### Perturbation & sensitivity stress check
+Before signing off on optimised weights $w^*$, perturb expected returns by $\pm 1\text{ SE}$ and correlations by $+0.20$:
+- If a $+50\text{ bps}$ tweak to one regional equity forecast flips the allocation from $40\%$ to $80\%$, the solution is driven by near-collinear covariance directions rather than genuine alpha. Apply shrinkage ([[covariance-estimation]]), Bayesian prior pulling ([[black-litterman]]), or explicit concentration caps.
 
 ### Connections
 
@@ -360,24 +324,16 @@ The 27.27/72.73 equal-risk allocation in [[strategic-multi-asset-allocation]] is
 
 Linear costs (spread, commission) create a no-trade band: trade only when the marginal alpha beats the marginal cost, and then only to the edge of the band. Market impact grows faster than linearly in trade size, so the optimiser spreads trades out. Across periods, trade partially toward an aim portfolio.
 
-### Key points: putting the allocation into the market
+### Rebalancing policy & drift triggers
 
-Choose instruments for the intended exposure, all-in costs, capacity and operational requirements. ETFs or pooled funds may be suitable for liquid beta; direct bonds can support cash-flow matching; futures and currency forwards can efficiently adjust exposures but require margin, collateral, rolls and funding. Manager selection adds fees, style drift and due-diligence considerations. Verify the exposures after choosing the instrument, not just its marketing category.
-
-Before trading, check mandate compliance, cash and collateral, current holdings, risk contributions, liquidity and executable trade sizes. Plan execution around market depth and participation limits. Where implementing gradually, monitor the temporary allocation and transition risk as well as the final target. Reconcile positions and cash after execution and compare realised costs with the estimates.
-
-### Rebalancing policy
-
-| Rule | Purpose | Trade-off |
+| Rebalancing Rule | Mechanism | Trade-off |
 |---|---|---|
-| Calendar review | Assess drift and assumptions on a regular schedule | Review need not mean trade; automatic full resets can create unnecessary costs |
-| Weight bands | Trade when a sleeve leaves its agreed allocation range | Responds to drift, but the band width must reflect costs and mandate limits |
-| Risk or liquidity triggers | Respond to excessive factor concentration, risk contributions, collateral needs or insufficient liquid reserves | These can require action even when capital weights remain close to target |
-| Cash-flow rebalancing | Direct contributions, distributions and withdrawals toward restoring the allocation | Reduces trading, but cash flows may be insufficient to correct a breach |
+| **Calendar schedule** | Review monthly/quarterly on a fixed clock | Predictable operations, but blind to intra-period crashes or unnecessary when drift is tiny. |
+| **No-trade weight bands** | Trade only when $|w_i - w_i^*| > \Delta_i$ (and trade to the band edge, not the center) | Optimal under proportional transaction costs ($\Delta_i = \kappa_i / (\gamma\sigma_i^2)$). |
+| **Risk / factor triggers** | Rebalance when active tracking error $TE$ or factor $\%RC$ breaches limit | Captures volatility spikes even when capital weights look unchanged. |
+| **Cash-flow routing** | Direct inflows, dividends, and withdrawals toward underweight sleeves | Zero extra spread cost, though insufficient during large market dislocations. |
 
-Specify both the trigger and the destination: rebalance to the target, to the permitted boundary or part of the way, depending on the rule and costs. Distinguish **rebalancing back to policy** from **changing policy** after a revised mandate or structural assumption; a market fall alone does not establish that the strategic allocation is wrong.
-
-**Example (illustrative, computed):** a 60/40 portfolio with equities up 20% and bonds unchanged drifts to equity weight **0.72 / 1.12 = 64.29%**, assuming no cash flows. A 55–65% equity band would not trigger on weights alone; a risk or collateral trigger might still do so. The no-trade model below explains why costs can justify tolerating some deviation.
+**Example (computed):** A 60/40 portfolio where equities rally $+20\%$ and bonds return $0\%$ drifts to equity weight $0.72 / 1.12 = \mathbf{64.29\%}$. Under a $\pm 5\%$ weight band ($[55\%, 65\%]$), no trade is triggered by capital weight alone, though if equity volatility simultaneously spiked from $16\%$ to $24\%$, a risk-contribution trigger would fire.
 
 ### Formula: linear costs, one asset
 $$\max_w\ \alpha w-\frac{\gamma}{2}\sigma^2w^2-\kappa\,|w-w_0|\ \Rightarrow\ w^{\text{new}}=\begin{cases}\bar w-\dfrac{\kappa}{\gamma\sigma^2}, & w_0<\bar w-\dfrac{\kappa}{\gamma\sigma^2}\ \text{(buy to the lower edge)}\\[2mm] w_0, & w_0\ \text{inside the band (no trade)}\\[2mm] \bar w+\dfrac{\kappa}{\gamma\sigma^2}, & w_0>\bar w+\dfrac{\kappa}{\gamma\sigma^2}\ \text{(sell to the upper edge)}\end{cases}$$
@@ -408,11 +364,11 @@ $$\text{impact per share}\approx Y\,\sigma_d\sqrt{\frac{Q}{V}},\qquad \text{tota
 
 **Variables:**
 
-- $Y$ constant, empirically of order 1 (calibrate on your own fills; cited from memory — verify)
+- $Y$ dimensionless impact constant of order unity ($Y \approx 0.5\text{–}1.0$, calibrated to execution fills; Almgren et al. 2005, *Risk*)
 - $\sigma_d$ daily volatility
 - $Q$ shares traded; $V$ average daily volume (ADV)
 
-**Example (computed):** $\sigma_d=2\%$: trading 1% of ADV costs about $2\%\times\sqrt{0.01}=20$ bp; 10% of ADV about $2\%\times\sqrt{0.1}\approx63$ bp. A 10× larger trade costs about 3.2× more per share.
+**Example (computed):** $\sigma_d=2\%$, $Y=1$: trading 1% of ADV costs about $2\%\times\sqrt{0.01}=20$ bp; 10% of ADV about $2\%\times\sqrt{0.1}\approx63$ bp. A 10× larger trade costs about 3.2× more per share.
 
 **Notes:**
 
@@ -421,7 +377,7 @@ $$\text{impact per share}\approx Y\,\sigma_d\sqrt{\frac{Q}{V}},\qquad \text{tota
 - The cost term is often multiplied by a cost aversion $\lambda>1$ tuned in backtests — the cost model has errors too, so overestimating is safer.
 
 ### Multi-period: Gârleanu & Pedersen (2013)
-*Dynamic Trading with Predictable Returns and Transaction Costs* (qualitative form; check the paper for exact coefficients):
+*Dynamic Trading with Predictable Returns and Transaction Costs* (*Journal of Finance*, 68(6), 2309–2340):
 
 $$x_t=x_{t-1}+\tau\,(\text{aim}_t-x_{t-1}),\qquad 0<\tau<1$$
 
@@ -446,35 +402,16 @@ $$x_t=x_{t-1}+\tau\,(\text{aim}_t-x_{t-1}),\qquad 0<\tau<1$$
 ## Step 5 Continued: Monitoring, Stress Tests & Attribution
 <!-- section: portfolio-validation-attribution | prerequisites: [backtest-pitfalls, sharpe-ratio, portfolio-construction-pipeline] | related: [covariance-estimation, transaction-costs-no-trade, risk-contribution, minimum-variance-portfolio, risk-budgeting] | sources: [src-portopt-pm-interview, src-multi-asset-portfolio-framework] | tags: [validation, 1-over-n, bias-statistic, attribution, out-of-sample] -->
 
-Monitoring checks whether the implemented portfolio still serves the mandate and whether the assumptions remain credible. An optimiser earns its place through out-of-sample evidence, net of costs; estimation error often eats the theoretical gain, so sample-based mean–variance can fail to beat 1/N.
+Post-trade monitoring reconciles ex-ante forecasts against realised risk, attributes active returns into factor vs idiosyncratic components, and tests whether complex optimisation beats simple heuristics net of costs out-of-sample.
 
-### Key points: the ongoing monitoring dashboard
+### Ongoing monitoring & stress-testing matrix
 
-| Monitor | Interpretation and response |
-|---|---|
-| Performance against objectives and policy benchmark | Separate market movements, policy allocation, tactical tilts, manager/security selection and implementation costs; compare on the same currency and fee basis |
-| Forecast versus realised risk | Compare volatility and tracking error with forecasts; persistent under-forecasting calls for risk-model review, not simply a larger risk budget |
-| Asset and factor risk contributions | Identify changes in equity, duration, spread, inflation, FX and style concentration; weights can stay constant while risk changes ([[risk-contribution]]) |
-| Drawdown, tail loss and stress losses | Check the investor's loss capacity and shortfall exposure using [[risk-measures]] and explicit scenarios; volatility alone does not summarise the tails |
-| Liquidity and collateral | Track available cash, cash-flow coverage, redemption terms and time to liquidate under stressed market depth; include future capital calls |
-| Costs and implementation | Check turnover, realised slippage, fees, financing and hedge costs against assumptions; reconcile holdings with the intended exposures |
-| Governance | Set reporting frequency, breach thresholds, responsible decision makers and an escalation procedure; record changes to assumptions and policy |
-
-Review assumptions and policy on a planned schedule, with event-driven checks for material changes in liabilities, liquidity or market structure. Respond to breaches using the agreed rules; do not continually retune weights to the latest winning backtest.
-
-### Stress testing across economic environments
-
-| Scenario | Joint shocks to consider | Portfolio question |
+| Regime / Diagnostic | Joint Shock / Metric | Portfolio Action & Governance |
 |---|---|---|
-| Recession with disinflation | Equities fall, credit spreads widen, government yields may fall | Does high-quality duration offset enough growth risk to preserve required liquidity? |
-| Inflation shock | Nominal yields rise, equity valuations compress, stock–bond correlation may turn positive | How much protection comes from inflation-linked exposure after allowing for real-rate moves? |
-| Credit and liquidity crisis | Spreads widen, market depth falls, redemptions and collateral needs increase | Can the portfolio fund obligations without distressed sales? |
-| Currency shock | Liability currency appreciates or depreciates and hedging costs change | Does the currency policy protect the obligations it was designed to cover? |
-| Persistent range-bound markets | Trend signals reverse frequently and trading costs accumulate | Can an alternative sleeve endure its own adverse environment? |
-
-Use historical episodes to understand known combinations and hypothetical shocks for risks absent from the sample. Shocks should be joint and internally plausible. Revalue instruments with nonlinear payoffs rather than extrapolating a small-move sensitivity ([[scenario-risk-grids]]). A **reverse stress test** starts with a failure, such as an unmanageable funding shortfall, and asks which combination of market and liquidity shocks could produce it; it does not estimate that event's probability.
-
-**Example (illustrative, computed):** if equities lose 15% and nominal government bonds lose 10% over the same stress horizon, the 60/40 portfolio loses **0.6 × 15% + 0.4 × 10% = 13%**, before costs, rebalancing and cash flows. This is a conditional single-period loss, not a forecast, an annual volatility or a maximum drawdown estimate. Check whether the investor can absorb it and still meet payments, including any collateral needs.
+| **Recession / Disinflation** | Equities $-20\%$, HY spreads $+300\text{ bps}$, nominal yields $-100\text{ bps}$ | Verify whether sovereign duration offsets growth and credit drawdowns without breaching liquidity reserves. |
+| **Inflation / Rate Shock (2022-style)** | Nominal yields $+200\text{ bps}$, equities $-15\%$, $\rho_{EB} > +0.5$ | Standard 60/40 loses $0.6(-15\%) + 0.4(-10\%) = -13\%$ simultaneously; requires TIPS, commodities, or short-duration tilts. |
+| **Liquidity & Collateral Stress** | Bid-ask spreads $3\times$, FX/futures variation margin calls, private capital calls | Run **reverse stress test**: find the smallest joint shock that exhausts unencumbered cash buffers. |
+| **Performance Attribution** | Brinson allocation/selection (multi-asset) or factor + specific + cost decomposition (quant equity) | Separate whether P&L came from intended alpha, unhedged factor drift, or lower/higher execution slippage. |
 
 ### Benchmarks to beat
 
@@ -485,7 +422,7 @@ Use historical episodes to understand known combinations and hypothetical shocks
 | Inverse-vol / risk parity | vols (and correlations) | [[risk-budgeting]] |
 | Global minimum variance | $\Sigma$ only | [[minimum-variance-portfolio]] |
 
-**DeMiguel, Garlappi & Uppal (2009),** *Optimal Versus Naive Diversification*, Review of Financial Studies: 14 optimisation models generally failed to beat 1/N out-of-sample; for 25 assets, sample-based MVO would need about 3,000 months of data to beat it (cited from memory — verify the figures before quoting).
+**DeMiguel, Garlappi & Uppal (2009),** *"Optimal Versus Naive Diversification: How Inefficient is the 1/N Portfolio Strategy?"*, *Review of Financial Studies*, 22(5), 1915–1953: across 14 optimisation models and 7 empirical datasets, sample-based MVO generally failed to beat $1/N$ out-of-sample in Sharpe ratio or certainty-equivalent return; for $N = 25$ assets, sample MVO requires a critical estimation window of ~3,000 months (~250 years) to outperform $1/N$ (~6,000 months for $N = 50$).
 
 ### Formula: risk-model bias statistic
 $$b=\mathrm{std}_t\!\left(\frac{r_t}{\hat\sigma_{t-1}}\right)\approx1$$

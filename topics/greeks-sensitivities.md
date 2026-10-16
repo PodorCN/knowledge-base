@@ -104,7 +104,9 @@ $$\Delta\approx\frac{V(S+\delta S)-V(S-\delta S)}{2\,\delta S},\qquad \Gamma\app
 
 **Variables:**
 
-- $V(\cdot)$ pricer evaluated at a bumped spot
+- $\Delta, \Gamma$ finite-difference delta and gamma
+- $V(\cdot)$ pricer evaluated at spot $S$ or bumped spot $S\pm\delta S$
+- $S$ current spot price
 - $\delta S$ bump size (~1% of spot)
 
 ### Key points

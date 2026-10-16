@@ -359,18 +359,19 @@ is_psd = np.linalg.eigvalsh(Sigma).min() >= -1e-10
 np.linalg.cholesky(Sigma)   # raises LinAlgError if not PD
 ```
 
-Fixes: eigenvalue clipping ($V\,\mathrm{diag}(\max(\lambda,\epsilon))\,V^\top$); nearest correlation matrix (Higham; MATLAB `nearcorr` — verify); Ledoit–Wolf shrinkage; a factor model, which is PD by construction:
+Fixes: eigenvalue clipping ($V\,\mathrm{diag}(\max(\lambda,\epsilon))\,V^\top$); nearest correlation matrix via Higham (2002) alternating projections (`nearcorr` in MATLAB Financial Toolbox); Ledoit–Wolf shrinkage; or a factor model, which is PD by construction:
 
 $$\Sigma=BFB^\top+D$$
 
 **Variables:**
 
+- $\Sigma$ $N\times N$ asset covariance matrix
 - $B$ $N\times K$ matrix of factor exposures
 - $F$ $K\times K$ factor covariance
 - $D$ diagonal matrix of specific (idiosyncratic) variances
 - $K$ number of factors
 
-The sample Σ is noisy and singular when $N>T$; the factor model has far fewer parameters, is PD by construction, and gives an interpretable risk decomposition. Alternative: Ledoit–Wolf shrinkage.
+The sample $\Sigma$ is noisy and singular when $N>T$; the factor model has far fewer parameters, is PD by construction, and gives an interpretable risk decomposition. Alternative: Ledoit–Wolf shrinkage.
 
 ### Connections
 - **Used by:** [[pca]] (eigenvectors of $\Sigma$), [[multicollinearity]] (small eigenvalues of $X^\top X$), [[portfolio-variance-diversification]] (valid correlation matrices), [[mean-variance-optimization]] (inverting $\Sigma$ amplifies small-eigenvalue noise), [[matlab-optimization-solvers]] (convexity of the QP).

@@ -13,7 +13,7 @@ A pricing application has to absorb new products, new models and monthly library
 
 **Leads to:** [[csharp-dotnet]] (the language); back to [[model-risk-governance]] (the controls the release and reconciliation procedures implement).
 
-**Sections:** [[oop-pillars]] · [[solid-principles]] · [[design-patterns-pricing]] · [[pricing-app-architecture]] · [[model-release-regression-testing]] · [[price-reconciliation]] · [[floyd-cycle-detection]]
+**Sections:** [[oop-pillars]] · [[solid-principles]] · [[design-patterns-pricing]] · [[pricing-app-architecture]] · [[model-release-regression-testing]] · [[price-reconciliation]] · [[floyd-cycle-detection]] · [[online-algorithms-rolling-stats]]
 
 <a id="oop-pillars"></a>
 
@@ -148,7 +148,7 @@ When two systems price the same trade differently, isolate the cause before touc
 <a id="floyd-cycle-detection"></a>
 
 ## Floyd's Cycle Detection (tortoise & hare)
-<!-- section: floyd-cycle-detection | prerequisites: [] | related: [] | sources: [src-rbc-quantdev-prep, src-rbc-gam-quantdev-notes] | tags: [algorithms, linked-list] -->
+<!-- section: floyd-cycle-detection | prerequisites: [] | related: [online-algorithms-rolling-stats] | sources: [src-rbc-quantdev-prep, src-rbc-gam-quantdev-notes] | tags: [algorithms, linked-list] -->
 
 Detect whether a linked list contains a cycle using two pointers moving at different speeds.
 
@@ -167,3 +167,52 @@ def has_cycle(head):
         if slow is fast: return True
     return False
 ```
+
+<a id="online-algorithms-rolling-stats"></a>
+
+## Streaming & Rolling Window Algorithms (Welford, Monotonic Deque, Two Heaps)
+<!-- section: online-algorithms-rolling-stats | prerequisites: [variance-covariance-correlation] | related: [floyd-cycle-detection, csharp-essentials] | sources: [src-rbc-quantdev-prep, src-squarepoint-dqa-workbook] | tags: [welford, streaming, rolling-window, algorithms] -->
+
+In tick-data and signal pipelines, recomputing statistics over a lookback window of length $W$ from scratch takes $O(W)$ per tick and suffers catastrophic floating-point cancellation when subtracting $\bar x^2$ from $\overline{x^2}$. Streaming algorithms update mean/variance, extrema, and quantiles in $O(1)$ or $O(\log W)$ per tick.
+
+### Formula
+$$\text{Welford online update (observation }x_n\text{):}\quad \delta_n = x_n - \mu_{n-1},\quad \mu_n = \mu_{n-1} + \frac{\delta_n}{n},\quad M_{2,n} = M_{2,n-1} + \delta_n(x_n - \mu_n),\quad s_n^2 = \frac{M_{2,n}}{n-1}$$
+$$\text{Parallel / chunk merge }(A, B \to AB):\quad \delta = \mu_B - \mu_A,\quad \mu_{AB} = \mu_A + \frac{n_B}{n_A+n_B}\delta,\quad M_{2,AB} = M_{2,A} + M_{2,B} + \delta^2\frac{n_A n_B}{n_A+n_B}$$
+
+**Variables:**
+
+- $x_n$ $n$-th streaming observation ($n$: sample count)
+- $\mu_n, \mu_{n-1}$ running sample mean after $n$ and $n-1$ observations
+- $\delta_n = x_n - \mu_{n-1}$ pre-update deviation from the old mean; $x_n - \mu_n$ post-update deviation from the new mean
+- $M_{2,n} = \sum_{i=1}^n (x_i - \mu_n)^2$ running sum of squared deviations; $s_n^2$ unbiased sample variance
+- $n_A, \mu_A, M_{2,A}$ and $n_B, \mu_B, M_{2,B}$ count, mean, and sum of squares of two disjoint chunks $A$ and $B$ ($\delta = \mu_B - \mu_A$)
+
+### Standard streaming patterns in quant interviews
+
+| Problem | Naive per-tick cost | Optimal data structure & per-tick cost | Why it matters in finance |
+|---|---|---|---|
+| **Running / rolling mean & variance** | $O(W)$ or unstable $\sum x_i^2 - n\bar x^2$ | **Welford's algorithm** (ring buffer for rolling window): $O(1)$ time, $O(1)$ or $O(W)$ space | Naive $E[X^2]-E[X]^2$ loses all precision when $\sigma \ll |\mu|$ (e.g. price levels around $5000.00$ with $0.01$ ticks). Parallel chunk merge combines Monte Carlo thread statistics cleanly. |
+| **Rolling window min / max** (e.g. rolling high/low or drawdown over $W$ ticks) | $O(W)$ scan | **Monotonic deque** of indices: amortised $O(1)$ time, $O(W)$ space | Each index enters and leaves the deque at most once; front of deque is always the current window max/min. |
+| **Streaming median / quantiles** | $O(W\log W)$ sort | **Two heaps** (max-heap for lower half, min-heap for upper half; lazy deletion for rolling window): $O(\log W)$ time | Real-time robust mid-price / spread filtering and rolling quantile signals. |
+
+### Code (Welford online & rolling window in Python)
+```python
+class WelfordRunningStats:
+    def __init__(self):
+        self.n = 0
+        self.mean = 0.0
+        self.M2 = 0.0
+
+    def update(self, x: float) -> None:
+        self.n += 1
+        delta = x - self.mean
+        self.mean += delta / self.n
+        self.M2 += delta * (x - self.mean)
+
+    @property
+    def variance(self) -> float:
+        return self.M2 / (self.n - 1) if self.n > 1 else 0.0
+```
+
+### Connections
+- **Builds on:** [[variance-covariance-correlation]]. **Used in:** [[monte-carlo-pricing]] (parallel path aggregation), [[csharp-essentials]] (zero-allocation ring buffers).

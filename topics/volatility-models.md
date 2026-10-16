@@ -94,12 +94,29 @@ $$dS_t=(r-q)S_t\,dt+\sqrt{v_t}\,S_t\,dW^S_t,\qquad dv_t=\kappa(\bar v-v_t)\,dt+\
 ## Jump-Diffusion (Merton, Bates)
 <!-- section: jump-diffusion | prerequisites: [geometric-brownian-motion, exponential-poisson-process] | related: [heston-model, volatility-skew, variance-swaps] | sources: [src-rbc-quantdev-prep] | tags: [jumps, short-dated-skew] -->
 
-Adding Poisson-arriving jumps to GBM (Merton), or to a stochastic-vol model (Bates), creates the steep short-dated skew that pure diffusions cannot.
+Adding Poisson-arriving jumps to GBM (Merton 1976), or to a Heston stochastic-vol process (Bates 1996), generates the steep short-dated smile/skew that pure continuous diffusions cannot produce as $T\to 0$.
+
+### Formula
+$$\frac{dS_t}{S_{t^-}} = (r - q - \lambda k)\,dt + \sigma\,dW_t + (J - 1)\,dN_t,\qquad \ln J \sim N(m_J, s_J^2),\qquad k = E[J - 1] = e^{m_J + \frac12 s_J^2} - 1$$
+$$C_{\text{Merton}}(S_0, K, T) = \sum_{n=0}^{\infty} \frac{e^{-\lambda' T}(\lambda' T)^n}{n!}\,C_{\text{BS}}\!\left(S_0, K, T, r_n, \sigma_n^2\right)$$
+$$\lambda' = \lambda(1+k),\qquad r_n = r - \lambda k + \frac{n\ln(1+k)}{T},\qquad \sigma_n^2 = \sigma^2 + \frac{n s_J^2}{T}$$
+
+**Variables:**
+
+- $S_t, S_{t^-}$ spot price at time $t$ and just before a jump at $t^-$ ($S_0$: initial spot)
+- $r, q, \sigma, K, T$ risk-free rate, dividend yield, diffusive volatility, strike, and maturity
+- $W_t$ standard Brownian motion under $\mathbb Q$
+- $N_t$ Poisson counting process with intensity $\lambda > 0$ (independent of $W_t$)
+- $J$ random gross jump multiplier ($S_t = J\,S_{t^-}$ at a jump), with log-jump mean $m_J$ and variance $s_J^2$
+- $k = E[J-1]$ expected proportional jump size; $-\lambda k\,dt$ is the drift compensator keeping $e^{-(r-q)t}S_t$ a $\mathbb Q$-martingale
+- $C_{\text{Merton}}, C_{\text{BS}}$ Merton jump-diffusion call price and standard Black–Scholes call price
+- $n$ number of jumps occurring in $[0,T]$
+- $\lambda', r_n, \sigma_n^2$ jump-adjusted Poisson intensity, $n$-jump effective short rate, and $n$-jump effective variance
 
 ### Key points
-- **Pro:** generates steep **short-dated skew** ([[volatility-skew]]).
-- **Con:** jumps can't be delta-hedged; more parameters.
-- Jumps also cause replication error in [[variance-swaps]].
+- **Why $-\lambda k\,dt$ appears:** Since $E[dN_t] = \lambda\,dt$ and each jump changes $S$ by $(J-1)S_{t^-}$, the expected jump contribution per $dt$ is $\lambda k\,S_{t^-}\,dt$. Subtracting $\lambda k$ from the drift ensures $E^{\mathbb Q}[S_T] = S_0 e^{(r-q)T}$ (no-arbitrage forward constraint).
+- **Pro:** Generates realistic **short-dated skew and kurtosis** ($m_J < 0$ gives downside crash skew; $s_J > 0$ gives wings, [[volatility-skew]]).
+- **Con:** Markets with random jump sizes are **incomplete** — jumps cannot be delta-hedged using the underlying alone, and discrete jumps create replication error ($O((\Delta S/S)^3)$) in [[variance-swaps]].
 
 ### Connections
 - **Builds on:** [[geometric-brownian-motion]], [[exponential-poisson-process]] (jump arrivals).
@@ -112,14 +129,15 @@ Adding Poisson-arriving jumps to GBM (Merton), or to a stochastic-vol model (Bat
 LSV multiplies a stochastic variance by a local "leverage function" calibrated so that every vanilla is still matched. It combines local vol's exact fit with stochastic vol's realistic dynamics.
 
 ### Formula
-$$\frac{dS_t}{S_t}=(r-q)\,dt+L(S_t,t)\sqrt{v_t}\,dW_t$$
+$$\frac{dS_t}{S_t}=(r-q)\,dt+L(S_t,t)\sqrt{v_t}\,dW_t,\qquad \sigma_{\text{loc}}^2(K,T)=L^2(K,T)\,E^{\mathbb Q}[v_T\mid S_T=K]$$
 
 **Variables:**
 
-- $S_t$ spot; $r$ rate; $q$ dividend yield
-- $L(S,t)$ leverage function, calibrated so that every vanilla is matched (particle methods are standard)
-- $v_t$ stochastic variance (sets how the smile evolves)
-- $W_t$ Brownian motion
+- $S_t, S_T$ spot at times $t$ and $T$; $r$ rate; $q$ dividend yield
+- $L(S,t)$ leverage function, calibrated via Gyöngy's theorem so that $L^2(K,T) = \sigma_{\text{loc}}^2(K,T) / E^{\mathbb Q}[v_T\mid S_T=K]$ (particle methods or Fokker–Planck PDE are standard)
+- $\sigma_{\text{loc}}(K,T)$ Dupire local volatility at strike $K$ and maturity $T$
+- $v_t, v_T$ stochastic variance at times $t$ and $T$ (sets how the smile evolves)
+- $W_t$ Brownian motion under $\mathbb Q$
 
 ### Key points
 - Fits the surface **exactly** + realistic dynamics → the **industry standard for equity exotics**. Cons: complex, slow, needs a mixing parameter.
@@ -141,12 +159,31 @@ $$\frac{dS_t}{S_t}=(r-q)\,dt+L(S_t,t)\sqrt{v_t}\,dW_t$$
 ## SABR & Normal (Bachelier) Vol
 <!-- section: sabr | prerequisites: [volatility-surface] | related: [svi, swaptions, fx-vol-conventions, black-76] | sources: [src-vol-surface-exotics-notes] | tags: [sabr, rates, normal-vol] -->
 
-SABR (Hagan et al.) is a stochastic-vol smile model fitted separately per expiry, and the standard for rates and FX smiles.
+SABR (Hagan et al. 2002, *Stochastic Alpha, Beta, Rho*) models a single forward rate or FX forward under the $T$-forward measure with CEV backbone and lognormal stochastic volatility. Its asymptotic implied-vol formula is fitted per expiry and is the market standard for rates and FX smiles.
+
+### Formula
+$$dF_t = \alpha_t F_t^\beta\,dW_t^1,\qquad d\alpha_t = \nu\alpha_t\,dW_t^2,\qquad d\langle W^1, W^2\rangle_t = \rho\,dt$$
+$$\sigma_N(K,F_0) \approx \alpha_0\,\frac{F_0 - K}{\int_K^{F_0} u^{-\beta}\,du}\left(\frac{z}{x(z)}\right)\big(1 + O(T)\big),\qquad z = \frac{\nu}{\alpha_0}(F_0 K)^{(1-\beta)/2}\ln\frac{F_0}{K}$$
+$$\text{Shifted SABR (negative rates):}\quad d(F_t + s) = \alpha_t (F_t + s)^\beta\,dW_t^1$$
+
+**Variables:**
+
+- $F_t, F_0$ forward rate or forward price at time $t$ and today (already a martingale under the $T$-forward measure, so zero drift)
+- $\alpha_t, \alpha_0$ stochastic volatility state and its initial value $\alpha_0 > 0$ (controls overall **ATM vol level**)
+- $\beta\in[0,1]$ CEV backbone exponent ($\beta=0$ normal/Bachelier, $\beta=1$ lognormal/Black, $\beta=1/2$ CIR-like; usually fixed by convention before fitting $\alpha_0,\rho,\nu$)
+- $\rho\in(-1,1)$ correlation between forward and volatility Brownian motions $W_t^1, W_t^2$ (controls **smile skew/slope**)
+- $\nu \ge 0$ vol-of-vol (controls **smile curvature/wings**)
+- $K, T$ strike and option expiry
+- $\sigma_N(K,F_0)$ Hagan implied normal (Bachelier) volatility
+- $z, x(z)$ dimensionless log-moneyness scaling and Hagan function $x(z)=\ln\!\big((\sqrt{1-2\rho z+z^2}+z-\rho)/(1-\rho)\big)$
+- $O(T)$ maturity expansion correction term
+- $u$ dummy integration variable
+- $s > 0$ rate shift allowing $F_t > -s$ in negative-rate regimes
 
 ### Key points
-- Fitted **per expiry** (per expiry–tenor pair in rates).
-- Standard for rates and FX smiles.
-- Since negative rates, rates vol is quoted as **normal (Bachelier) vol in bp**, often with **shifted SABR** (in place of Black vol, [[black-76]]).
+- **Four parameters, four clear roles:** $\beta$ sets the ATM backbone dynamics ($\sigma_{\text{ATM}}\propto F_0^{\beta-1}$ for Black vol), $\alpha_0$ pins ATM level, $\rho$ tilts the skew, and $\nu$ lifts the wings (butterflies).
+- **Fitted per expiry** (or per expiry $\times$ swap tenor cell in the [[swaptions]] cube) — SABR is an interpolation/hedging smile model for a single maturity $T$, not a joint term-structure model across expiries.
+- **Normal (Bachelier) vol & Shifted SABR:** Because interest rates can approach or cross zero, rates desks quote **normal (Bachelier) implied vol** $\sigma_N$ in bp/year ($\sigma_N \approx F_0\,\sigma_{\text{Black}}$ near ATM, [[black-76]]) and use $\beta=0$ or Shifted SABR ($F_t + s$) to prevent $F_t^\beta$ from breaking down when $F_t \le 0$.
 
 ### Connections
 - **Builds on:** [[volatility-surface]].

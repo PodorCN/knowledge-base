@@ -898,7 +898,7 @@ sol.w
 ## The `Portfolio` Object (Financial Toolbox)
 <!-- section: matlab-portfolio-object | prerequisites: [matlab-optimization-solvers, matlab-memory-model] | related: [mean-variance-optimization, risk-budgeting, sharpe-ratio, matlab-custom-portfolio-optimization] | sources: [src-rbc-gam-quantdev-notes] | tags: [matlab, portfolio-object, efficient-frontier, max-sharpe, estimation-error] -->
 
-The `Portfolio` object is a Financial Toolbox class (introduced **R2011a**) for **mean–variance portfolio optimisation and analysis** (sourced). It is a container for the whole problem definition — **data** (μ, Σ) + **constraints** + **methods** to solve and analyse — and it is a **value object**, so every `set*` returns a new object: `p = setBounds(p, ...)`; `setBounds(p, ...)` alone does nothing ([[matlab-memory-model]]).
+The `Portfolio` object is a Financial Toolbox class (introduced **R2011a**) for **mean–variance portfolio optimisation and analysis** (sourced). It is a container for the whole problem definition — **data** ($\mu, \Sigma$) + **constraints** + **methods** to solve and analyse — and it is a **value object**, so every `set*` returns a new object: `p = setBounds(p, ...)`; `setBounds(p, ...)` alone does nothing ([[matlab-memory-model]]).
 
 ### Formula: default problem
 (The formula is a transcription of the documented setup.)
@@ -1036,8 +1036,6 @@ p = setBounds(p, 0.01, 0.05, 'BoundType', 'Conditional');   % 0 or 1–5%
 ```
 
 `riskBudgetingPortfolio` targets $RC_i/\sum_jRC_j=b_i$, with $RC_i$ the risk contribution of asset $i$ and $b_i$ its target budget ([[risk-budgeting]]).
-
-(`setTurnover`, `setCosts`, `setProbabilityLevel`, `estimateFrontierByRisk/ByReturn` argument orders not individually verified.)
 
 **References:**
 

@@ -1,7 +1,7 @@
 # AGENTS.md — how to work on this knowledge base
 
-Instructions for any AI agent (Claude, Codex, …) that adds or reorganises material here.
-Read this whole file before editing.
+Instructions for any AI agent (Claude, Codex, Gemini, subagents, …) that adds, edits, or reorganises material here.
+**Read this whole file before making any edit.** Assume future subagents will follow your structure literally: write clean, canonical, contradiction-free notes.
 
 ## 0. The rules that matter most
 
@@ -17,23 +17,40 @@ Read this whole file before editing.
    is built without any questions. The user studies them in `local/index.html` (git-ignored), which the
    build writes alongside. Never add question text anywhere that gets uploaded (notes, examples, commit messages).
 
-1. **Only put in what the user gives you.** Do not add explanations, intros, summaries, examples or
-   "helpful" extra content beyond the user's material unless the user explicitly asks. Keep it concise.
-   Reformatting for readability is fine; changing or adding content is not.
+1. **Only put in what the user gives you (or explicitly asks you to add).** Do not add unrequested filler,
+   long-winded introductions, or repetitive summaries. Reformatting for readability is fine; changing or inventing content is not.
 2. **Read the whole library before adding anything, then add in the right place. Never start something new
    alongside what exists.** New material almost always belongs inside an existing section; parallel
    notes on the same idea make the library messy and hard to reorganise later. Concretely:
    - Read `maps/` (all chapters), then read in full every chapter and section that touches the topic,
      and `grep -ril` the key terms across `topics/` (and `questions/` for questions).
    - **Extend an existing section** when the idea is already covered, even partially: add a `###`
-     sub-heading inside it, merge overlapping bullets instead of repeating them, and keep one version of
-     each formula.
+     sub-heading inside it, merge overlapping bullets instead of repeating them, and keep **one single canonical version** of
+     each formula across the entire wiki.
    - Add a **new section** to an existing chapter only if no section covers the idea; place it next to
      the sections it depends on and update the chapter's `**Sections:**` line.
    - Create a **new chapter** only when no chapter fits, and never a new group or track unless the user asks.
    - Before editing, tell the user where each piece will go (which chapter / section, extend or new).
 3. **Everything is written in English**, even when the user's material is in Chinese: translate
    faithfully, don't summarise or embellish. Keep the user's numbers, tables, references and **(自己推理)** marks.
+
+## 0d. Target Audience & Quality Bar (Master's + 2 YoE Quant / Quant Dev)
+
+The reader of this wiki is a **quant researcher / quant developer with a Master's degree and ~2 years of industry experience** preparing for technical interviews. Every section must be calibrated to this exact persona:
+
+1. **No formula-free stubs on core technical topics.** A 3-bullet summary with no formula or algorithm does not pass a 2-YoE interview. Every technical section must state the exact mathematical formula, SDE, PDE scheme, estimator, or algorithm, followed by a complete `**Variables:**` block (`- $symbol$ meaning`) and concrete interview takeaways (when it works, when it breaks, and why alternatives were rejected).
+2. **No CS101 / intro-textbook micro-sections.** Do not create standalone top-level `##` sections for elementary syntax (e.g. what a ternary operator `?:` or `=>` arrow is). Group basic syntax reminders into a single compact cheatsheet section using `alias: [...]` and `<a id="...">` anchors so top-level navigation stays focused on high-signal architecture, memory/concurrency, and numerical engineering.
+3. **Single Source of Truth (Zero Cross-Chapter Duplication):**
+   - **Formulas & Definitions** live in the **tool/metric chapter** (e.g. `signal-metrics.md` owns the equations for `IC`, `Rank IC`, `ICIR`, `Hit Rate`, `Fundamental Law`, `Turnover`, and `Cost Drag`).
+   - **Workflow & Protocol chapters** (e.g. `signal-evaluation.md`, `portfolio-construction-process.md`) explain *how to interpret, stress-test, and make decisions* with those metrics and **link** to `[[section-id]]` instead of re-deriving the same equations and `**Variables:**` blocks.
+   - **Case-study chapters** (e.g. `carry-stock-bond-timing.md`) present the specific economic hypothesis, data audit, and empirical results of that case study, linking back to the protocol and metric chapters.
+4. **Strict Anti-Patterns (NEVER DO THESE):**
+   - **NEVER write defensive or pedantic disclaimer prose.** Do not write sentences like *"This is a definition, not a theorem that X is the best metric"* or *"The formula is only a mechanical identity, not an economic law that guarantees profit."* State what the formula computes, what assumptions it requires, and the exact failure mode when those assumptions break (e.g., *"When $h > 1$ overlaps, naive $\sqrt{T}$ inflates $t$-stats by $\approx\sqrt{h}$; use Newey–West or $N_{\text{eff}}$"*).
+   - **NEVER use mechanical string-replacement scripts (`inbox/*.py`) to bulk-insert boilerplate disclaimers into Markdown files.** Edit thoughtfully and read the surrounding prose.
+   - **NEVER leave `(verify)`, `(cited from memory — verify)`, or `(not individually verified)` placeholders in `topics/`.** Verify every citation, equation, and function signature before writing it into `topics/`. If something cannot be verified, omit the unverified claim or ask the user.
+   - **NEVER leave conflicting numbers for the same empirical case study across different chapters.** If two runs exist (e.g. a registered baseline run with `auto_adjust=True` giving `Rank IC = +0.0252` and an unadjusted-close check `auto_adjust=False` giving `Rank IC = +0.0423`), label both columns explicitly side by side in the table and reference them consistently everywhere.
+   - **NEVER use raw Unicode Greek letters (`μ, Σ, σ, ρ, λ`) in prose when referring to mathematical variables.** Always use LaTeX math mode (`$\mu, \Sigma, \sigma, \rho, \lambda$`).
+   - **NEVER delete or rename a section ID or alias.** If you merge section `foo-bar` into `baz-qux`, add `alias: [foo-bar]` to the `<!-- section: baz-qux | alias: [foo-bar] | ... -->` metadata comment AND keep `<a id="foo-bar"></a>` inside the merged section so all `[[foo-bar]]` links and local question banks continue to resolve with 0 errors. Never declare the same `section:` or `alias:` ID in two different places.
 
 ## 1. Structure
 
@@ -46,7 +63,7 @@ home
 ```
 
 Tracks and chapters are in **reading order**: a section's `prerequisites` must come earlier in this order
-(the build warns otherwise). Symbols follow the **Notation & conventions**
+(the build warns otherwise). If Section A wants to reference Section B that appears *later* in the reading order, put `B` in `related:`, **never** in `prerequisites:`. Symbols follow the **Notation & conventions**
 table in `maps/home.md`; a chapter that needs local symbols defines them in its introduction.
 
 Levels: **Group → Track → Chapter → Section**.
@@ -74,12 +91,12 @@ Ask in this order:
 |---|---|
 | `prob-stats` | probability, distributions, expectation/variance, puzzles, estimation, hypothesis tests, linear algebra, calculus / Taylor / mental math |
 | `stochastic-finance` | returns, no-arbitrage, forwards, bonds, option payoffs / bounds / put–call parity / binomial & static replication (track title: "Finance Foundations") |
-| `signal-research` | regression, ML, time series, validation/leakage, signals, IC / alpha, multi-asset risk premia & macro signals, research process & backtests |
+| `signal-research` | regression (OLS, Fama–MacBeth), ML (shrinkage, tree ensembles), time series, validation/leakage, signals, IC / alpha, multi-asset risk premia & macro signals, research process & backtests |
 | `portfolio-construction` | Sharpe, win rate / expectancy, exposure, diversification, optimisation (Lagrange/KKT, constraints, infeasibility), risk contribution/budgeting, position sizing, the construction process (mandate/TE, covariance estimation, transaction costs, validation) |
-| `pricing` | numerical methods, implied vol, vol surface construction, local/stochastic vol; exotic options, structured products, delta one (track title: "Pricing") |
-| `black-scholes` | Brownian motion, Itô, GBM, martingales, risk-neutral pricing; Black–Scholes PDE/formula, N(d1) vs N(d2), Black-76, American exercise; **Greeks** (own chapter) (track title: "Black–Scholes") |
-| `risk-management` | hedging, pin risk, scenarios, VaR/ES, model risk (Greeks themselves live in the `black-scholes` track) |
-| `quant-dev` | OOP, design patterns, C#/.NET, MATLAB (vs Python, interop, performance, memory model, config), portfolio optimisation in MATLAB, pricing-app architecture, releases, reconciliation, coding questions |
+| `pricing` | numerical methods (root finding, PDE finite differences, Monte Carlo), implied vol, vol surface construction, local/stochastic/jump/SABR vol; exotic options, structured products, delta one (track title: "Pricing") |
+| `black-scholes` | Brownian motion, Itô, GBM, Ornstein–Uhlenbeck / mean reversion, martingales, risk-neutral pricing; Black–Scholes PDE/formula, N(d1) vs N(d2), Black-76, American exercise; **Greeks** (own chapter) (track title: "Black–Scholes") |
+| `risk-management` | hedging, pin risk, scenarios, VaR/ES & coherent risk measures, model risk (Greeks themselves live in the `black-scholes` track) |
+| `quant-dev` | OOP, design patterns, C#/.NET, MATLAB (vs Python, interop, performance, memory model, config), portfolio optimisation in MATLAB, pricing-app architecture, releases, reconciliation, streaming/rolling algorithms & coding questions |
 
 3. **Which chapter?** Pick the existing chapter below whose subject fits. Only create a new chapter for a
    genuinely new topic (and list it in the track map).
@@ -93,7 +110,7 @@ Current chapters and question banks:
 | `prob-stats` | `calculus-mental-math`, `probability-distributions`, `moments-covariance`, `puzzles-markov`, `estimation-testing`, `statistical-testing` | `qb-probability`, `qb-statistics-inference` |
 | `stochastic-finance` | `no-arbitrage-finance-basics`, `fixed-income-bonds`, `no-arbitrage-parity` | `qb-finance-foundations` |
 | `quant-dev` | `oop-design`, `csharp-dotnet`, `matlab-quant-dev` | `qb-quant-dev-engineering` |
-| `signal-research` | `linear-regression`, `ml-regularisation`, `time-series-validation`, `signal-evaluation`, `alpha-forecasting`, `multi-asset-signals`, `carry-stock-bond-timing` | `qb-regression-ml`, `qb-research-judgment` |
+| `signal-research` | `linear-regression`, `ml-regularisation`, `time-series-validation`, `signal-metrics`, `signal-evaluation`, `alpha-forecasting`, `multi-asset-signals`, `carry-stock-bond-timing` | `qb-regression-ml`, `qb-research-judgment` |
 | `portfolio-construction` | `measuring-performance`, `portfolio-optimisation`, `risk-budgeting-position-sizing`, `portfolio-construction-process` | `qb-portfolio-performance` |
 | `black-scholes` | `stochastic-calculus`, `black-scholes`, `black-scholes-call-derivation`, `greeks-sensitivities` | `qb-stochastic-calculus`, `qb-options-bs-greeks` |
 | `pricing` | `numerical-methods`, `implied-volatility-skew`, `vol-surface-construction-chapter`, `volatility-models`, `exotic-options`, `structured-products-delta-one` | `qb-vol-surface`, `qb-exotics-structured` |
@@ -137,7 +154,10 @@ $$RC_i(w)=w_i\frac{(\Sigma w)_i}{\sigma(w)}=b_i\cdot\sigma(w)$$
 **Variables:**
 
 - $w_i$ weight of asset $i$
-- $b_i$ risk budget of asset $i$
+- $\Sigma$ covariance matrix of asset returns
+- $\sigma(w) = \sqrt{w^\top \Sigma w}$ portfolio volatility
+- $b_i$ risk budget of asset $i$ ($\sum_i b_i = 1$)
+- $RC_i(w)$ risk contribution of asset $i$
 
 ### Key points
 - …
@@ -149,18 +169,15 @@ $$RC_i(w)=w_i\frac{(\Sigma w)_i}{\sigma(w)}=b_i\cdot\sigma(w)$$
 Rules:
 - **Chapter intro:** after `# Title`, one overview paragraph, then `**Prerequisites:**` and `**Leads to:**` lines
   (links to sections in other chapters), then the `**Sections:**` line. Local notation goes in the intro.
-- **Section layout, always in this order:** a 1–3 sentence statement of the idea (restating the user's material,
-  nothing new) → `### Formula` / `### Definition` with `**Variables:**` → `### Key points` →
-  `### Worked example` (if any) → `### Connections` with `**Builds on:**` / `**Used by:**` / `**Related:**` / `**Contrast:**`.
-- Every symbol in a formula appears in its `**Variables:**` list, written `- $symbol$ meaning` (the viewer turns
-  the list into a "where" table). Don't put another bullet list directly after it; add a label such as `**Notes:**` between.
+- **Section layout, always in this order:** a 1–3 sentence statement of the idea → `### Formula` / `### Definition` with `**Variables:**` → `### Key points` → `### Worked example` (if any) → `### Connections` with `**Builds on:**` / `**Used by:**` / `**Related:**` / `**Contrast:**`.
+- **Every symbol in a display formula (`$$...$$`) MUST appear in its `**Variables:**` list**, written `- $symbol$ meaning` (the viewer turns the list into a "where" table, and `scripts/check_variables.py` checks it automatically). Don't put another bullet list directly after `**Variables:**`; add a bold label such as `**Notes:**` or a `###` heading between them.
 - The `<a id>` line, the `## ` title and the `<!-- section: … -->` comment go together, in that order;
   the anchor id must equal `section:`. Section ids are kebab-case and unique across the repo.
 - `prerequisites` ("you need X first") and `related` in the comment create the links shown in the wiki.
   Link across chapters and tracks whenever the material connects.
 - Inside a section use `###` for sub-headings, never `##`. Update the `**Sections:**` line when adding a section.
 - Keep formulas with their variables, one variable per list item (`- $symbol$ meaning`).
-- Every bold label (`**Variables:**`, `**Example:**`) starts its own paragraph (blank line before it).
+- Every bold label (`**Variables:**`, `**Example:**`, `**Interview takeaway:**`) starts its own paragraph (blank line before it).
 - Math: `$inline$`, `$$display$$`. Keep any **(自己推理)** marks that appear in the user's material.
 
 The wiki typesets this like course notes automatically: numbered chapters/sections/equations, boxed
@@ -216,19 +233,19 @@ The wiki typesets this like course notes automatically: numbered chapters/sectio
 ### Source (`sources/src-*.md`)
 One short note per document: title, file path, and the list of sections it fed. Raw PDF in `sources/pdfs/`.
 
-## 4. Workflow for adding material
+## 4. Workflow for adding or editing material
 
 1. Save the raw file in `sources/pdfs/` (or text in `inbox/`); these are git-ignored and never uploaded.
    Create `sources/src-<slug>.md`.
 2. Read the library (rule 2), classify each piece (section 2), then extend an existing section or add a new
-   one. Only the user's content, in English.
+   one. Check section 0d to ensure zero cross-chapter duplication, no defensive disclaimer prose, and complete mathematical & variable definitions.
 3. Add the questions to the track's question bank with `**Topics:**` links and the next free number
    (the build prints it). Check first that the question isn't already there.
-4. Build and check: `python3 scripts/build_graph.py --strict` must report **0 errors**. For the course-notes quality bar
-   (every symbol defined, worked examples, why/what was rejected) follow `.claude/skills/course-notes/SKILL.md`
-   and run `python3 scripts/check_variables.py topics/<chapter>.md` (advisory: lists formula symbols missing from **Variables:**).
-   Before every published update, increment the patch number in `VERSION` (for example, `1.01` → `1.02`);
-   the build injects it into the viewer.
+4. Build and check (on Windows, if `python3` is the Windows Store stub, use `& "$env:LOCALAPPDATA\Programs\Python\Python314\python.exe"`):
+   - `python3 scripts/check_variables.py` must report **0 unexplained symbols** across all modified chapters.
+   - `python3 scripts/build_graph.py --strict` must report **0 errors and 0 warnings**.
+   - Before every published update, increment the patch number in `VERSION` (for example, `1.20` → `1.21`);
+     the build injects it into the viewer.
 5. Commit the notes and the regenerated `docs/`.
 6. **The website follows `main`.** GitHub Pages serves `docs/` from the `main` branch. When the user OKs an
    upload (rule 0), merge the finished work into `main` (bring `main` into your working branch first and

@@ -140,6 +140,7 @@ $$Z=\frac{X-\mu}{\sigma}\sim N(0,1);\quad \sum_{i=1}^{\nu}Z_i^2\sim\chi^2_\nu;\q
 - $Z,Z_i$ independent standard normals
 - $U\sim\chi^2_\nu$ (or $\chi^2_a$ in the $F$ ratio), independent of $Z$
 - $V\sim\chi^2_b$, independent of $U$
+- $t_\nu, \chi^2_\nu, F_{a,b}$ Student-$t$, chi-square, and $F$ distributions
 - $\nu,a,b$ degrees of freedom
 
 Notation used throughout the wiki: $N(\cdot)$ is the standard normal CDF and $\phi(\cdot)$ its density.

@@ -203,7 +203,7 @@ $$q(\mu)=\max_x\ L(x,\mu);\qquad f(x)\le L(x,\mu)\le q(\mu)\ \ \text{for any fea
 ### Key points
 - Solvers (Gurobi, MOSEK, CVXPY) report the multipliers as **dual values**; that is where shadow prices come from in practice ([[constraints-shadow-prices]]).
 - Solver statuses "primal infeasible" / "dual infeasible" are read in [[optimiser-infeasibility]].
-- Reference: Boyd & Vandenberghe, *Convex Optimization*, Ch. 5 (cited from memory — verify).
+- Reference: Boyd, S. & Vandenberghe, L. (2004), *Convex Optimization*, Ch. 5 (Duality & KKT Conditions), Cambridge University Press.
 
 ### Connections
 - **Used by:** [[minimum-variance-portfolio]] (GMV via one multiplier), [[constraints-shadow-prices]] (Jagannathan–Ma, shadow prices), [[optimiser-infeasibility]], [[transaction-costs-no-trade]] (the no-trade band is the same logic at a kink).
@@ -481,8 +481,8 @@ $$\text{shadow price}_j=\frac{\partial U^*}{\partial c_j}$$
 
 **References:**
 
-- Jagannathan, R. & Ma, T. (2003), *Risk Reduction in Large Portfolios: Why Imposing the Wrong Constraints Helps*, Journal of Finance (cited from memory — verify).
-- DeMiguel, Garlappi, Nogales & Uppal (2009), norm-constrained portfolios, *Management Science* (cited from memory — verify).
+- Jagannathan, R. & Ma, T. (2003), *Risk Reduction in Large Portfolios: Why Imposing the Wrong Constraints Helps*, *Journal of Finance*, 58(4), 1651–1684.
+- DeMiguel, V., Garlappi, L., Nogales, F. J. & Uppal, R. (2009), *A Generalized Approach to Portfolio Optimization: Improving Performance by Constraining Portfolio Norms*, *Management Science*, 55(5), 798–812.
 
 ### Connections
 - **Builds on:** [[lagrange-kkt-duality]], [[minimum-variance-portfolio]], [[mean-variance-optimization]] (why unconstrained MVO is fragile).

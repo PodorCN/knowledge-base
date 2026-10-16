@@ -64,9 +64,11 @@ $$r_{i,t+1}=a+b\,z_{i,t}+\varepsilon,\qquad b=\frac{\mathrm{Cov}(z,r)}{\mathrm{V
 
 **Variables:**
 
+- $r_{i,t+1}, r$ next-period return of asset $i$ (and generic cross-sectional return)
+- $z_{i,t}, z$ cross-sectional z-score of the signal ($\mathrm{Var}(z)=1$)
 - $a,b$ intercept and slope of the predictive regression
-- $\sigma_r$ standard deviation of returns
-- $\mathrm{Var}(z)=1$ for a z-score
+- $\varepsilon$ zero-mean regression residual
+- $\sigma_r$ cross-sectional standard deviation of returns
 
 Replacing $\sigma_r$ with the asset's own $\sigma_i$ gives $\alpha_i=IC\,\sigma_i\,z_i$.
 

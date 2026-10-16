@@ -7,296 +7,205 @@ sources: [src-signal-to-weight, src-squarepoint-dqa-workbook, src-quant-finance-
 ---
 # Signal Evaluation
 
-Evaluate a signal in three steps: check what it predicts, test whether a fixed trading rule earns money after costs, and assess its contribution to the portfolio. Start with the simulated curves below, then follow the matching scatter, bucket, drawdown and cost plots through the chapter. Here $i$ indexes assets, $t$ denotes a decision date, $h$ is a forecast horizon in trading days and $\Delta$ is the sampling interval in trading days; returns are simple decimals.
+Evaluating a quantitative signal requires separating three distinct questions: **(1) Does the score predict future returns out-of-sample?** **(2) Does a fixed sizing rule survive transaction costs and drawdowns?** **(3) Does the strategy add incremental Sharpe to the existing portfolio?** This chapter walks through the pre-registered experimental protocol, point-in-time data auditing, three-stage sample isolation (Select / Validate / Test), the eight-step diagnostic checklist, and the root-cause hierarchy for debugging backtest-to-live failures.
 
-**Prerequisites:** [[information-coefficient]], [[cross-validation-leakage]], [[timing-curve-metrics]], [[turnover-cost-drag]].
+**Prerequisites:** [[information-coefficient]], [[ic-significance]], [[icir-stability]], [[hit-rate]], [[fundamental-law-active-management]], [[signal-position-construction]], [[timing-curve-metrics]], [[turnover-cost-drag]], [[cross-validation-leakage]], [[multiple-testing]].
 
-**Leads to:** [[signal-to-weight]], [[carry-stock-bond-timing]], [[marginal-sharpe-improvement]].
+**Leads to:** [[grinold-alpha]], [[signal-to-weight]], [[carry-stock-bond-timing]], [[marginal-sharpe-improvement]].
 
 **Sections:** [[timing-signal-evaluation]] · [[broker-research-replication]] · [[eval-three-stage-protocol]] · [[eval-directional-prediction]] · [[eval-statistical-significance]] · [[eval-directional-hit-rate]] · [[eval-sizing-monotonicity]] · [[eval-tradable-profitability]] · [[eval-turnover-costs]] · [[eval-temporal-stability]] · [[eval-correlation-redundancy]] · [[research-workflow]] · [[backtest-pitfalls]]
 
-
 ![Three net equity curves on the same simulated market: predictive at 5 bps, noise at 5 bps, and the same predictive signal at 50 bps.](../assets/figures/signal-evaluation/equity-curves.svg)
 
-**Read the curves:** blue turns 1 into **2.37**; grey noise ends at **0.80**. Orange uses exactly the same predictive score as blue but pays higher costs and ends at **0.63**. Prediction and profitable implementation are separate questions.
+**Read the curves:** Over 520 weekly decisions on the same simulated market, a predictive score ($IC^{\mathrm{rank}} = +0.17$) traded at 5 bps compounds \$1 into **\$2.37** (blue), while pure noise ($IC^{\mathrm{rank}} = -0.01$) decays to **\$0.80** (grey). Trading the **exact same predictive score** at 50 bps decays to **\$0.63** (orange). Predictive skill and tradable profitability must be verified separately.
 
 <details>
-<summary>Simulation setup, assumptions and reproducibility</summary>
+<summary>Simulation setup, equations and reproducibility</summary>
 
-**Illustrative simulation (自己推理):** 520 weekly decisions, fixed seed 20261014. These are synthetic outcomes, not market evidence. Each score is available before the next return is realised. Scores and rules are fixed in advance; no model is fitted or selected from these outcomes. All plots below use this same sample.
+**Illustrative simulation (自己推理):** $T = 520$ weekly rebalance intervals (10 years), fixed seed `20261014` (`python scripts/generate_signal_figures.py`):
 
-$$R_{t\to t+1}=0.025\left(0.18s_t+\sqrt{1-0.18^2}\,\varepsilon_{t+1}\right),\qquad w_t^{g}=\mathrm{clip}(s_t/2,-1,1),\qquad w_t^{n}=\mathrm{clip}(u_t/2,-1,1)$$
-
-**Variables:**
-
-- $t$ weekly decision index in this simulation, rather than a trading-day index
-- $R_{t\to t+1}$ next-week simple return of the simulated spread
-- $s_t$ predictive score known at the decision time, drawn from a standard normal distribution
-- $u_t$ standard normal noise score known at the decision time, independent of the predictive scores and returns
-- $\varepsilon_{t+1}$ new standard normal shock realised after the decision; all scores and shocks are independent across weeks
-- $w_t^{g}$ predictive strategy's spread exposure during the next week
-- $w_t^{n}$ noise strategy's spread exposure during the next week
-- $\mathrm{clip}$ operator imposing the lower and upper exposure limits
-
-**Notes:** the loading 0.18 creates a modest positive population correlation in this illustrative model; 0.025 is the weekly target-return standard deviation. Both score series have unit variance. The realised Rank ICs are +0.166 and −0.007. These values are outcomes of the simulation, not acceptance thresholds.
-
-$$\Pi_{t+1}^{\mathrm{net}}=w_tR_{t\to t+1}-c|w_t-w_{t-1}|$$
+$$R_{t\to t+1}=0.025\left(0.18\,s_t+\sqrt{1-0.18^2}\,\varepsilon_{t+1}\right),\qquad w_t=\mathrm{clip}(s_t/2,-1,1),\qquad \Pi_{t+1}^{\mathrm{net}}=w_t R_{t\to t+1}-c|w_t-w_{t-1}|$$
 
 **Variables:**
 
-- $\Pi_{t+1}^{\mathrm{net}}$ net strategy return for the weekly holding interval
-- $w_t$ chosen strategy's exposure at decision $t$
-- $w_{t-1}$ previous target exposure, with zero exposure before the first trade
-- $t$ weekly decision index
-- $R_{t\to t+1}$ realised spread return over the following week
-- $c$ all-in cost per unit of absolute spread exposure traded: 0.0005 for 5 bps or 0.005 for 50 bps
-
-**Limitations:** this is a diagnostic spread sleeve. It charges the initial entry and each target-weight change, without separate final liquidation, financing, borrow, market impact or price-driven weight drift. One simulated path is not a guarantee: noise can temporarily profit and a useful signal can temporarily lose. Regenerate with `python scripts/generate_signal_figures.py` (NumPy and Matplotlib).
+- $t=1,\dots,520$ weekly decision index
+- $R_{t\to t+1}$ realised next-week spread return (weekly volatility $\sigma = 2.5\%$, annualised $\approx 18\%$)
+- $s_t\sim\mathcal{N}(0,1)$ predictive score known at decision time $t$ (population correlation $0.18$, sample Rank IC $+0.166$)
+- $\varepsilon_{t+1}\sim\mathcal{N}(0,1)$ independent forward return shock realised after decision $t$
+- $w_t\in[-1,1]$ spread weight held over $[t, t+1]$ ($w_0 = 0$; noise benchmark replaces $s_t$ with independent $u_t\sim\mathcal{N}(0,1)$, sample Rank IC $-0.007$)
+- $\Pi_{t+1}^{\mathrm{net}}$ weekly net strategy return after deducting one-way cost $c\in\{0, 5\text{ bps}, 50\text{ bps}\}$
 
 </details>
 
 <a id="timing-signal-evaluation"></a>
 
-## Specify the Experiment Before Reading Results
-<!-- section: timing-signal-evaluation | prerequisites: [information-coefficient, cross-validation-leakage, signal-position-construction, timing-curve-metrics] | related: [eval-three-stage-protocol, eval-directional-prediction, research-workflow, stock-bond-carry-case-study] | sources: [src-carry-course-notes, src-squarepoint-dqa-workbook] | tags: [checklist, signal-testing, diagnostics] -->
+## Pre-Registration & The 8-Step Evaluation Checklist
+<!-- section: timing-signal-evaluation | prerequisites: [information-coefficient, cross-validation-leakage, signal-position-construction, timing-curve-metrics] | related: [eval-three-stage-protocol, eval-directional-prediction, research-workflow, stock-bond-carry-case-study] | sources: [src-carry-course-notes, src-squarepoint-dqa-workbook] | tags: [checklist, signal-testing, diagnostics, pre-registration] -->
 
-Begin with a testable claim: which return should the signal predict, using which information, and through which trading rule? Fixing these choices before inspecting results makes the backtest an experiment rather than a search for an attractive curve.
+Never judge a candidate signal by a single backtest Sharpe ratio. Before viewing any return correlation, freeze the economic hypothesis, point-in-time data mapping, normalisation rule, forecast horizon $h$, and pass/kill thresholds, then evaluate the candidate across eight orthogonal diagnostics.
 
-### Definition
+### The 8-part diagnostic checklist
 
-Record the economic hypothesis, universe, signal orientation, return target, information availability, forecast horizon, rebalance frequency, execution assumptions, benchmark, costs, sample partitions and pass/stop rules. A positive score must have an explicit meaning: higher expected asset return, greater relative attractiveness, or a tilt toward one leg of a spread.
+| # | Diagnostic | Metric & Section | Institutional Benchmark | Why This Check Matters |
+|---|---|---|---|---|
+| **1** | **Directional skill** | Rank IC ([[eval-directional-prediction]]) | $0.03\text{–}0.08$ (Good)<br>$\le 0$ (Fail) · $> 0.10$ (Audit leakage) | Confirms raw monotonic forecast power before position sizing; $>0.10$ in liquid markets usually signals look-ahead leakage. |
+| **2** | **Statistical significance** | Overlap-adjusted $t_{IC}$ ([[eval-statistical-significance]]) | $t \ge 1.5$ (macro timing)<br>$t \ge 2.0$ (single equity) / $\ge 3.0$ (multi-trial) | Deflates overlapping windows ($n_{\mathrm{eff}} = n/m$) so serial correlation does not manufacture fake significance. |
+| **3** | **Directional accuracy** | Hit rate $HR$ ([[eval-directional-hit-rate]]) | $52\%\text{–}58\%$ (Realistic)<br>$\le 50\%$ (Coin flip) | Checks sign consistency; must be paired with payoff magnitude because high $HR$ with negative skew still loses money. |
+| **4** | **Sizing monotonicity** | Quantile sort Q1–Q5 ([[eval-sizing-monotonicity]]) | Monotonic staircase $\bar R_1 < \dots < \bar R_5$<br>Humped / inverted Q5 (Fail) | Linear sizing ($w_t \propto s_t$) puts maximum capital on Q1/Q5; if Q5 loses money, conviction sizing blows up. |
+| **5** | **Tradable profitability** | Timing curve & $\text{Max }DD$ ([[eval-tradable-profitability]]) | Positive $AR$, shallow/short $DD$<br>Multi-year underwater (Fail) | Simulates non-overlapping holding returns and checks whether drawdown depth and recovery duration fit the mandate. |
+| **6** | **Execution survival** | Turnover $TO$ & Net $AR_{\mathrm{net}}$ ([[eval-turnover-costs]]) | $AR_{\mathrm{net}} > 0$ at realistic bps<br>Costs wipe out gross $AR$ (Fail) | Fast signals ($\rho_1 \approx 0.30$) churn portfolio weights and bleed alpha to bid-ask spread and market impact. |
+| **7** | **Temporal stability** | Rolling 52w IC & Yearly IC ([[eval-temporal-stability]]) | $\text{ICIR} \ge 0.5$; $>70\%$ positive years<br>Single-year crisis windfall (Fail) | Verifies that performance is steady across regimes rather than a single lucky bet in 2008 or 2020. |
+| **8** | **Portfolio increment** | Cross-signal $\rho$ & $\Delta SR$ ([[eval-correlation-redundancy]]) | $|\rho(s_{\mathrm{new}}, s_{\mathrm{book}})| \le 0.60$, $\Delta SR > 0$<br>$|\rho| > 0.60$ (Redundant) | Ensures the candidate adds independent breadth rather than doubling leverage on an existing factor. |
 
-### Key points
-
-**Reading order:** audit data → isolate samples → measure prediction → simulate trades and costs → check stability and portfolio value.
-
-<details>
-<summary>Detailed checklist and interpretation</summary>
-
-| Stage | Evidence | Question answered |
-|---|---|---|
-| Data audit | Formula, universe history, publication dates, price adjustments | Could the signal have been computed and traded then? |
-| Sample isolation | Chronological splits and complete forward windows | Which data may influence design, and which evaluate it? |
-| Prediction | IC, uncertainty, hit rate, quantile returns | Does the score contain information about its stated target? |
-| Trading | Fixed sizing, return curve, drawdown, costs | Does that information survive conversion into positions? |
-| Robustness | Subperiods, rolling diagnostics, out-of-sample results | How concentrated and reproducible is the evidence? |
-| Portfolio contribution | Existing exposures and incremental performance | Is the candidate useful alongside existing holdings? |
-| Decision | Evidence, limitations, rejected alternatives | Proceed, stop, or register a new experiment? |
-
-**Reading it:** ranking assets correctly, earning net trading profits and improving an existing portfolio are distinct claims. No single IC, hit rate, Sharpe ratio or correlation cutoff establishes all three.
-
-<details>
-<summary>Predictive ordering, directional accuracy and profit</summary>
-
-A signal can rank two assets correctly while both lose money. A directional rule can be right often but lose more on its few mistakes than it gains on its successes. A profitable standalone strategy can repeat exposures already held in the portfolio. The separate diagnostics distinguish these possibilities.
-
-</details>
-
-**Notes:** the carry experiment used weekly observations, 21-trading-day forward returns, and a selection hurdle of positive IC with an approximate IC statistic of at least 1.5. These are recorded experiment choices, not universal standards.
-
-</details>
+### Pre-registration discipline in code
+Write the pass/kill gate into the evaluation script before running the backtest so the verdict is mechanical:
+```python
+verdict = "PASS to validate" if (rank_ic > 0 and t_stat_overlap >= 1.5) else "FAIL stop"
+```
+Modifying the data feed, lookback window, or forecast horizon after seeing `FAIL stop` is a **new trial** that must face the multiple-testing hurdle ($t \ge 3.0$, [[multiple-testing]]).
 
 ### Connections
-
-- **Builds on:** [[information-coefficient]], [[cross-validation-leakage]], [[signal-position-construction]].
+- **Builds on:** [[information-coefficient]], [[cross-validation-leakage]], [[signal-position-construction]], [[timing-curve-metrics]].
 - **Used by:** [[eval-three-stage-protocol]], [[research-workflow]], [[carry-measurement-protocol]].
 
 <a id="broker-research-replication"></a>
 
-## Audit the Data and Reproduce the Signal
-<!-- section: broker-research-replication | prerequisites: [timing-signal-evaluation, cross-validation-leakage] | related: [eval-three-stage-protocol, backtest-pitfalls, carry-measurement-protocol] | sources: [src-carry-course-notes, src-squarepoint-dqa-workbook] | tags: [broker-research, replication, point-in-time] -->
+## Point-in-Time Data Audit & Replicating Broker Research
+<!-- section: broker-research-replication | prerequisites: [timing-signal-evaluation, cross-validation-leakage] | related: [eval-three-stage-protocol, backtest-pitfalls, carry-measurement-protocol] | sources: [src-carry-course-notes, src-squarepoint-dqa-workbook] | tags: [broker-research, replication, point-in-time, data-revisions, look-ahead] -->
 
-Before testing predictive power, establish that the historical signal matches its definition and uses information available at the decision time. Replicating published research requires reproducing its calculations and auditing its trading assumptions.
+Before testing whether a signal predicts returns, verify that every input was actually observable at decision timestamp $t$ and that any replication of an external paper or sell-side note matches the published series mechanically.
 
-### Definition
+### Formula: Replication correlation benchmark
+When reconstructing a published broker or academic signal $s_{\mathrm{broker}}$, verify mechanical replication before testing returns:
 
-Point-in-time data are indexed by when an input became available, not merely by the economic period it describes. The trade follows the decision and the assumed execution opportunity; a price observed after the close cannot support an earlier fill at that close.
+$$\rho_{\mathrm{rep}}=\operatorname{corr}(s_{\mathrm{rep}},s_{\mathrm{broker}})\ge 0.60$$
 
-### Key points
+**Variables:**
 
-- Use only data available at the decision time.
-- Match formulas, units, universe history and executable prices before testing performance.
+- $\rho_{\mathrm{rep}}\in[-1,1]$ time-series correlation between the internally reconstructed signal and the published series
+- $s_{\mathrm{rep}}$ internally reconstructed point-in-time signal series
+- $s_{\mathrm{broker}}$ external published signal series over the overlapping historical window
 
-<details>
-<summary>Detailed checklist and interpretation</summary>
+**Replication vs Redundancy:** When *replicating an external paper*, $\rho_{\mathrm{rep}} \ge 0.60$ is the minimum threshold proving your code captures the author's mechanism. When *adding a candidate to your own book*, correlation with existing internal signals must be $|\rho| \le 0.60$ ([[eval-correlation-redundancy]]).
 
-| Audit | Why it matters | Naive version to reject |
-|---|---|---|
-| Formula and units | Inputs must measure the intended quantity | Mixing percentages and decimals or incompatible horizons |
-| Price adjustments | Total-return prices and valuation denominators serve different purposes | Dividing cash dividends by retrospectively dividend-adjusted prices |
-| Publication and revisions | A period date is not an availability date | Using revised macro history as if it were known then |
-| Calendar alignment | Values may flow forward after availability | Interpolating toward a future month-end observation |
-| Universe history | The tradable universe changes | Testing only today's surviving constituents |
-| Normalisation | Calibration must use available history | Full-sample means, standard deviations or transformations |
-| Execution | Delay, spread, fees, borrow and financing affect feasibility | Immediate fills without friction or capacity limits |
-
-**Replication checks:** align dates, units, missing values and formula versions, then compare raw values and correlations. The notes' correlation benchmark of 0.60 is a screening heuristic, not proof of correct replication: even perfect correlation can coexist with an incorrect scale or offset.
-
-</details>
-
-### Worked example
-
-The carry notes report that a dividend-adjusted denominator overstated the 2006 SPY dividend yield as 2.48% rather than 1.73%. That is a discrepancy of 0.75 percentage points, about 43.4% of the stated correct yield. An input error changes the signal before any predictive test.
-
-**Notes:** the original one-business-day lag for BAA10Y and seven-day lag for ICSA are assumptions to verify against actual availability records. Date labels alone do not establish release timing. Applying an annual valuation measure to weekly timing also requires an explicit economic rationale.
+### Seven reasons published broker backtests fail in live replication
+| # | Failure Mode | Concrete Mechanism & Empirical Example | Point-in-Time Fix |
+|---|---|---|---|
+| **1** | **Price-adjustment denominator bug** | Dividing trailing cash dividends by dividend-adjusted close (`auto_adjust=True`) instead of unadjusted close understates early prices and **overstates 2006 SPY dividend yield as 2.48% vs true 1.73%** (+43% relative error). | Always pair cash payouts with unadjusted close (`auto_adjust=False`) on the payout date. |
+| **2** | **Full-sample normalisation** | Standardising via $z_t = (x_t - \mu_{\text{full}})/\sigma_{\text{full}}$ leaks future mean and volatility (e.g. post-2008 zero rates or 2020 crash vol) into pre-2008 scores. | Use an expanding window ($\bar x_{\le t}, \hat\sigma_{\le t}$) or strictly trailing window ([[signal-position-construction]]). |
+| **3** | **Retroactive macro revisions** | GDP, payrolls, and composite indices (e.g. NFCI) are revised months or years later; backtesting on revised FRED history uses numbers nobody knew at $t$. | Use vintage point-in-time databases (ALFRED) indexed by release date, not reference period. |
+| **4** | **Ignored publication lags** | Assuming macro or accounting data stamped "Month $M$" is tradable on the last day of Month $M$ (e.g. FRED `BAA10Y` lags 1 business day; initial jobless claims `ICSA` lag 5–7 days). | Lag every series by its conservative publication delay before joining onto the trading calendar. |
+| **5** | **Linear interpolation across dates** | Interpolating monthly series onto daily grids pulls next month's level into mid-month trading days. | Union calendars and strictly forward-fill (`ffill`) after publication timestamps ([[cross-validation-leakage]]). |
+| **6** | **Survivorship bias** | Testing on today's S&P 500 membership excludes delisted bankruptcies (Lehman, Enron, SVB), inflating value and reversal backtests. | Use point-in-time constituent lists including delisting returns. |
+| **7** | **Clock & friction mismatch** | Evaluating slow annual valuation multiples (CAPE) on daily/weekly clocks without transaction costs or borrow fees. | Match forecast horizon $h$ to signal half-life and deduct realistic spread/slippage ([[eval-turnover-costs]]). |
 
 ### Connections
-
 - **Builds on:** [[timing-signal-evaluation]], [[cross-validation-leakage]].
-- **Used by:** [[eval-three-stage-protocol]], [[backtest-pitfalls]].
-- **Related:** [[carry-measurement-protocol]].
+- **Used by:** [[eval-three-stage-protocol]], [[backtest-pitfalls]], [[carry-measurement-protocol]].
 
 <a id="eval-three-stage-protocol"></a>
 
-## Isolate Selection, Validation and Test Samples
-<!-- section: eval-three-stage-protocol | prerequisites: [timing-signal-evaluation, cross-validation-leakage] | related: [eval-statistical-significance, research-workflow, stock-bond-carry-case-study] | sources: [src-carry-course-notes] | tags: [select-validate-test, protocol, purging] -->
+## Three-Stage Sample Isolation (Select, Validate, Test)
+<!-- section: eval-three-stage-protocol | prerequisites: [timing-signal-evaluation, cross-validation-leakage] | related: [eval-statistical-significance, research-workflow, stock-bond-carry-case-study] | sources: [src-carry-course-notes] | tags: [select-validate-test, protocol, purging, straddle-rule] -->
 
-Partition history before inspecting performance. Separate the evidence used to design a signal from the evidence used to evaluate the frozen design.
+To prevent $p$-hacking and subtle boundary leakage, partition the historical timeline into three strictly isolated chronological segments before computing any return statistics.
 
-### Definition
+### The three-stage partition & the straddle rule
 
-| Sample | Permitted use | Carry experiment dates |
+| Stage | Chronological Window (Carry Study) | Permitted Research Actions |
 |---|---|---|
-| Select | Develop and screen; record all variants tried | Inception through 2017-12-31 |
-| Validate | Check persistence under the frozen protocol | 2018-01-01 through 2023-09-27 |
-| Test | Evaluate a design fixed without this sample | From 2023-09-28 to the experiment's stated data cutoff |
+| **1. Select** | Inception – `2017-12-31` (574 weeks) | Screen candidates against pre-registered gates ($IC > 0, t_{IC} \ge 1.5$). Kill failures immediately. |
+| **2. Validate** | `2018-01-01` – `2023-09-27` (295 weeks) | Examined **strictly once** for passing candidates to verify persistence under the frozen rule. Zero parameter tuning allowed. |
+| **3. Test** | `2023-09-28` – Present | Sealed out-of-sample vault; opened once at final sign-off before production deployment. |
 
-### Key points
+**The Straddle Rule (Purging boundary windows):** Any weekly decision date $t$ whose $h = 21$-trading-day forward return window $[t, t+21]$ crosses the `2017-12-31` or `2023-09-27` boundary is **dropped from both adjacent segments** ([[cross-validation-leakage]]). Assigning straddling weeks to either side leaks target returns across the split.
 
-- **Purge boundary crossings:** this protocol retains a label only when its entire forward window lies inside the partition. A crossing 21-day label is excluded. The purpose is to prevent earlier selection from using later outcomes ([[cross-validation-leakage]]).
-- **Distinguish protocols:** ordinary model validation may select hyperparameters before a final test. This carry protocol used validation as a one-time check of a frozen candidate. If its results influence redesign, it becomes development evidence and a new untouched evaluation is needed.
+### Worked case study: Stock–Bond Carry (`equity_bond_carry`) across stages and denominator definitions
+Testing S&P 500 dividend yield minus 10-year Treasury yield ($DY_t - y_t^{10}$, [[stock-bond-carry-case-study]]) across the 574-week Select period ($m = 21/5 = 4.2 \implies n_{\mathrm{eff}} \approx 137$) shows how the protocol operates—and reconciles the two price-denominator variants documented in the research notes:
 
-<details>
-<summary>Assumptions, edge cases and further checks</summary>
+| Metric | Select: Baseline Registered (`auto_adjust=True`, 574 wks) | Select: Unadjusted-Close Check (`auto_adjust=False`, 574 wks) | Validate Period (295 wks, 2018–2023, unsealed for post-mortem) | Pre-Registered Gate & Verdict |
+|---|---|---|---|---|
+| **Rank IC** | $+0.0252$ | $+0.0423$ | $+0.1220$ | Gate: $IC > 0$ (Passed sign) |
+| **Overlap-adjusted $t_{IC}$** | **$+0.29$** | **$+0.49$** | $+1.02$ | **Gate: $t_{IC} \ge 1.5$ → FAIL STOP** |
+| **Directional hit rate $HR$** | $56\%$ | $60\%$ | $55\%$ | Nominal $>50\%$, masks tail losses |
+| **Timing curve $AR$ (gross)** | $+1.6\%/\text{yr}$ | $+2.3\%/\text{yr}$ | $+1.5\%/\text{yr}$ | Positive gross, $-27.7\%$ Max DD |
+| **Score autocorrelation $\rho_1$** | $0.95$ | $0.95$ | $0.94$ | Slow-moving ($\sim 21\text{ bps/yr}$ cost) |
+| **Quintiles Q1 / Q2 / Q3 / Q4 / Q5** | $-0.26\% / +0.73\% / +1.32\% / +0.63\% / \mathbf{-0.09\%}$ | $-0.10\% / +0.41\% / +0.95\% / +0.72\% / \mathbf{-0.09\%}$ | $+0.60\% / +0.15\% / +1.14\% / +0.99\% / +1.17\%$ | **Hump in Select:** Q5 lost money ($-0.09\%$) in both! |
 
-- **Preserve available history:** past inputs may construct a later signal if they would have been available live. Later forward returns must not influence earlier calibration.
-- **Record repeated trials:** changing sign, horizon, data source, clipping or sizing after seeing results is another experiment. Sealing a final sample does not eliminate selection bias within development.
-- **Separate testing and monitoring:** a final historical test is evaluated once. Live monitoring continues, but observed live data cease to be untouched evidence for subsequent redesigns.
-
-</details>
-
-### Worked example
-
-Carry selection had 574 weeks, Rank IC +0.0423 and approximate overlap-adjusted statistic +0.49. It failed the registered 1.5 hurdle. Gross annualised return +2.3% and hit rate 60% did not override that decision.
-
-The later disclosed demonstration had 295 validation weeks: IC +0.1220, approximate statistic +1.02, hit rate 55% and gross annualised return +1.5%. This does not mean the failed candidate passed the original protocol. The complete case belongs in [[stock-bond-carry-case-study]].
+**Two critical lessons from the table:**
+1. **Why both Select columns exist (and why both fail):** In the baseline registered code ([[carry-across-assets]]), SPY dividend yield was divided by Yahoo's `auto_adjust=True` close, yielding $IC = +0.0252$ ($t = +0.29$). Replacing the denominator with unadjusted close (`auto_adjust=False`, fixing the 2006 yield overstatement noted in [[broker-research-replication]]) lifts Select Rank IC to $+0.0423$ ($t = +0.49$) and gross $AR$ to $+2.3\%$. However, **both versions fail the $t \ge 1.5$ gate by a wide margin** and both exhibit the exact same Q5 hump ($-0.09\%$).
+2. **Hindsight overfitting trap ($z_{\mathrm{hump}} = -|z|$, 自己推理):** Seeing Select returns peak in the middle quintile (Q3) and lose money in the extremes (Q1, Q5), a researcher tempted by in-sample data might invent a nonlinear "hump rule" $z_{\mathrm{hump}} = -|z|$ (buy equities when carry is normal; buy bonds when carry is extreme). When evaluated on the untouched 295-week Validate segment, the hump rule **collapses completely to $IC = +0.007, t = +0.06$** because the Select hump was sample noise (in Validate, Q5 earned $+1.17\%$). Freezing the rule and stopping at Select prevented deploying an overfitted mirage.
 
 ### Connections
-
 - **Builds on:** [[timing-signal-evaluation]], [[cross-validation-leakage]].
-- **Used by:** [[eval-statistical-significance]], [[research-workflow]], [[carry-measurement-protocol]].
-- **Related:** [[stock-bond-carry-case-study]].
+- **Used by:** [[eval-statistical-significance]], [[research-workflow]], [[carry-measurement-protocol]], [[stock-bond-carry-case-study]].
 
 <a id="eval-directional-prediction"></a>
 
-## Test Predictive Ordering at the Intended Horizon
+## Check 1: Directional Prediction (Rank IC)
 <!-- section: eval-directional-prediction | prerequisites: [information-coefficient, eval-three-stage-protocol] | related: [eval-statistical-significance, eval-directional-hit-rate, eval-sizing-monotonicity] | sources: [src-carry-course-notes, src-quant-finance-study-notes] | tags: [rank-ic, prediction, evaluation] -->
 
-IC tests whether higher scores correspond to higher subsequent returns. Choose the comparison axis first: assets on a given date for selection, or historical dates for timing an asset or spread.
+Check 1 evaluates whether higher signal scores $s_t$ predict higher forward returns $R_{t\to t+h}$ over the intended holding horizon using Spearman Rank IC (formula and properties in [[information-coefficient]]).
 
-### Definition
+### Threshold rationale & failure modes
+- **Target range ($IC \in [0.03, 0.08]$):** Financial returns are dominated by unforecastable shocks ($\varepsilon_{t+1}$). Even an IC of $0.04\text{–}0.06$ explains enough cross-sectional or temporal variation to generate a strong Sharpe ratio when combined with breadth or low turnover.
+- **Zero or inverted ($IC \le 0$):** Gives an immediate stop under the registered orientation. Never flip the sign in-sample and claim a pass on the same dataset.
+- **Too good to be true ($IC > 0.10$):** In liquid equities or macro futures, persistent IC above $0.10$ is a red flag for look-ahead bias (e.g. `shift(-h)` target misalignment, restatement leakage, or survivorship bias, [[broker-research-replication]]).
 
-Use [[information-coefficient]] for Pearson and Rank IC formulas. Cross-sectional IC gives one coefficient per date by comparing assets; time-series IC compares dated score/forward-return pairs across the sample. State the target, horizon, ranking direction, ties and missing-value treatment.
-
-### Key points
-
-- Positive IC supports the registered orientation, subject to uncertainty. Negative IC may indicate an inverted relationship or noise; reversing the sign after inspection is a new design choice.
-- Near-zero IC provides little evidence for the measured association. It does not rule out every nonlinear or conditional relationship.
-
-<details>
-<summary>Assumptions, edge cases and further checks</summary>
-
-- Pearson measures linear association in levels; Rank IC measures association in ordering. Rank IC is neither a directional success percentage nor a profit measure.
-- A large IC motivates an audit but does not establish leakage. The earlier 0.04–0.08 range and 0.10 warning level are contextual heuristics, not universal pass/fail rules.
-- A 21-day IC evaluates a 21-day target. It does not establish that a weekly position earns money; that requires [[eval-tradable-profitability]].
-
-</details>
-
-### Worked example
+### Visual diagnostic: score vs forward-return scatter
 
 ![A predictive score has a positive fitted relationship; a noise score has almost none. Both scatter plots remain noisy.](../assets/figures/signal-evaluation/predictive-scatter.svg)
 
-**Read the plot:** blue slopes upward: higher scores tend to precede higher returns. Grey is nearly flat. The large scatter explains why even a useful score is wrong on many individual weeks.
+**Read the plot:** Even for a genuinely predictive signal with $IC^{\mathrm{rank}} = +0.17$ (blue), individual weekly outcomes scatter widely above and below zero because $\sigma_\varepsilon \gg \text{signal slope}$. The upward regression slope emerges only across ratusan observations—which is why single-week outcomes cannot judge a quantitative model.
 
 ### Connections
-
 - **Builds on:** [[information-coefficient]], [[eval-three-stage-protocol]].
 - **Used by:** [[eval-statistical-significance]], [[eval-directional-hit-rate]], [[eval-sizing-monotonicity]].
 
 <a id="eval-statistical-significance"></a>
 
-## Measure Uncertainty and Account for Repeated Trials
+## Check 2: Statistical Significance & Overlap Adjustment
 <!-- section: eval-statistical-significance | prerequisites: [ic-significance, effective-sample-size, multiple-testing, eval-directional-prediction] | related: [eval-three-stage-protocol, eval-temporal-stability] | sources: [src-carry-course-notes] | tags: [t-stat, overlap, sample-size] -->
 
-After estimating association, ask how precisely it is estimated and how much searching preceded it. A small positive estimate with wide uncertainty is weaker evidence than the same effect supported by an appropriate independent evaluation.
+Check 2 tests whether the sample IC is distinguishable from noise after deflating the sample size for overlapping forward return windows ($n_{\mathrm{eff}} = n / (h/\Delta)$, formula in [[ic-significance]]).
 
-### Definition
+### Why the $t$-hurdle depends on the domain
+| Strategy Domain | Effective Sample Size $n_{\mathrm{eff}}$ | Required $t$-Hurdle | Statistical Rationale |
+|---|---|---|---|
+| **Macro / Asset-Class Timing** (single spread, weekly 21d horizon) | $\sim 120\text{–}150$ over 10–15 years (only 2–3 business cycles) | $t_{IC} \ge 1.5$ (initial screen, one-sided $p \approx 0.067$) | Low statistical power: requiring $t \ge 2.0$ requires $IC \ge 0.17$, which would reject almost every genuine macro risk premium. |
+| **Cross-Sectional Equity Selection** (single theoretical signal) | $500\text{ stocks} \times 52\text{ wks}$ ($T$ periodic ICs via $\text{ICIR}\sqrt{T}$) | $t \ge 2.0$ (two-sided $p \le 0.05$) | High cross-sectional breadth provides ample statistical power; failure to clear $2.0$ indicates noise. |
+| **Multi-Trial Factor Mining / ML** ($M \ge 50$ variants or Round 2 redesign) | Any | $t \ge 3.0$ (Harvey–Liu–Zhu 2016, [[multiple-testing]]) | Corrects for family-wise false discoveries when searching across features, lookbacks, or universes. |
 
-Report the estimate, sample length, horizon, sampling interval, dependence treatment, test direction and candidate family. The approximate statistic in [[ic-significance]] is a screening calculation; replacing sample size with an overlap approximation does not give an exact test for dependent Rank IC observations.
-
-### Key points
-
-- **Overlap:** weekly 21-day returns share approximately 16 days. Carry used overlap ratio 4.2 and effective sample size near 137 rather than 574. This is a simplifying approximation, not a count of independent economic cycles.
-- **Additional dependence:** persistent signals, clustered shocks and changing volatility may defeat a correction based only on window length. Use suitable dependence-aware resampling or, for a specified predictive regression, HAC inference ([[robust-standard-errors]]).
-
-<details>
-<summary>Assumptions, edge cases and further checks</summary>
-
-- **Cross-sectional dependence:** 500 stocks over 52 weeks produce 26,000 rows, not necessarily independent observations. Shared factors and repeated asset observations matter.
-- **Low power:** fewer observations make small effects hard to detect. Lowering a hurdle changes the error tradeoff; it does not restore missing information.
-- **Repeated testing:** a statistic near 3 is a literature benchmark under particular setups, not protection against every search. Define a correction for the actual family ([[multiple-testing]]).
-- **Failure:** not rejecting zero means insufficient evidence under the method. It does not prove no effect exists or that every realised profit was luck.
-
-**Reading it:** a statistic of 1.5 has a one-sided normal tail probability about 0.067 and two-sided about 0.134. It is not a conventional two-sided 5% result. These approximations require valid inference; carry used 1.5 as a registered screening choice.
-
-</details>
+**Interview takeaway:** Always check whether a reported $t$-statistic was computed on raw $n$ or overlap-adjusted $n_{\mathrm{eff}}$ (or Newey–West lags $L \approx h$). Dividing out the $m = 4.2$ overlap cuts an apparent $t = 2.1$ down to an insignificant $t = 1.02$.
 
 ### Connections
-
 - **Builds on:** [[ic-significance]], [[effective-sample-size]], [[multiple-testing]], [[eval-directional-prediction]].
 - **Used by:** [[eval-temporal-stability]], [[research-workflow]].
 - **Related:** [[robust-standard-errors]].
 
 <a id="eval-directional-hit-rate"></a>
 
-## Check Directional Accuracy Without Confusing It with Profit
+## Check 3: Directional Hit Rate & Payoff Asymmetry
 <!-- section: eval-directional-hit-rate | prerequisites: [hit-rate, eval-directional-prediction] | related: [eval-tradable-profitability, win-rate-expectancy] | sources: [src-carry-course-notes] | tags: [hit-rate, win-rate] -->
 
-Hit rate checks whether the signal sign agrees with the subsequent return sign. It is meaningful only when zero is a defined directional boundary for both score and target.
+Check 3 measures how often $\mathrm{sign}(s_t) = \mathrm{sign}(R_{t\to t+h})$ (formula in [[hit-rate]]) and cross-checks directional accuracy against win/loss payoff skew ([[win-rate-expectancy]]).
 
-### Definition
-
-Use [[hit-rate]] for the formula. State how zero signals, zero returns and abstentions enter the denominator. A cross-sectional score can rank assets usefully without predicting each asset's absolute return sign.
-
-### Key points
-
-- Compare with a relevant baseline. Fifty percent applies to symmetric guessing, not automatically to a target with positive drift or imbalanced signs.
-- The original 52–55% screening range and 65% warning level require context; neither proves tradability or overfitting.
-
-<details>
-<summary>Assumptions, edge cases and further checks</summary>
-
-- Directional hit rate and trade win rate can differ because of overlapping positions, exits and costs.
-- Inspect gain and loss magnitudes ([[win-rate-expectancy]]).
-
-</details>
-
-### Worked example
-
-The notes describe correct predictions on 58% of dates with +0.2% outcomes and incorrect predictions on 42% with −3.0% outcomes. At equal exposure and without costs, the mean signed outcome is $0.58\times0.2\%-0.42\times3.0\%=-1.144\%$. High accuracy does not establish profitability.
+### Diagnostic interpretation
+- **Realistic institutional range ($52\%\text{–}56\%$):** In liquid markets, a persistent $53\%$ hit rate with symmetric win/loss sizes compounds into a high Sharpe ratio.
+- **Why $HR > 55\%$ can still fail (the Carry example):** In [[eval-three-stage-protocol]], stock–bond carry achieved a $56\%$ ($60\%$ unadjusted) hit rate during the Select period—yet its timing curve suffered a $-27.7\%$ drawdown and failed statistical significance because its winning weeks were small steady carry ticks while its losing weeks were sharp risk-off equity selloffs.
+- **Benchmark drift check:** Always compare $HR$ against the unconditional positive-return frequency $\Pr(R_{t\to t+h} > 0)$. During a bull market where equities rise $58\%$ of weeks, a constant positive score gets $HR = 58\%$ with $IC = 0$.
 
 ### Connections
-
 - **Builds on:** [[hit-rate]], [[eval-directional-prediction]].
 - **Used by:** [[eval-tradable-profitability]].
 - **Related:** [[win-rate-expectancy]].
 
 <a id="eval-sizing-monotonicity"></a>
 
-## Inspect Score Strength and Conditional Returns
+## Check 4: Sizing Monotonicity & Quantile Sorts
 <!-- section: eval-sizing-monotonicity | prerequisites: [eval-directional-prediction] | related: [eval-tradable-profitability, stock-bond-carry-case-study] | sources: [src-carry-course-notes] | tags: [quantile-sort, monotonicity, bucket-returns] -->
 
-A quantile sort shows whether stronger scores correspond to higher average forward returns. It diagnoses a proposed sizing rule but does not establish an optimal rule by itself.
+Check 4 sorts evaluation observations into $Q = 5$ quintiles by signal score $s_t$ and computes the mean forward return $\bar R_q$ in each bucket to verify that expected returns increase monotonically with signal conviction.
 
 ### Formula
 
@@ -304,277 +213,168 @@ $$\bar R_q=\frac{1}{|B_q|}\sum_{t\in B_q}R_{t\to t+h},\qquad q=1,\ldots,Q$$
 
 **Variables:**
 
-- $\bar R_q$ mean forward simple return in bucket $q$, in decimals
-- $q$ bucket index, ordered from lowest to highest score
-- $Q$ number of buckets; five in the carry experiment
-- $B_q$ set of evaluation dates assigned to bucket $q$
-- $|B_q|$ number of dates in that bucket
-- $t$ evaluation date
+- $\bar R_q$ average forward simple return in score bucket $q$
+- $q=1,\dots,Q$ bucket index ordered from lowest score ($q=1$) to highest score ($q=Q$, typically $Q=5$)
+- $B_q$ set of observations (dates $t$ in timing, or asset-date pairs in selection) falling in bucket $q$
+- $|B_q|$ number of observations in bucket $q$
+- $t$ evaluation date index
 - $h$ forecast horizon in trading days
-- $R_{t\to t+h}$ realised target return over that horizon
+- $R_{t\to t+h}$ realised forward return over horizon $h$
 
-### Key points
-
-- Timing buckets historical dates; cross-sectional selection sorts assets within each date before aggregating.
-- Report bucket counts and uncertainty. Overlapping labels reduce the information behind apparent differences.
-
-<details>
-<summary>Assumptions, edge cases and further checks</summary>
-
-- Increasing means support monotonicity, not constant slope or optimal linear sizing. Risk and costs also determine weights.
-- Full-sample buckets may describe a sample. If their boundaries determine trades, estimate them from information available at the decision time.
-- A hump warrants investigation. A nonlinear rule invented after inspecting it needs a fresh evaluation.
-
-</details>
-
-### Worked example
+### Visual diagnostic: Monotonic staircase vs Hump trap
 
 ![Mean next-week returns by score quintile for the predictive and noise scores, with approximate confidence intervals.](../assets/figures/signal-evaluation/quantile-returns.svg)
 
-**Read the bars:** blue rises from low-score Q1 to high-score Q5; grey has no consistent ordering. Thin lines are approximate 95% intervals for group means in this independent-week simulation. They show uncertainty, not guaranteed future ranges.
+**Read the bars:**
+- **Monotonic staircase (blue predictive signal):** $\bar R_1 < \bar R_2 < \bar R_3 < \bar R_4 < \bar R_5$, with Q1 strongly negative and Q5 strongly positive. Linear position sizing ($w_t = \mathrm{clip}(s_t/2, -1, 1)$) is well-specified because maximum capital is deployed where expected returns are highest.
+- **Flat / noisy (grey):** Bucket means bounce randomly around zero with overlapping 95% confidence bars ($\pm 1.96\,\hat\sigma_q/\sqrt{|B_q|}$).
+- **The Hump Trap:** In the Carry Select sample ([[eval-three-stage-protocol]]), quintile returns were $-0.26\%, +0.73\%, +1.32\%, +0.63\%, \mathbf{-0.09\%}$. Even though Rank IC was slightly positive, **Q5 lost money**—meaning linear sizing puts maximum $100\%$ long exposure on the worst-performing bucket.
 
-<details>
-<summary>Carry results and alternative rule</summary>
-
-Carry selection quintiles were −0.10%, +0.41%, +0.95%, +0.72%, −0.09%. Q5 underperformed Q3, challenging the proposed monotonic relationship. Validation quintiles were +0.60%, +0.15%, +1.14%, +0.99%, +1.17%; neither sample forms an exact staircase.
-
-The hindsight-inspired alternative was $z_{\mathrm{hump}}=-|z|$: buy equities near normal carry and bonds at extremes. **(自己推理)**: this was the original alternative interpretation. Its validation IC +0.007 and approximate statistic +0.06 did not support the alternative. They do not prove that the original hump was purely noise.
-
-</details>
+**Implementation note (breaking ties at caps):** When scores are clipped at $\pm 2$, many observations share the exact value $+2$ or $-2$. Rank with `df["z"].rank(method="first")` before calling `pd.qcut(..., 5)` so buckets maintain equal sample sizes $|B_q|$.
 
 ### Connections
-
 - **Builds on:** [[eval-directional-prediction]].
-- **Used by:** [[eval-tradable-profitability]].
-- **Related:** [[stock-bond-carry-case-study]].
+- **Used by:** [[eval-tradable-profitability]], [[eval-three-stage-protocol]], [[stock-bond-carry-case-study]].
 
 <a id="eval-tradable-profitability"></a>
 
-## Simulate Positions, Returns and Drawdowns
+## Check 5: Tradable Profitability & Underwater Drawdown
 <!-- section: eval-tradable-profitability | prerequisites: [timing-curve-metrics, signal-position-construction, eval-sizing-monotonicity] | related: [eval-turnover-costs, eval-temporal-stability, sharpe-ratio] | sources: [src-carry-course-notes] | tags: [timing-curve, drawdown, equity-curve] -->
 
-The trading backtest evaluates a fixed, executable score-to-position rule. Simulate actual holding intervals instead of compounding overlapping forecast labels as if they were sequential profits.
+Check 5 converts scores into executable weights $w_t$ and compounds non-overlapping holding-period returns to inspect the equity curve and the underwater drawdown profile ($V_t$, $AR$, and $DD_t$ formulas in [[timing-curve-metrics]]).
 
-### Definition
-
-Use [[signal-position-construction]] for sizing and [[timing-curve-metrics]] for compounding and drawdown. Carry predicts 21 trading days ahead but holds each diagnostic position for one weekly rebalance interval. Each realised weekly return enters the curve once.
-
-### Key points
-
-- Specify signal availability, order time, fill time and the return earned after execution.
-- Define the weight: a unit stock-minus-bond spread has two legs and differs from a fully invested stock/bond allocator in exposure and costs.
-
-<details>
-<summary>Assumptions, edge cases and further checks</summary>
-
-- Label a spread curve as a diagnostic sleeve unless baseline holdings, cash and financing are included in the complete portfolio simulation.
-- Compare gross and net return, annualised geometric return, [[sharpe-ratio]], drawdown and recovery duration with the intended benchmark at comparable risk.
-- Drawdown in [[timing-curve-metrics]] is nonpositive. If reporting a positive loss magnitude, label that convention.
-- A positive curve with years underwater may fail the mandate. Drawdown tolerances are mandate-specific rather than universal.
-
-**Reading it:** IC is evidence about a score; simulated net return is evidence about one implementation. Neither substitutes for the other.
-
-<details>
-<summary>Forecast horizon versus rebalance interval</summary>
-
-A weekly decision can use a forecast about the next 21 trading days. If the rule rebalances every week, simulate each week's realised return on the position actually held. The 21-day forward returns serve as prediction labels and overlap; multiplying them together would count shared market moves repeatedly. A rule that holds each new trade for the full 21 days instead needs an explicit simulation of its overlapping positions and capital allocation.
-
-</details>
-
-</details>
-
-### Worked example
+### Visual diagnostic: The underwater drawdown chart
 
 ![Weekly peak-to-trough drawdowns for the three simulated implementations.](../assets/figures/signal-evaluation/drawdowns.svg)
 
-**Read the drawdown:** zero means a new capital peak. Blue still falls about **15%** below its previous peak; grey reaches about **36%** and orange **50%**. A profitable long-run curve can still involve a difficult recovery.
+**Read the drawdown:**
+- Even the profitable predictive strategy at 5 bps (blue, compounding \$1 to \$2.37) suffers a **$-15\%$ maximum drawdown** and spends over a year below its prior peak.
+- The noise strategy (grey) reaches **$-36\%$**, and the high-cost implementation of the predictive signal (orange, 50 bps) plunges to **$-50\%$**.
+- **Allocator rule:** Institutional PMs read the underwater chart before the cumulative return chart. A strategy with a 10% annual return but a 4-year drawdown duration will be shut down or redeemed long before recovery.
+
+### Horizon vs rebalance clock discipline
+When a signal forecasts $h = 21$-day returns but the portfolio rebalances weekly ($\Delta = 5$ days), the timing curve must compound the **realised 1-week return** $w_t R_{t\to t+1}$ on each weekly rebalance step—never the overlapping 21-day return $R_{t\to t+21}$.
 
 ### Connections
-
 - **Builds on:** [[timing-curve-metrics]], [[signal-position-construction]], [[eval-sizing-monotonicity]].
 - **Used by:** [[eval-turnover-costs]], [[eval-temporal-stability]].
 - **Related:** [[sharpe-ratio]], [[signal-to-weight]].
 
 <a id="eval-turnover-costs"></a>
 
-## Deduct Frictions at Each Rebalance
+## Check 6: Turnover & Transaction Cost Feasibility
 <!-- section: eval-turnover-costs | prerequisites: [turnover-cost-drag, eval-tradable-profitability] | related: [eval-correlation-redundancy, portfolio-construction-process] | sources: [src-carry-course-notes] | tags: [turnover, transaction-costs, net-return] -->
 
-Charge costs to the actual trades produced by the frozen rule. Persistence may influence turnover, but signal autocorrelation alone does not determine cost survival.
+Check 6 deducts realistic transaction costs from every rebalance trade ($TO$, $\text{Cost} = c \cdot TO \cdot 52$, and $AR_{\mathrm{net}}$ formulas in [[turnover-cost-drag]]) to verify that gross alpha is not consumed by execution friction.
 
-### Definition
-
-[[turnover-cost-drag]] gives the simplified weekly convention. For a portfolio, measure changes from pretrade holdings to target holdings, charge each leg consistently and compound net period returns. Specify whether costs are per leg, one-way, round-trip or all-in for a spread.
-
-### Key points
-
-- Include applicable spread, slippage, commissions, borrow and financing. Impact and capacity depend on liquidity and trade size; 5 bps is illustrative.
-- A scalar spread-weight change is not automatically the sum of traded asset notionals. Account for both legs and reversals.
-
-<details>
-<summary>Assumptions, edge cases and further checks</summary>
-
-- Price changes can create rebalancing trades even with an unchanged signal.
-- Annual drag based on average turnover is an approximation. Subtracting it from geometric gross return is not exact net CAGR.
-- Recompute under plausible, documented costs. If net return becomes negative, the tested implementation fails under those assumptions.
-
-</details>
-
-### Worked example
+### Visual diagnostic: Gross alpha vs cost drag
 
 ![Identical predictive strategy: gross mean return less annualised trading costs at zero, five and fifty basis points.](../assets/figures/signal-evaluation/cost-drag.svg)
 
-**Read the cost bars:** the score and positions stay unchanged. Annualised arithmetic gross mean return is **10.4%**; trading drag is about **1.5%** at 5 bps and **14.6%** at 50 bps. Black dots mark net mean return. These arithmetic means differ from the geometric returns of the compounded curves.
+**Read the cost bars:**
+- The underlying predictive signal and target weights $w_t$ are identical across all three bars, earning an annualised arithmetic gross return of **+10.4%**.
+- At **5 bps** (liquid index futures / ETFs), annual cost drag is **1.5%**, leaving **+8.9%** net.
+- At **50 bps** (illiquid credit, small-cap equities, or wide bid-ask spreads), annual cost drag jumps to **14.6%**, flipping net return to **−4.2%**.
 
-<details>
-<summary>Turnover calculation with small numbers</summary>
-
-At a one-way all-in cost of 5 bps per unit of the stated turnover convention, weekly turnover 0.08 gives annual arithmetic drag $0.0005\times0.08\times52=0.208\%$. Turnover 0.60 gives 1.56%; subtracting from 2.0% gross return gives approximately 0.44%, before other frictions and compounding effects.
-
-**Notes:** the original examples pair these turnover levels with autocorrelations 0.95 and 0.30. These are illustrative pairings, not a mapping from autocorrelation to turnover. Carry's selection/validation autocorrelations were 0.95/0.94.
-
-</details>
+**Interview takeaway:** Before celebrating a high-IC short-horizon signal, compute its **breakeven transaction cost** $c^* = \frac{AR_{\text{gross}}}{52 \cdot TO}$. If $c^*$ is below the instrument's effective half-spread + market impact, the signal cannot be traded standalone and must either be smoothed (EWMA / trade buffer) or used only as a slow tilt on trades already triggered by other signals.
 
 ### Connections
-
 - **Builds on:** [[turnover-cost-drag]], [[eval-tradable-profitability]].
 - **Used by:** [[eval-correlation-redundancy]].
 - **Related:** [[portfolio-construction-process]].
 
 <a id="eval-temporal-stability"></a>
 
-## Check Stability Across Time and Conditions
+## Check 7: Temporal & Regime Stability
 <!-- section: eval-temporal-stability | prerequisites: [icir-stability, eval-statistical-significance, eval-tradable-profitability] | related: [eval-three-stage-protocol, eval-correlation-redundancy] | sources: [src-carry-course-notes] | tags: [rolling-ic, yearly-ic, regime-stability] -->
 
-Compare predictive and trading evidence across subperiods to understand where the effect occurs. Stability does not require every noisy yearly IC estimate to be positive.
+Check 7 inspects whether predictive skill and net returns persist across subperiods and macro regimes rather than coming from a single crisis windfall ($\text{ICIR}$ formula in [[icir-stability]]).
 
-### Definition
-
-Inspect rolling and yearly IC alongside net return, drawdown, turnover and exposure. [[icir-stability]] defines ICIR for a specified periodic IC series; it is not portfolio IR and does not guarantee smooth profits.
-
-### Key points
-
-- Carry used rolling 52-week IC and yearly IC with at least ten observations. Ten weeks is a display threshold, not reliable inference for overlapping 21-day labels.
-- Rolling windows share data. Successive estimates are not independent confirmations; smoothness can arise from overlap.
-
-<details>
-<summary>Assumptions, edge cases and further checks</summary>
-
-- Sign changes may reflect noise, changing economics or input problems. Investigate rather than declaring pure noise.
-- Inspect profit concentration separately from IC concentration. Crisis performance may be meaningful, but its repeatability and mandate fit need explanation.
-- The earlier 70%-positive-years criterion is a possible registered diagnostic, not a universal standard. Report counts, sample lengths and uncertainty.
-- Define regimes before using them for model selection. Post-hoc subperiod analysis is exploratory.
-
-</details>
+### Three standard stability views
+1. **Rolling 52-week Rank IC:** Plots trailing 1-year Rank IC over time.
+   - *Healthy:* Hovers predominantly above zero, with brief dips during regime transitions.
+   - *Red flag:* Oscillates symmetrically around zero (pure noise, as seen in `equity_bond_carry`) or decays secularly toward zero (alpha crowding / structural change).
+   - *Caveat:* Consecutive 52-week windows share 51 weeks of data; visual smoothness is a product of window overlap, not 52 independent tests per year.
+2. **Calendar-year IC & hit rate (minimum 10 weeks per year):** Checks that at least $\sim 70\%$ of full calendar years show positive IC, ruling out "one-hit wonder" signals that made 100% of their cumulative P&L during 2008 or March 2020.
+3. **Ex-ante macro regime splits:** Evaluates performance across pre-defined rate/volatility environments (e.g. ZIRP 2009–2021 vs post-2022 rate-hiking regime, where zero rates pinned both legs of stock–bond carry and caused a variance drought, [[carry-case-diagnosis]]).
 
 ### Connections
-
 - **Builds on:** [[icir-stability]], [[eval-statistical-significance]], [[eval-tradable-profitability]].
 - **Used by:** [[eval-correlation-redundancy]], [[research-workflow]].
 - **Related:** [[eval-three-stage-protocol]].
 
 <a id="eval-correlation-redundancy"></a>
 
-## Assess Incremental Portfolio Value
+## Check 8: Signal Redundancy & Incremental Portfolio Value
 <!-- section: eval-correlation-redundancy | prerequisites: [information-coefficient, eval-turnover-costs, eval-temporal-stability] | related: [marginal-sharpe-improvement, fundamental-law-active-management, research-workflow] | sources: [src-carry-course-notes, src-quant-finance-study-notes] | tags: [correlation, redundancy, diversification] -->
 
-Ask whether adding the candidate improves the existing portfolio under its costs and constraints. Similarity is a diagnostic, not a complete decision rule.
+A signal that passes Checks 1–7 standalone must still clear Check 8: it must add **independent information** relative to the signals already in the portfolio rather than duplicating an existing factor bet.
 
-### Definition
-
-Distinguish score correlation, strategy-return correlation and common risk exposures. Similar scores can produce different returns through sizing or execution; low score correlation can conceal common factor exposure.
-
-### Key points
-
-- Compare aligned samples, net strategy returns and exposures. A score correlation above 0.60 flags similarity under the contextual screening heuristic, not zero incremental information; a lower value does not establish usefulness.
-- Choosing the higher in-sample statistic among correlated signals adds selection bias. Evaluate the chosen design independently.
-
-<details>
-<summary>Assumptions, edge cases and further checks</summary>
-
-- Recompute the combined portfolio at feasible allocations under its risk budget, turnover and capacity constraints.
-- [[marginal-sharpe-improvement]] derives a local frictionless addition condition using return correlation and Sharpe ratios. It is not a condition on signal-score correlation.
-- Square-root formulas for optimal Sharpe improvement require an optimally combined, uncorrelated incremental return component. An ordinary benchmark-relative IR cannot be substituted without establishing that decomposition.
-- [[fundamental-law-active-management]] links skill, independent breadth and implementation. It explains possible sources of portfolio value, but does not certify this candidate's realised contribution.
-
-</details>
+### Two-step redundancy & increment test
+1. **Cross-signal correlation screen ($|\rho(s_{\mathrm{new}}, s_{\mathrm{existing}})| \le 0.60$):**
+   - Compute pairwise correlation between the candidate score (and its strategy return series) and every signal already in production.
+   - If $|\rho| > 0.60$, the candidate is largely redundant with an existing signal ([[ic-contribution]]). Either discard the weaker signal or orthogonalise the candidate against the existing book and re-test the residual.
+2. **Marginal Sharpe improvement condition ([[marginal-sharpe-improvement]]):**
+   - Adding a new strategy with standalone Sharpe $SR_{\mathrm{new}}$ and return correlation $\rho$ with the existing portfolio ($SR_{\mathrm{base}}$) improves the combined frictionless Sharpe ratio if and only if $SR_{\mathrm{new}} > \rho\,SR_{\mathrm{base}}$.
+   - When orthogonalised ($\rho = 0$), the optimal combined Sharpe ratio is $SR_{\mathrm{comb}} = \sqrt{SR_{\mathrm{base}}^2 + IR_{\mathrm{new}}^2}$. In production, verify that net portfolio Sharpe improves **after** accounting for combined turnover netting and risk constraints.
 
 ### Connections
-
 - **Builds on:** [[information-coefficient]], [[eval-turnover-costs]], [[eval-temporal-stability]].
 - **Used by:** [[research-workflow]], [[signal-to-weight]].
-- **Related:** [[marginal-sharpe-improvement]], [[fundamental-law-active-management]].
+- **Related:** [[marginal-sharpe-improvement]], [[fundamental-law-active-management]], [[ic-contribution]].
 
 <a id="research-workflow"></a>
 
-## Record the Decision and Research Trail
+## Research Workflow & Interview Project Storytelling
 <!-- section: research-workflow | prerequisites: [eval-three-stage-protocol, eval-statistical-significance, eval-correlation-redundancy] | related: [backtest-pitfalls, multiple-testing] | sources: [src-squarepoint-dqa-workbook] | tags: [research, communication, workflow] -->
 
-Conclude with a decision tied to the registered objective and evidence. Documenting a failed candidate preserves what was learned and prevents repeated searches from losing their history.
+Every research project should follow a reproducible seven-step lifecycle from economic hypothesis to post-deployment monitoring, and a candidate should be ready to present any project at three time budgets in an interview.
 
-### Definition
+### The 7-step research lifecycle
+1. **Economic Hypothesis:** State *why* the return premium or inefficiency exists (behavioral bias, institutional constraint, or risk transfer) and who takes the other side.
+2. **Point-in-Time Data Audit:** Map every input to its publication timestamp, corporate-action adjustment, and universe roster ([[broker-research-replication]]).
+3. **Unparameterised Baseline:** Build the simplest zero-free-parameter benchmark first (e.g. equal-weight or 12M expanding z-score).
+4. **Three-Stage Isolation:** Freeze Select / Validate / Test splits and purge boundary-straddling forward windows ([[eval-three-stage-protocol]]).
+5. **8-Check Diagnostic & Cost Stress:** Run the frozen candidate through Checks 1–8 under realistic transaction costs.
+6. **Recorded Verdict:** Either **Proceed** (all gates cleared), **Stop** (record negative finding and keep later samples sealed, as in [[stock-bond-carry-case-study]]), or **Register Round 2** (document the change and raise the $t$-hurdle to $\ge 3.0$).
+7. **Live Telemetry & Kill Criteria:** Monitor live vs paper fills, rolling IC, and factor exposures against pre-set stop-loss triggers.
 
-Record the hypothesis, availability rules, baseline, implementation, partitions, variants, results, rejected alternatives, limitations and decision. Future modifications start from this record.
+### Presenting a research project at three interview depths
+- **30-second pitch:** Economic hypothesis → your specific modeling/data design → headline out-of-sample net result (or disciplined kill decision).
+- **2-minute overview:** Universe & point-in-time data → baseline vs proposed signal → validation protocol & $n_{\mathrm{eff}}$ → gross vs net Sharpe/turnover → main limitation.
+- **10-minute deep dive:** Exact equations, edge cases & data bugs fixed (e.g. `auto_adjust` dividend denominator, straddle purging), failed variants & why they failed, transaction-cost breakeven, and how the signal interacts with the rest of the book.
 
-### Key points
-
-- End with a recorded decision: proceed, stop, or register another experiment.
-- Separate measured evidence from explanations that remain hypotheses.
-
-<details>
-<summary>Detailed checklist and interpretation</summary>
-
-| Decision | Meaning | Next step |
-|---|---|---|
-| Proceed under the protocol | The stated criteria were met | Evaluate the frozen design on the next reserved sample or monitor an authorised deployment |
-| Stop under the protocol | A required criterion failed | Record the failure without claiming the economic theory was disproved |
-| Register another experiment | A specific measurement or design hypothesis merits testing | Document the change, accumulated trials and remaining independent data |
-
-**Carry decision:** IC +0.0423 and approximate statistic +0.49 did not meet the selection criterion. This tested proxy failed the registered screen; it does not establish that carry cannot predict returns elsewhere.
-
-**Communication:** the original project notes use 30 seconds for hypothesis and decision, two minutes for data, baseline, implementation, validation and limitations, and ten minutes for assumptions, diagnostics, rejected alternatives, costs and risks. At each depth distinguish measured results from untested explanations.
-
-**Monitoring:** establish review/stop criteria before deployment. Compare actual signals, orders, fills and costs with the historical implementation. Record any redesign informed by those observations.
-
-</details>
+### 6-step quantitative problem-solving protocol
+1. **Clarify the setup:** Confirm asset class, horizon, constraints, and edge assumptions.
+2. **Define variables:** State every symbol, dimension, and time subscript ($t$ vs $t+h$).
+3. **State the governing principle:** Name the theorem first (no-arbitrage, Itô, Gauss–Markov, Bayes, KKT).
+4. **Write the anchor equation:** Lay down the cleanest starting formula before algebra.
+5. **Solve & check boundary limits:** Verify $\sigma \to 0$, $\rho \to \pm 1$, $T \to 0$, or equal-volatility special cases.
+6. **State where the model breaks:** Give the desk reality (illiquidity, fat tails, discrete hedging, estimation error).
 
 ### Connections
-
 - **Builds on:** [[eval-three-stage-protocol]], [[eval-statistical-significance]], [[eval-correlation-redundancy]].
 - **Used by:** [[backtest-pitfalls]].
 - **Related:** [[multiple-testing]], [[carry-case-diagnosis]].
 
 <a id="backtest-pitfalls"></a>
 
-## Diagnose Backtest and Live Performance Gaps
-<!-- section: backtest-pitfalls | prerequisites: [research-workflow, multiple-testing] | related: [cross-validation-leakage, price-reconciliation, sharpe-ratio] | sources: [src-squarepoint-dqa-workbook] | tags: [backtest, overfitting, survivorship, debugging] -->
+## Backtest Pitfalls & Debugging Live Underperformance
+<!-- section: backtest-pitfalls | prerequisites: [research-workflow, multiple-testing] | related: [cross-validation-leakage, price-reconciliation, sharpe-ratio, conditional-probability-bayes] | sources: [src-squarepoint-dqa-workbook] | tags: [backtest, overfitting, survivorship, debugging] -->
 
-Start by checking whether both systems implement the same decisions on the same information. Then assess execution, uncertainty, selection and market changes.
+When a strategy with a strong backtest Sharpe ratio immediately loses money in live trading, investigate strictly from **mechanical plumbing bugs** to **statistical/regime explanations**—never blame a "regime shift" before ruling out a code or execution discrepancy.
 
-### Definition
+### "Sharpe 4 in backtest, loses money live" — 4-level root-cause hierarchy
 
-Separate an implementation discrepancy from a disappointing realisation of a correctly implemented strategy. A short loss sequence can occur under positive expectation; the loss itself does not identify the cause.
-
-### Key points
-
-- First compare signals, orders and fills at identical timestamps.
-- Then investigate costs, selection bias and market changes.
-
-<details>
-<summary>Detailed checklist and interpretation</summary>
-
-| Investigation | Checks | Purpose |
+| Priority Level | Category | Concrete Checks to Run First |
 |---|---|---|
-| Implementation and data | Same timestamps; signals, orders, dividends, splits, duplicates, future-shifted features, universes, revisions | Establish that the comparison is valid |
-| Execution and accounting | Assumed versus actual fills, costs, borrow, financing, volumes | Establish whether frictions consume the paper edge |
-| Uncertainty and selection | Sample length, dependence, all variants tried, reused evaluation samples | Assess inflated performance expectations |
-| Regime and capacity | Exposure changes, volatility, structure, crowding | Test market explanations after operational checks |
+| **Level 1: Plumbing & Data Leakage** | Code / Timestamp mismatch | Re-run backtest on the exact live window and diff signals, target weights, and fills timestamp-by-timestamp ([[price-reconciliation]]). Check for `shift(-1)` look-ahead, unlagged macro releases, dividend/split adjustment bugs, duplicate rows, stale close prices, and survivorship-biased universes. |
+| **Level 2: Execution & Accounting** | Unmodeled frictions | Compare assumed mid-price fills against actual execution: bid-ask spread, market impact (>5% ADV participation), short-borrow fees, financing rates, and pre-trade risk-limit clipping. |
+| **Level 3: Selection Bias & Overfitting** | Research process | Count total signal variants, parameters, and post-hoc tweaks tried ($M$). Apply the multiple-testing haircut ([[multiple-testing]]) and Bayes' rule on low base-rate true signals ([[conditional-probability-bayes]]). |
+| **Level 4: Regime Shift & Crowding** | Market structure | Only after Levels 1–3 reconcile cleanly: check whether realized return volatility, cross-asset correlation, or peer factor crowding shifted outside the historical training distribution. |
 
-**Notes:** the original 5%-of-daily-volume check is a capacity diagnostic, not a universal safe limit. A backtest Sharpe of 4 motivates an audit, but proves neither an edge nor a bug. Record supported explanations separately from unresolved hypotheses.
-
-</details>
+**Interview takeaway:** A bad first week or month is also checked against the expected distribution of drawdowns under the true ex-ante Sharpe ratio ($SR = 1.5$ still has a $\sim 16\%$ probability of losing money over a full year, and near $50\%$ over a single week). First verify that live code matches backtest code on identical timestamps; then quantify whether the realized loss exceeds normal sampling variance.
 
 ### Connections
-
 - **Builds on:** [[research-workflow]], [[multiple-testing]].
-- **Related:** [[cross-validation-leakage]], [[price-reconciliation]], [[sharpe-ratio]].
+- **Related:** [[cross-validation-leakage]], [[price-reconciliation]], [[sharpe-ratio]], [[conditional-probability-bayes]].

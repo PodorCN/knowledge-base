@@ -48,6 +48,7 @@ $$\Theta=-\tfrac12\,\Gamma\,\sigma_{\text{imp}}^2\,S^2\quad(r=0),\qquad \text{P\
 - $S$ underlying price
 - $\sigma_{\text{imp}}$ implied vol paid for the option
 - $\sigma_{\text{real}}$ realised vol over the step
+- $r$ risk-free interest rate
 - $\Delta t$ time step
 
 The first relation is the Black–Scholes PDE of [[black-scholes-pde]] for a delta-neutral book with $r=0$ (Hull ch. 19 gives the Θ–Γ relation).

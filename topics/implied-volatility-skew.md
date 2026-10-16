@@ -160,6 +160,7 @@ $$\sigma_{\text{imp}}=f(K,T)$$
 **Variables:**
 
 - $\sigma_{\text{imp}}$ implied volatility
+- $f(K,T)$ implied volatility surface mapping strike and expiry to implied vol
 - $K$ strike (or log-moneyness $k=\ln(K/F)$, or delta)
 - $T$ expiry
 
