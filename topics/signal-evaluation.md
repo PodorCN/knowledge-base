@@ -283,7 +283,7 @@ A signal gives a weekly long (+1) or short (−1) call on an equity index, held 
 <a id="eval-sizing-monotonicity"></a>
 
 ## Check 4: Sizing Monotonicity & Quantile Sorts
-<!-- section: eval-sizing-monotonicity | prerequisites: [eval-directional-prediction] | related: [eval-tradable-profitability, stock-bond-carry-case-study] | sources: [src-carry-course-notes] | tags: [quantile-sort, monotonicity, bucket-returns] -->
+<!-- section: eval-sizing-monotonicity | prerequisites: [eval-directional-prediction, effective-sample-size] | related: [eval-tradable-profitability, stock-bond-carry-case-study, signal-position-construction, eval-statistical-significance] | sources: [src-carry-course-notes] | tags: [quantile-sort, monotonicity, bucket-returns] -->
 
 Check 4 sorts evaluation observations into $Q = 5$ quintiles by signal score $s_t$ and computes the mean forward return $\bar R_q$ in each bucket to verify that expected returns increase monotonically with signal conviction.
 
@@ -308,13 +308,65 @@ $$\bar R_q=\frac{1}{|B_q|}\sum_{t\in B_q}R_{t\to t+h},\qquad q=1,\ldots,Q$$
 **Read the bars:**
 - **Monotonic staircase (blue predictive signal):** $\bar R_1 < \bar R_2 < \bar R_3 < \bar R_4 < \bar R_5$, with Q1 strongly negative and Q5 strongly positive. Linear position sizing ($w_t = \mathrm{clip}(s_t/2, -1, 1)$) is well-specified because maximum capital is deployed where expected returns are highest.
 - **Flat / noisy (grey):** Bucket means bounce randomly around zero with overlapping 95% confidence bars ($\pm 1.96\,\hat\sigma_q/\sqrt{|B_q|}$).
-- **The Hump Trap:** In the Carry Select sample ([[stock-bond-carry-case-study]]), quintile returns were $-0.26\%, +0.73\%, +1.32\%, +0.63\%, \mathbf{-0.09\%}$. Even though Rank IC was slightly positive, **Q5 lost money**—meaning linear sizing puts maximum $100\%$ long exposure on the worst-performing bucket.
+- **The Hump Trap:** In the Carry Select sample ([[stock-bond-carry-case-study]]), quintile returns were $-0.26\%, +0.73\%, +1.32\%, +0.63\%, \mathbf{-0.09\%}$. Even though Rank IC was slightly positive, **Q5 lost money**, so linear sizing puts its maximum $100\%$ long exposure on a bucket that lost money. What this means and how to respond is below.
+
+### Six quantile shapes: what each means and how to fix it
+
+![Six small bar charts of mean forward return by score quintile: monotonic staircase, flat, inverted staircase, the carry hump, one tail only, and extremes only.](../assets/figures/signal-evaluation/quantile-patterns.svg)
+
+1. **Monotonic staircase** ($\bar R_1 < \dots < \bar R_5$)
+   - *Means:* the score ranks expected returns across its whole range.
+   - *Fix:* none needed. Linear or rank-based sizing is well specified ([[signal-position-construction]]); move on to costs (Check 6).
+2. **Flat / noisy** (bars bounce around zero, confidence bars overlap)
+   - *Means:* no information.
+   - *Fix:* none by sizing. Stop, as pre-registered. Searching for a sizing rule that makes noise profitable is data mining.
+3. **Inverted staircase** ($\bar R_1 > \dots > \bar R_5$)
+   - *Means:* the signal predicts, but opposite to the hypothesis. Either the code has a sign error (e.g. a forward return computed as $P_t/P_{t+h}-1$), or the economics differs from the story (e.g. a "momentum" score at a 1-month horizon picks up short-term reversal).
+   - *Fix:* audit the sign conventions first. If the code is right, flipping the sign is a **new hypothesis**: it needs an economic reason, the multiple-testing hurdle $t \ge 3$ ([[eval-statistical-significance]]), and untouched data to validate on.
+4. **Hump** (middle buckets best, one or both extremes weak or negative): the carry case
+   - *Means:* the extreme scores occur in unusual periods where something other than the signal drives returns: crisis sell-offs, zero-rate regimes (which compressed both carry legs after 2008), crowded positions unwinding, or bad data at the extremes. Rank IC can stay slightly positive because the middle buckets are still ordered. With few independent observations per bucket, the hump can also be pure noise.
+   - *Fix, in this order:*
+     1. **Test whether it is real** before changing anything (next sub-section).
+     2. **Audit the Q5 dates:** if they cluster in one or two episodes (one crisis), the "pattern" is one event, not a law.
+     3. **Check the data** behind the extreme scores: outliers, stale prices, a broken series.
+     4. **Bound the bet instead of reshaping it:** cap the score lower (e.g. clip at $\pm1$ instead of $\pm2$) or size by rank, so no bucket gets an outsized position. This limits damage without claiming new alpha, and it can be the pre-registered default.
+     5. **Condition on an economically motivated regime variable** only as a new, pre-registered hypothesis tested on fresh data (e.g. do not add to "cheap" equities while volatility is spiking).
+     6. **Never fit the in-sample shape:** a rule like $z_{\mathrm{hump}} = -|z|$ copies the noise (worked example below).
+5. **One tail only** (one extreme bucket clearly different, the rest flat)
+   - *Means:* the information is one-sided, e.g. distress predicts underperformance but "healthy" does not predict outperformance.
+   - *Fix:* asymmetric use: trade only that tail (short or underweight Q1, flat elsewhere), or use the score as a screen rather than as a linear long-short signal.
+6. **Extremes only** (Q1 and Q5 strong, Q2–Q4 near zero)
+   - *Means:* the score matters only when it is far from normal, e.g. valuation spreads that only predict at extremes.
+   - *Fix:* threshold sizing: take a position only when $|s_t|$ exceeds a cut-off fixed in advance (e.g. $|z| > 1$), and stay flat in between. This also cuts turnover (Check 6).
+
+### Is the hump real? Test before you fix
+A bucket mean is an average of about $|B_q|$ forward returns, but with overlapping windows and a slow score those dates cluster in time, so each bucket has roughly $|B_q|/m$ independent observations **(自己推理)**:
+
+$$t_{5-3}=\frac{\bar R_5-\bar R_3}{\sqrt{\dfrac{\hat\sigma_5^{2}}{|B_5|/m}+\dfrac{\hat\sigma_3^{2}}{|B_3|/m}}}$$
+
+**Variables:**
+
+- $t_{5-3}$ $t$-statistic for the gap between the top bucket and the middle bucket
+- $\bar R_5, \bar R_3$ mean forward return in Q5 and Q3
+- $\hat\sigma_5, \hat\sigma_3$ standard deviation of forward returns within Q5 and Q3
+- $|B_5|, |B_3|$ number of dates in each bucket
+- $m=h/\Delta$ overlap ratio ([[effective-sample-size]])
+
+**Reading it:** in the carry Select sample each quintile holds about $574/5 \approx 115$ weeks, or only about $115/4.2 \approx 27$ independent 21-day returns. Assuming the 21-day equity-minus-bond return has a volatility of about $5\%$ **(自己推理; an assumption, not a number from the study)**, each bucket mean has a standard error of about $5\%/\sqrt{27} \approx 0.96\%$. The Q3–Q5 gap then has a standard error of about $\sqrt2 \times 0.96\% \approx 1.36\%$. The observed gap of $1.32\% - (-0.09\%) = 1.41\%$ gives $t_{5-3} \approx 1.0$, which is indistinguishable from noise.
+
+### Worked example: the carry hump out of sample
+The Select-period hump ($-0.26\%, +0.73\%, +1.32\%, +0.63\%, -0.09\%$) suggests a tempting rule: buy equities when carry is normal and bonds when carry is extreme, i.e. $z_{\mathrm{hump}} = -|z|$.
+
+- On the untouched 295-week Validate period (2018–2023), the quintiles were $+0.60\%, +0.15\%, +1.14\%, +0.99\%, +1.17\%$: **Q5 was the best bucket**, so the hump did not repeat.
+- The hump rule scored $IC = +0.007$, $t = +0.06$ in Validate: no skill at all.
+- **Lesson:** the Select hump was sample noise. Bounding the bet (fix 4) would have cost little in either period. Fitting the shape (fix 6) would have deployed an overfitted rule.
 
 **Implementation note (breaking ties at caps):** When scores are clipped at $\pm 2$, many observations share the exact value $+2$ or $-2$. Rank with `df["z"].rank(method="first")` before calling `pd.qcut(..., 5)` so buckets maintain equal sample sizes $|B_q|$.
 
 ### Connections
-- **Builds on:** [[eval-directional-prediction]].
+- **Builds on:** [[eval-directional-prediction]], [[effective-sample-size]].
 - **Used by:** [[eval-tradable-profitability]], [[stock-bond-carry-case-study]].
+- **Related:** [[signal-position-construction]] (linear vs bounded sizing), [[eval-statistical-significance]].
 
 <a id="eval-tradable-profitability"></a>
 
