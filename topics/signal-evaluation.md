@@ -371,7 +371,7 @@ The Select-period hump ($-0.26\%, +0.73\%, +1.32\%, +0.63\%, -0.09\%$) suggests 
 <a id="eval-tradable-profitability"></a>
 
 ## Check 5: Tradable Profitability & Underwater Drawdown
-<!-- section: eval-tradable-profitability | prerequisites: [timing-curve-metrics, signal-position-construction, eval-sizing-monotonicity] | related: [eval-turnover-costs, eval-temporal-stability, sharpe-ratio] | sources: [src-carry-course-notes] | tags: [timing-curve, drawdown, equity-curve] -->
+<!-- section: eval-tradable-profitability | prerequisites: [timing-curve-metrics, signal-position-construction, eval-sizing-monotonicity] | related: [eval-turnover-costs, eval-temporal-stability, sharpe-ratio, risk-measures] | sources: [src-carry-course-notes] | tags: [timing-curve, drawdown, equity-curve] -->
 
 Check 5 converts scores into executable weights $w_t$ and compounds non-overlapping holding-period returns to inspect the equity curve and the underwater drawdown profile ($V_t$, $AR$, and $DD_t$ formulas in [[timing-curve-metrics]]).
 
@@ -380,9 +380,37 @@ Check 5 converts scores into executable weights $w_t$ and compounds non-overlapp
 ![Weekly peak-to-trough drawdowns for the three simulated implementations.](../assets/figures/signal-evaluation/drawdowns.svg)
 
 **Read the drawdown:**
-- Even the profitable predictive strategy at 5 bps (blue, compounding \$1 to \$2.37) suffers a **$-15\%$ maximum drawdown** and spends over a year below its prior peak.
+- Even the profitable predictive strategy at 5 bps (blue, compounding \$1 to \$2.37) suffers a **$-15\%$ maximum drawdown** and spends 2.6 years below its prior peak (anatomy below).
 - The noise strategy (grey) reaches **$-36\%$**, and the high-cost implementation of the predictive signal (orange, 50 bps) plunges to **$-50\%$**.
 - **Allocator rule:** Institutional PMs read the underwater chart before the cumulative return chart. A strategy with a 10% annual return but a 4-year drawdown duration will be shut down or redeemed long before recovery.
+
+### Anatomy of one drawdown
+
+![Top: capital of the predictive strategy with its running peak as a dashed line and the gap shaded; peak, trough and recovery are marked. Bottom: the same gap as a percentage drawdown, with the 2.6-year underwater span marked.](../assets/figures/signal-evaluation/drawdown-anatomy.svg)
+
+**What you can read:**
+
+1. **The dashed line is the high-water mark** $\max_{u\le t}V_u$: it only moves up, at each new high. The shaded gap between it and the capital curve *is* the drawdown; the bottom panel plots the same gap as $DD_t = V_t/\max_{u\le t}V_u - 1$ ([[timing-curve-metrics]]).
+2. **Every episode has three numbers:**
+   - *Depth:* from the peak $1.79$ (year 5.3) to the trough $1.52$ (year 7.4), so $1.52/1.79 - 1 = -15\%$.
+   - *Time to trough:* 108 weeks (2.1 years) of slow grinding down.
+   - *Time to recover:* 28 weeks (0.5 years) back to $1.79$.
+   - Total underwater: 136 weeks, **2.6 years**.
+3. **A good strategy still has a bad stretch.** This one earns about $9\%$ a year with a realised Sharpe ratio of about $1.1$, yet an investor who bought at the year-5 peak waited 2.6 years to break even.
+4. **The small shaded gaps elsewhere** are routine noise: they are shallow and close within weeks.
+
+### Is this drawdown normal? Expected maximum drawdown for a given Sharpe ratio
+
+![Probability that the 10-year maximum drawdown is at least a given depth, for strategies with Sharpe 0.25, 0.5, 1.0 and 1.5 at 8.4% volatility; a dotted line marks the predictive signal's actual -15%.](../assets/figures/signal-evaluation/expected-max-drawdown.svg)
+
+**Illustrative simulation (自己推理):** 4,000 ten-year paths for each Sharpe ratio, with normal, independent weekly returns at the predictive strategy's volatility ($8.4\%$ a year). Script: `python scripts/generate_drawdown_figures.py` (seed `20261019`). Each curve gives the probability that the worst drawdown over 10 years is at least as deep as the value on the horizontal axis.
+
+**What you can read:**
+
+1. **Higher Sharpe shifts the curve left** (shallower drawdowns), but no curve sits at zero. The median 10-year maximum drawdown is $21\%$ at Sharpe $0.25$, $17\%$ at $0.5$, $13\%$ at $1.0$ and $10\%$ at $1.5$. One path in ten is worse than $33\%$, $27\%$, $19\%$ and $14\%$ respectively.
+2. **Judge an observed drawdown against the Sharpe you believe.** The predictive strategy's $-15\%$ (dotted line) is worse than $29\%$ of paths with a true Sharpe of $1.0$: an ordinary outcome, not evidence that the signal broke. If you believed the Sharpe was $1.5$, only $8\%$ of paths are that deep, so the same $-15\%$ would be a warning sign.
+3. **Set kill-switches from this distribution, not from intuition.** A $-10\%$ stop would close a genuine Sharpe-$1.0$ strategy in $80\%$ of 10-year paths. A limit near the 1-in-10 depth for the expected Sharpe (about $-19\%$ here) stops real failures without killing most good strategies.
+4. **Real drawdowns are deeper than this.** Fat tails, volatility clustering and autocorrelated returns all deepen drawdowns relative to independent normal returns, so read these curves as a lower bound. Negatively skewed strategies (carry, short volatility) are the worst case ([[timing-curve-metrics]]).
 
 ### Horizon vs rebalance clock discipline
 When a signal forecasts $h = 21$-day returns but the portfolio rebalances weekly ($\Delta = 5$ days), the timing curve must compound the **realised 1-week return** $w_t R_{t\to t+1}$ on each weekly rebalance step—never the overlapping 21-day return $R_{t\to t+21}$.

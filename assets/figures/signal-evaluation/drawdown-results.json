@@ -1,0 +1,45 @@
+{
+  "anatomy": {
+    "peak_week": 276,
+    "trough_week": 384,
+    "recovery_week": 412,
+    "max_drawdown": -0.14993048438233636,
+    "peak_value": 1.791642309397515,
+    "trough_value": 1.5230205101096577,
+    "fall_weeks": 108,
+    "recover_weeks": 28
+  },
+  "expected_dd": {
+    "vol": 0.08353397546996677,
+    "sims": 4000,
+    "weeks": 520,
+    "seed": 20261019,
+    "observed": -0.14993048438233636,
+    "by_sharpe": {
+      "0.25": {
+        "median": 0.20725263335768973,
+        "p90": 0.3288607626137091,
+        "p_worse_than_observed": 0.81975,
+        "p_at_least_10pct": 0.986
+      },
+      "0.5": {
+        "median": 0.17249701345827906,
+        "p90": 0.26543253084227003,
+        "p_worse_than_observed": 0.667,
+        "p_at_least_10pct": 0.9625
+      },
+      "1.0": {
+        "median": 0.12621125018193197,
+        "p90": 0.18849077447375984,
+        "p_worse_than_observed": 0.29125,
+        "p_at_least_10pct": 0.8015
+      },
+      "1.5": {
+        "median": 0.10127912851323245,
+        "p90": 0.14425603061826653,
+        "p_worse_than_observed": 0.0785,
+        "p_at_least_10pct": 0.51775
+      }
+    }
+  }
+}
