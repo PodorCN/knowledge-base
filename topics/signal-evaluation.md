@@ -7,7 +7,18 @@ sources: [src-signal-to-weight, src-squarepoint-dqa-workbook, src-quant-finance-
 ---
 # Signal Evaluation
 
-Evaluating a quantitative signal requires separating three distinct questions: **(1) Does the score predict future returns out-of-sample?** **(2) Does a fixed sizing rule survive transaction costs and drawdowns?** **(3) Does the strategy add incremental Sharpe to the existing portfolio?** This chapter walks through the pre-registered experimental protocol, point-in-time data auditing, three-stage sample isolation (Select / Validate / Test), the eight-step diagnostic checklist, and the root-cause hierarchy for debugging backtest-to-live failures.
+Signal evaluation asks three separate questions:
+
+1. **Prediction:** does the score predict future returns out-of-sample?
+2. **Tradability:** does a fixed sizing rule survive costs and drawdowns?
+3. **Portfolio fit:** does it add Sharpe to the existing portfolio?
+
+This chapter covers:
+
+- the pre-registered protocol and point-in-time data audit;
+- Select / Validate / Test sample isolation;
+- the eight-step diagnostic checklist;
+- debugging backtest-to-live failures.
 
 **Prerequisites:** [[information-coefficient]], [[ic-significance]], [[icir-stability]], [[hit-rate]], [[fundamental-law-active-management]], [[signal-position-construction]], [[timing-curve-metrics]], [[turnover-cost-drag]], [[cross-validation-leakage]], [[multiple-testing]].
 
