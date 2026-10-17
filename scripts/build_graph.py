@@ -238,6 +238,7 @@ def main() -> int:
     warnings: list[str] = []
 
     nodes: dict[str, dict] = {}
+    aliases: dict[str, str] = {}  # merged section id -> canonical section id
     qnumbers: dict[str, str] = {}
     raw_edges: list[tuple[str, str, str]] = []  # (source, target, type)
     link_sites: list[tuple[str, str]] = []  # (from node, target) for broken-link checks
@@ -290,7 +291,7 @@ def main() -> int:
                     block = body[sm.start():end].strip()
                     if smeta.get("section") != sid:
                         errors.append(f"{rel}: section anchor '{sid}' does not match its comment '{smeta.get('section')}'")
-                    if sid in nodes:
+                    if sid in nodes or sid in aliases:
                         errors.append(f"{rel}: duplicate section id '{sid}'")
                     nodes[sid] = {
                         "id": sid, "title": stitle, "type": "concept", "domain": node["domain"],
@@ -298,9 +299,9 @@ def main() -> int:
                         "summary": summarize(block), "topic": nid,
                     }
                     for aid in as_list(smeta.get("alias")):
-                        if aid in nodes:
+                        if aid in nodes or aid in aliases:
                             errors.append(f"{rel}: duplicate alias id '{aid}'")
-                        nodes[aid] = nodes[sid]
+                        aliases[aid] = sid
                     node["sections"].append(sid)
                     raw_edges.append((nid, sid, "contains"))
                     for target in WIKILINK.findall(block):
@@ -359,6 +360,12 @@ def main() -> int:
 
             nodes[nid] = node
 
+    for aid in aliases:
+        if aid in nodes:
+            errors.append(f"{nodes[aid]['path']}: id '{aid}' is also declared as an alias")
+    # Links to a merged section point at the section that now holds it.
+    raw_edges = [(aliases.get(s, s), aliases.get(t, t), ty) for s, t, ty in raw_edges]
+
     # Domain membership edges (concept -> its map).
     map_ids = {n["id"] for n in nodes.values() if n["type"] == "map"}
     for n in list(nodes.values()):
@@ -397,7 +404,7 @@ def main() -> int:
 
     # Broken links. Source notes (sources/) are local-only, so a missing src-* note is not an error.
     for src, target in link_sites:
-        if target not in nodes and not target.startswith(("src-", "qb-")):
+        if target not in nodes and target not in aliases and not target.startswith(("src-", "qb-")):
             errors.append(f"{nodes[src]['path']}: broken link [[{target}]] (in {src})")
 
     # Deduplicate edges: one edge per unordered pair, keep highest-priority type.
@@ -435,12 +442,12 @@ def main() -> int:
         n["content"] = re.sub(r"\[\[(src|qb)-[^\]]*\]\]", "", n["content"])
         public_nodes.append(n)
     public_links = [l for l in links if l["source"] not in hidden and l["target"] not in hidden]
-    write_site({"nodes": public_nodes, "links": public_links}, OUT_DIR)
+    write_site({"nodes": public_nodes, "links": public_links, "aliases": aliases}, OUT_DIR)
 
     # Local site (local/, git-ignored): everything except sources, for the user's own study.
     local_nodes = [n for n in all_nodes if n["type"] != "source"]
     local_links = [l for l in links if nodes[l["source"]]["type"] != "source" and nodes[l["target"]]["type"] != "source"]
-    local_graph = {"nodes": local_nodes, "links": local_links}
+    local_graph = {"nodes": local_nodes, "links": local_links, "aliases": aliases}
     password = os.environ.get("KB_QUESTIONS_PASSWORD", "")
     if password:
         local_graph = lock_questions(local_graph, password)

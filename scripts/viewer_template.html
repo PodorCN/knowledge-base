@@ -402,6 +402,8 @@ const GROUPS = [
 const TYPE_LABEL = { concept: "Section", topic: "Chapter", map: "Overview", question: "Question", "question-bank": "Question bank", source: "Source" };
 
 const byId = new Map(DATA.nodes.map(n => [n.id, n]));
+// Merged sections keep their old id as an alias: [[alias]] opens the merged section at its <a id> anchor.
+for (const [alias, sid] of Object.entries(DATA.aliases || {})) if (byId.has(sid)) byId.set(alias, byId.get(sid));
 const adj = new Map(DATA.nodes.map(n => [n.id, []]));
 for (const l of DATA.links) {
   adj.get(l.source).push({ other: l.target, type: l.type, dir: "out" });
