@@ -183,11 +183,11 @@ Average next-21-day equity-minus-bond return by score quintile (baseline / unadj
 
 **Notes:**
 
-- **Why both runs fail:** Even after fixing the dividend-adjusted close denominator (which overstated 2006 SPY yield as $2.48\%$ vs true $1.73\%$, see [[broker-research-replication]] and [[eval-three-stage-protocol]]), the overlap-adjusted $t$-statistic rises only from $+0.29$ to $+0.49$—still far below the pre-registered $1.5$ hurdle.
+- **Why both runs fail:** Even after fixing the dividend-adjusted close denominator (which overstated 2006 SPY yield as $2.48\%$ vs true $1.73\%$, see [[carry-across-assets]]), the overlap-adjusted $t$-statistic rises only from $+0.29$ to $+0.49$—still far below the pre-registered $1.5$ hurdle.
 - **The quintiles hump in both runs:** the strongest buy signals (Q5) lost money ($-0.09\%$), so linear sizing puts the largest positions where returns are worst.
 - Figures in the original notes (not reproduced here): raw carry and its z-score compress after 2008 (the zero-rate era pins both legs); rolling 52-week IC flips sign around zero; no single regime carries the result (no "crisis alpha"); the decile-mean line bends down at the right end.
 
-**Verdict: fail.** By the pre-committed rule the candidate stops here; later data stays sealed (see [[eval-three-stage-protocol]] for the post-mortem unsealing of the 2018–2023 Validate period).
+**Verdict: fail.** By the pre-committed rule the candidate stops here; later data stays sealed.
 
 ### Worked example
 **Effective N and the IC needed for $t=1.5$** (574 overlapping weeks, 21-day horizon):

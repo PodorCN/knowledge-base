@@ -91,7 +91,9 @@ $$m=\frac{h}{\Delta},\qquad n_{\text{eff}}\approx\frac{n}{m},\qquad \text{shared
 <a id="cross-validation-leakage"></a>
 
 ## Validation, Walk-Forward CV & Leakage
-<!-- section: cross-validation-leakage | prerequisites: [bias-variance-tradeoff] | related: [backtest-pitfalls, stationarity-ar1, research-workflow, effective-sample-size] | sources: [src-squarepoint-dqa-workbook, src-rbc-gam-quantdev-notes, src-carry-course-notes] | tags: [walk-forward, purging, leakage, point-in-time] -->
+<!-- section: cross-validation-leakage | alias: [eval-three-stage-protocol] | prerequisites: [bias-variance-tradeoff] | related: [backtest-pitfalls, stationarity-ar1, research-workflow, effective-sample-size] | sources: [src-squarepoint-dqa-workbook, src-rbc-gam-quantdev-notes, src-carry-course-notes] | tags: [walk-forward, purging, leakage, point-in-time] -->
+
+<a id="eval-three-stage-protocol"></a>
 
 Model selection needs data the model has not seen. With time series the split must respect time order, and any use of future information ("leakage") makes the validation meaningless.
 
