@@ -249,8 +249,31 @@ So always report the hit rate together with $g$ and $\ell$ (or the quantile retu
 
 ### Diagnostic interpretation
 - **Realistic institutional range ($52\%\text{–}56\%$):** In liquid markets, a persistent $53\%$ hit rate with symmetric win/loss sizes compounds into a high Sharpe ratio.
-- **Why $HR > 55\%$ can still fail (the Carry example):** In [[stock-bond-carry-case-study]], stock–bond carry achieved a $56\%$ ($60\%$ unadjusted) hit rate during the Select period—yet its timing curve suffered a $-27.7\%$ drawdown and failed statistical significance because its winning weeks were small steady carry ticks while its losing weeks were sharp risk-off equity selloffs.
+- **Why $HR > 55\%$ can still fail:** a hit rate counts every week as one right-or-wrong vote and ignores how much was won or lost. See the worked example below.
 - **Benchmark drift check:** Always compare $HR$ against the unconditional positive-return frequency $\Pr(R_{t\to t+h} > 0)$. During a bull market where equities rise $58\%$ of weeks, a constant positive score gets $HR = 58\%$ with $IC = 0$.
+
+### Worked example: a 60% hit rate that loses money
+A signal gives a weekly long (+1) or short (−1) call on an equity index, held for one week. Over 10 weeks it says **long every week**, and the index does this:
+
+- **Weeks 1–6:** index $+0.5\%$ each week. The call is right 6 times: $+3.0\%$.
+- **Weeks 7–9:** index $-0.5\%$ each week. Wrong 3 times: $-1.5\%$.
+- **Week 10:** risk-off sell-off, index $-4.0\%$. Wrong once: $-4.0\%$.
+
+**Result:** $HR = 6/10 = 60\%$, which looks good, but the total P&L is $3.0 - 1.5 - 4.0 = -2.5\%$.
+
+**Why it loses:**
+
+1. **The crash counts as one miss but costs eight wins.** In the hit rate, week 10 is just 1 of 10 votes. In P&L, its $-4.0\%$ wipes out $4.0/0.5 = 8$ winning weeks.
+2. **The payoff ratio is far below 1.** Average gain $g = 0.5\%$; average loss $\ell = (3\times0.5\%+4.0\%)/4 = 1.375\%$, so $g/\ell = 0.36$. The break-even hit rate is $HR_{\mathrm{BE}} = 1.375/(0.5+1.375) = 73\%$, and $60\%$ is well below it: expected P&L is $0.6(0.5\%) - 0.4(1.375\%) = -0.25\%$ per week.
+3. **The 60% is not even timing skill.** The signal was long every week, and the index rose in 6 of 10 weeks, so $HR$ simply equals $\Pr(R > 0) = 60\%$: the benchmark drift trap above.
+
+**What would have caught it:**
+
+- The payoff ratio and $HR_{\mathrm{BE}}$, reported next to $HR$.
+- The worst week and the drawdown of the timing curve ([[eval-tradable-profitability]]).
+- The quantile returns ([[eval-sizing-monotonicity]]): a skilled signal should be *least* long before the big down weeks.
+
+**The same pattern in real data:** stock–bond carry had a $56\%$ hit rate ($60\%$ in the unadjusted-close run) in its Select period. Its winning weeks were small, steady carry gains and its losing weeks were sharp risk-off sell-offs, giving a $-27.7\%$ drawdown and $t = 0.29$ ([[stock-bond-carry-case-study]]).
 
 ### Connections
 - **Builds on:** [[hit-rate]], [[eval-directional-prediction]].
