@@ -114,7 +114,7 @@ $$TE=\sqrt{(w-b)^\top\Sigma\,(w-b)},\qquad IR=\frac{E[r_p-r_b]}{TE},\qquad E[r_p
 
 - The fundamental law links IR to signal skill and breadth: $IR\approx IC\sqrt{BR}$ ([[information-coefficient]]).
 - The TE constraint's shadow price is the optimal IR: one more percent of TE budget buys about $IR^*\times1\%$ of alpha ([[constraints-shadow-prices]]).
-- Realised TE and IR (measured after the fact from returns) are in [[risk-measures]]; this section is the ex-ante, model-based version.
+- Realised IR (measured after the fact from returns), its residual version and IR vs Sharpe are in [[information-ratio]]; realised TE is in [[risk-measures]]. This section is the ex-ante, model-based version.
 
 ### Worked example
 

@@ -104,30 +104,148 @@ Check 1 evaluates whether higher signal scores $s_t$ predict higher forward retu
 <a id="eval-statistical-significance"></a>
 
 ## Check 2: Statistical Significance & Overlap Adjustment
-<!-- section: eval-statistical-significance | prerequisites: [ic-significance, effective-sample-size, multiple-testing, eval-directional-prediction] | related: [eval-temporal-stability] | sources: [src-carry-course-notes] | tags: [t-stat, overlap, sample-size] -->
+<!-- section: eval-statistical-significance | prerequisites: [ic-significance, effective-sample-size, multiple-testing, eval-directional-prediction] | related: [eval-temporal-stability, icir-stability, robust-standard-errors] | sources: [src-carry-course-notes] | tags: [t-stat, t-hurdle, overlap, sample-size, power] -->
 
-Check 2 tests whether the sample IC is distinguishable from noise after deflating the sample size for overlapping forward return windows ($n_{\mathrm{eff}} = n / (h/\Delta)$, formula in [[ic-significance]]).
+Check 2 asks: *if the signal had no skill at all (true $IC = 0$), how surprising would the IC we measured be?* Compute the $t$-statistic of the IC on the **effective** sample size, then compare it with a pass mark $t^*$ (the $t$-hurdle) that was fixed before looking at the data.
 
-### Why the $t$-hurdle depends on the domain
-| Strategy Domain | Effective Sample Size $n_{\mathrm{eff}}$ | Required $t$-Hurdle | Statistical Rationale |
-|---|---|---|---|
-| **Macro / Asset-Class Timing** (single spread, weekly 21d horizon) | $\sim 120\text{–}150$ over 10–15 years (only 2–3 business cycles) | $t_{IC} \ge 1.5$ (initial screen, one-sided $p \approx 0.067$) | Low statistical power: requiring $t \ge 2.0$ requires $IC \ge 0.17$, which would reject almost every genuine macro risk premium. |
-| **Cross-Sectional Equity Selection** (single theoretical signal) | $500\text{ stocks} \times 52\text{ wks}$ ($T$ periodic ICs via $\text{ICIR}\sqrt{T}$) | $t \ge 2.0$ (two-sided $p \le 0.05$) | High cross-sectional breadth provides ample statistical power; failure to clear $2.0$ indicates noise. |
-| **Multi-Trial Factor Mining / ML** ($M \ge 50$ variants or Round 2 redesign) | Any | $t \ge 3.0$ (Harvey–Liu–Zhu 2016, [[multiple-testing]]) | Corrects for family-wise false discoveries when searching across features, lookbacks, or universes. |
+### Formula: the pass/fail rule
+$$t_{IC}=\widehat{IC}\,\sqrt{n_{\mathrm{eff}}-2}\;\ge\;t^{*},\qquad n_{\mathrm{eff}}=\frac{n}{m},\qquad m=\frac{h}{\Delta}$$
 
-**Interview takeaway:** Always check whether a reported $t$-statistic was computed on raw $n$ or overlap-adjusted $n_{\mathrm{eff}}$ (or Newey–West lags $L \approx h$). Dividing out the $m = 4.2$ overlap cuts an apparent $t = 2.1$ down to an insignificant $t = 1.02$.
+**Variables:**
+
+- $t_{IC}$ $t$-statistic of the sample IC, testing $H_0: IC = 0$ (dimensionless)
+- $\widehat{IC}\in(-1,1)$ sample IC between the score at $t$ and the forward return $t\to t+h$ ([[information-coefficient]])
+- $n_{\mathrm{eff}}$ effective number of independent observations ($n_{\mathrm{eff}} > 2$)
+- $n$ number of sampled dates (rows)
+- $m$ overlap ratio: how many sampling steps one forward window spans
+- $h$ forward-return horizon in trading days (e.g. $h = 21$)
+- $\Delta$ sampling step in trading days (e.g. $\Delta = 5$ for weekly)
+- $t^{*}$ $t$-hurdle: the minimum $t_{IC}$ required to pass, fixed in advance
+
+**Notes:**
+
+- This is the small-IC form; the exact form divides by $\sqrt{1-\widehat{IC}^{\,2}}$ ([[ic-significance]]), which changes $t$ by less than 1% when $|IC| < 0.15$.
+- Why $n/m$: each forward window shares $h-\Delta$ days with its neighbour, so $m$ consecutive rows carry roughly one row of new information ([[effective-sample-size]]).
+- For a **cross-sectional** signal (many stocks each date), the same rule is applied to $t = \text{ICIR}\sqrt{T}$, the $t$-statistic of the mean of $T$ non-overlapping periodic ICs ([[icir-stability]]).
+
+### What a $t$-hurdle is
+If the signal is pure noise, $t_{IC}$ is approximately standard normal (for $n_{\mathrm{eff}} \gtrsim 30$ the Student-$t$ and the normal are nearly identical). The hurdle $t^*$ is a cut-off on that distribution: it fixes how often noise will pass by luck (the false-positive rate) and, given a true IC, how often a real signal will pass (the power).
+
+$$\alpha=P\big(t_{IC}\ge t^{*}\mid IC=0\big)=1-\Phi(t^{*}),\qquad \text{Power}=P\big(t_{IC}\ge t^{*}\mid IC\big)\approx1-\Phi\big(t^{*}-IC\sqrt{n_{\mathrm{eff}}-2}\big)$$
+
+**Variables:**
+
+- $\alpha$ one-sided false-positive rate: probability that a zero-skill signal clears the hurdle
+- $t_{IC}$ $t$-statistic of the sample IC
+- $t^{*}$ $t$-hurdle
+- $\Phi(\cdot)$ standard normal cumulative distribution function
+- $IC$ true (population) IC of the signal
+- $\text{Power}$ probability that a signal with true skill $IC$ clears the hurdle
+- $n_{\mathrm{eff}}$ effective sample size
+
+**The three hurdles used in this wiki and what they cost:**
+
+- $t^* = 1.5$: one-sided $\alpha = 6.7\%$ (two-sided $13.4\%$). A loose screen.
+- $t^* = 2.0$: one-sided $\alpha = 2.3\%$, two-sided $4.6\%$. This is the usual "5% significance" convention (exactly $1.96$ two-sided).
+- $t^* = 3.0$: one-sided $\alpha = 0.13\%$, two-sided $0.27\%$. The multiple-testing hurdle ([[multiple-testing]]).
+
+![Two bell curves of the t-statistic: a dashed grey curve centred at 0 for a noise signal and a blue curve centred at 1.74 for a real signal with true IC 0.15, cut by a vertical hurdle at t* = 1.5.](../assets/figures/signal-evaluation/t-hurdle.svg)
+
+**Reading the figure:** with the carry study's $n_{\mathrm{eff}} \approx 137$, a real signal with true $IC = 0.15$ produces $t_{IC}$ centred at $0.15\sqrt{134.7} = 1.74$. At $t^* = 1.5$, noise passes $6.7\%$ of the time (hatched grey tail) and the real signal passes $60\%$ (blue area). Raising the hurdle to $2.0$ cuts false positives to $2.3\%$ but drops power to $40\%$; at $3.0$ power is only $10\%$. **A higher hurdle buys fewer false discoveries at the price of rejecting more real signals.**
+
+### Minimum IC needed to pass
+Rearranging the rule gives the smallest sample IC that can clear a given hurdle:
+
+$$IC_{\min}=\frac{t^{*}}{\sqrt{n_{\mathrm{eff}}-2}}$$
+
+**Variables:**
+
+- $IC_{\min}$ smallest sample IC that passes
+- $t^{*}$ $t$-hurdle
+- $n_{\mathrm{eff}}$ effective sample size
+
+![Minimum IC needed to pass, falling with effective sample size, for hurdles 1.5, 2.0 and 3.0; the carry study's two ICs sit far below the 1.5 curve at n_eff of about 137.](../assets/figures/signal-evaluation/min-ic-vs-neff.svg)
+
+**Reading the figure:** at $n_{\mathrm{eff}} \approx 137$ the IC must be at least $0.129$ ($t^*=1.5$), $0.172$ ($t^*=2.0$) or $0.259$ ($t^*=3.0$). Realistic timing ICs are $0.03\text{–}0.08$ ([[eval-directional-prediction]]), so with only 10–15 years of a single time series even a genuine signal rarely clears $2.0$. That is why the hurdle depends on the domain (below).
+
+### Why overlap must be removed first
+Counting overlapping rows as independent makes $n$ too large by the factor $m$, so the naive $t$ is too large by about $\sqrt{m}$. Pure noise then clears the hurdle far more often than $\alpha$ promises.
+
+![Histogram of t-statistics for 4,000 pure-noise signals: naive t computed with n = 574 is spread out with standard deviation about 2, while overlap-adjusted t matches the standard normal curve.](../assets/figures/signal-evaluation/overlap-t-inflation.svg)
+
+**Illustrative simulation (自己推理):** 4,000 noise scores (weekly AR(1) with coefficient $0.95$, similar to the carry score's $\rho_1 = 0.95$), each correlated with independent 21-day forward returns sampled weekly over $n = 574$ weeks ($m = 4.2$). Script: `python scripts/generate_significance_figures.py` (seed `20261017`).
+
+- **Naive $t$ (using $n = 574$):** standard deviation $1.99 \approx \sqrt{4.2}$; $24\%$ of noise signals pass $t \ge 1.5$ and $32\%$ pass $|t| \ge 2$.
+- **Adjusted $t$ (using $n_{\mathrm{eff}} = 137$):** standard deviation $0.97$; $6.7\%$ pass $t \ge 1.5$ and $3.7\%$ pass $|t| \ge 2$, matching the nominal rates.
+- **When $n/m$ over-corrects:** the inflation comes from the score *and* the forward return both being autocorrelated. A slow score (carry, valuation) inflates $t$ by the full $\sqrt{m}$; a score that changes completely every week inflates it much less, so $n/m$ is conservative there. Newey–West standard errors with about $h/\Delta$ lags handle both cases ([[robust-standard-errors]]).
+
+### Which hurdle to use
+Fix $t^*$ in the pre-registration ([[timing-signal-evaluation]]), before computing any return statistic.
+
+- **Macro / asset-class timing** (one spread, weekly sampling, 21-day horizon):
+  - *Sample:* $n_{\mathrm{eff}} \approx 120\text{–}150$ over 10–15 years, only 2–3 business cycles.
+  - *Hurdle:* $t^* = 1.5$ as the initial screen (one-sided $\alpha \approx 6.7\%$).
+  - *Why:* demanding $t \ge 2.0$ requires $IC \ge 0.17$, which would reject almost every genuine macro risk premium.
+- **Cross-sectional equity selection** (one theory-driven signal):
+  - *Sample:* e.g. 500 stocks × 52 weeks a year; test the mean of the $T$ periodic ICs with $t = \text{ICIR}\sqrt{T}$.
+  - *Hurdle:* $t^* = 2.0$ (two-sided $p \le 0.05$).
+  - *Why:* cross-sectional breadth gives ample power, so failing $2.0$ indicates noise.
+- **Many variants tried** (factor mining / ML with $M \ge 50$ variants, or a round-two redesign after a fail):
+  - *Hurdle:* $t^* = 3.0$ (Harvey, Liu & Zhu 2016, [[multiple-testing]]).
+  - *Why:* with many tries, some noise variants clear $2.0$ by luck; $3.0$ controls the family-wise false discoveries across features, lookbacks and universes.
+
+### Worked example: the carry study's Validate period
+Stock–bond carry over the 295-week Validate period (2018–2023) had $\widehat{IC} = +0.122$ with $h = 21$, $\Delta = 5$:
+
+$$n_{\mathrm{eff}}=\frac{295}{4.2}\approx70.2,\qquad t_{IC}=\frac{0.122\sqrt{68.2}}{\sqrt{1-0.122^{2}}}\approx1.02$$
+
+**Variables:**
+
+- $n_{\mathrm{eff}}$ effective sample size of the Validate period
+- $t_{IC}$ overlap-adjusted $t$-statistic (exact form, [[ic-significance]])
+
+**Reading it:**
+
+- **Naive:** $0.122\sqrt{293}/\sqrt{1-0.122^2} \approx 2.10$, which would "pass" even the $2.0$ hurdle.
+- **Adjusted:** $t_{IC} \approx 1.02 < 1.5$, so it fails; passing would need $IC \ge 1.5/\sqrt{68.2} \approx 0.18$.
+- The Select-period numbers ($t = +0.29$ and $+0.49$) are worked in [[ic-significance]].
+
+**Interview takeaway:** always ask whether a reported $t$ used raw $n$ or $n_{\mathrm{eff}}$ (or Newey–West with lags $\approx h$). Then ask what hurdle was fixed in advance and how many variants were tried before it.
 
 ### Connections
 - **Builds on:** [[ic-significance]], [[effective-sample-size]], [[multiple-testing]], [[eval-directional-prediction]].
 - **Used by:** [[eval-temporal-stability]], [[research-workflow]].
-- **Related:** [[robust-standard-errors]].
+- **Related:** [[robust-standard-errors]], [[icir-stability]].
 
 <a id="eval-directional-hit-rate"></a>
 
 ## Check 3: Directional Hit Rate & Payoff Asymmetry
 <!-- section: eval-directional-hit-rate | prerequisites: [hit-rate, eval-directional-prediction] | related: [eval-tradable-profitability, win-rate-expectancy] | sources: [src-carry-course-notes] | tags: [hit-rate, win-rate] -->
 
-Check 3 measures how often $\mathrm{sign}(s_t) = \mathrm{sign}(R_{t\to t+h})$ (formula in [[hit-rate]]) and cross-checks directional accuracy against win/loss payoff skew ([[win-rate-expectancy]]).
+Check 3 measures how often $\mathrm{sign}(s_t) = \mathrm{sign}(R_{t\to t+h})$ (formula in [[hit-rate]]). It then checks the hit rate against the **win/loss payoff skew**: whether the strategy's winning periods and losing periods are of very different sizes.
+
+### What win/loss payoff skew means
+Split the evaluation periods into wins and losses. Let $g$ be the average gain in a winning period and $\ell$ the average loss in a losing period (as a positive number), so $g/\ell$ is the **payoff ratio**. "Payoff skew" means $g/\ell$ is far from 1:
+
+- **Negative payoff skew ($g/\ell < 1$):** many small wins, occasional large losses. Typical of carry, short volatility and selling insurance. The return distribution has a long left tail (negative skewness).
+- **Positive payoff skew ($g/\ell > 1$):** many small losses, occasional large wins. Typical of trend following and buying options (long right tail).
+
+Expected return per period is $HR\cdot g-(1-HR)\,\ell$ ([[win-rate-expectancy]]). Setting it to zero gives the hit rate a strategy *needs* just to break even (before costs):
+
+$$HR_{\mathrm{BE}}=\frac{\ell}{g+\ell}$$
+
+**Variables:**
+
+- $HR_{\mathrm{BE}}\in(0,1)$ break-even hit rate: the minimum fraction of winning periods for zero expected return
+- $g$ average gain per winning period ($g > 0$, % per period)
+- $\ell$ average loss per losing period, as a positive number ($\ell > 0$, % per period)
+
+**Reading it:** a hit rate is only good relative to $HR_{\mathrm{BE}}$.
+
+- *Carry-like, negative skew:* $g = 0.2\%$, $\ell = 3.0\%$ gives $HR_{\mathrm{BE}} = 3.0/3.2 = 93.8\%$. A $58\%$ hit rate therefore loses $0.58(0.2\%) - 0.42(3.0\%) = -1.14\%$ per week ([[hit-rate]]).
+- *Trend-like, positive skew:* $g = 3\%$, $\ell = 1\%$ gives $HR_{\mathrm{BE}} = 25\%$. A $40\%$ hit rate earns $0.40(3\%) - 0.60(1\%) = +0.6\%$ per period.
+
+So always report the hit rate together with $g$ and $\ell$ (or the quantile returns in [[eval-sizing-monotonicity]]), never alone.
 
 ### Diagnostic interpretation
 - **Realistic institutional range ($52\%\text{–}56\%$):** In liquid markets, a persistent $53\%$ hit rate with symmetric win/loss sizes compounds into a high Sharpe ratio.

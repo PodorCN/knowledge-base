@@ -156,10 +156,7 @@ $$t_{IC}\approx\frac{\widehat{IC}\sqrt{n_{\mathrm{eff}}-2}}{\sqrt{1-\widehat{IC}
 - **Cross-sectional vs time-series $t$-stat:**
   - **Time-series timing:** one series of $n$ dates → use $t_{IC} \approx \widehat{IC}\sqrt{n_{\mathrm{eff}}-2}$ (or Newey–West HAC standard errors on the predictive regression, [[robust-standard-errors]]).
   - **Cross-sectional equity selection:** compute cross-sectional $IC_t$ on each non-overlapping date $t = 1,\dots,T$, then test whether the mean $\overline{IC}$ differs from zero via $t = \frac{\overline{IC}}{\sigma_{IC}/\sqrt{T}} = \text{ICIR}\sqrt{T}$ ([[icir-stability]]). Never pool all $N \times T$ stock-date pairs into a single correlation—cross-sectional stock returns share market and sector factors and are not independent.
-- **Screening hurdles:**
-  - $t \ge 1.5$ (one-sided $p \approx 0.067$): initial screening gate for macro timing signals where a 15-year sample contains only 2–3 business cycles ($n_{\mathrm{eff}} \approx 137$).
-  - $t \ge 2.0$: single-hypothesis two-sided 5% benchmark for cross-sectional signals.
-  - $t \ge 3.0$: required hurdle under multiple testing across many candidate signals or parameter variations (Harvey, Liu & Zhu 2016, [[multiple-testing]]).
+- **Pass/fail hurdles:** what the hurdle $t^*$ means, its false-positive rate and power, and which value to use for timing, cross-sectional and multi-trial research are in [[eval-statistical-significance]].
 
 ### Worked example
 

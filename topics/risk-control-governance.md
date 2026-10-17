@@ -39,12 +39,12 @@ Greeks are local. Revaluing the whole book under a grid of market moves captures
 <a id="risk-measures"></a>
 
 ## Drawdown, VaR, Expected Shortfall, Information Ratio
-<!-- section: risk-measures | prerequisites: [sharpe-ratio, normal-distribution] | related: [win-rate-expectancy] | sources: [src-squarepoint-dqa-workbook, src-rbc-gam-quantdev-notes] | tags: [var, es, drawdown, tracking-error] -->
+<!-- section: risk-measures | prerequisites: [sharpe-ratio, normal-distribution] | related: [win-rate-expectancy, information-ratio] | sources: [src-squarepoint-dqa-workbook, src-rbc-gam-quantdev-notes] | tags: [var, es, drawdown, tracking-error] -->
 
 The Sharpe ratio summarises only the mean and standard deviation. Tail risk, path drawdown, benchmark-relative performance, and coherent capital allocation require dedicated risk measures.
 
 ### Formulas
-$$MDD=\max_t\Big(1-\frac{V_t}{\max_{s\le t}V_s}\Big),\qquad TE=\sigma(R-R_b),\qquad IR=\frac{E[R-R_b]}{TE}$$
+$$MDD=\max_t\Big(1-\frac{V_t}{\max_{s\le t}V_s}\Big),\qquad TE=\sigma(R-R_b)$$
 $$VaR_\alpha(L)=\inf\{x\in\mathbb R : P(L\le x)\ge\alpha\},\qquad ES_\alpha(L)=E[L\mid L\ge VaR_\alpha(L)]=\frac{1}{1-\alpha}\int_\alpha^1 VaR_u(L)\,du$$
 $$\text{Gaussian loss }L\sim N(\mu_L,\sigma_L^2):\quad VaR_\alpha(L)=\mu_L+\sigma_L z_\alpha,\qquad ES_\alpha(L)=\mu_L+\sigma_L\frac{\phi(z_\alpha)}{1-\alpha}$$
 
@@ -53,7 +53,7 @@ $$\text{Gaussian loss }L\sim N(\mu_L,\sigma_L^2):\quad VaR_\alpha(L)=\mu_L+\sigm
 - $MDD$ maximum drawdown over the sample horizon
 - $V_t, V_s$ portfolio wealth at times $t$ and $s\le t$
 - $R, R_b$ portfolio return and benchmark return
-- $TE, IR$ tracking error (active risk) and information ratio
+- $TE$ tracking error (active risk), the denominator of the information ratio ([[information-ratio]])
 - $L$ portfolio loss over the risk horizon ($L = -\Delta V$)
 - $\alpha\in(0,1)$ confidence level (e.g. $\alpha = 0.99$ for 99% VaR or $\alpha = 0.975$ for FRTB 97.5% ES)
 - $VaR_\alpha(L), ES_\alpha(L)$ Value at Risk and Expected Shortfall (Conditional VaR / CVaR) at confidence $\alpha$
