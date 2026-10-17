@@ -1,0 +1,39 @@
+{
+  "hold": {
+    "final_value": 1.6188664220953317,
+    "annualised_return": 0.04935177510841782,
+    "max_drawdown": -0.3537914000582475,
+    "longest_underwater_weeks": 362,
+    "annualised_vol": 0.15290649418352298
+  },
+  "skill": {
+    "final_value": 1.4600652690518492,
+    "annualised_return": 0.038573476080657976,
+    "max_drawdown": -0.12028107830671131,
+    "longest_underwater_weeks": 79,
+    "annualised_vol": 0.06630121619340305
+  },
+  "noise": {
+    "final_value": 1.0467621602746304,
+    "annualised_return": 0.004580633476070295,
+    "max_drawdown": -0.16375841969093496,
+    "longest_underwater_weeks": 254,
+    "annualised_vol": 0.07078992129218925
+  },
+  "bug": {
+    "final_value": 2.5649177231272495,
+    "annualised_return": 0.09877139300066196,
+    "max_drawdown": -0.2531964225508688,
+    "longest_underwater_weeks": 166,
+    "annualised_vol": 0.12988369870116012
+  },
+  "carry": {
+    "final_value": 1.4600652690518492,
+    "annualised_return": 0.038573476080657976,
+    "max_drawdown": -0.2115749782583619,
+    "longest_underwater_weeks": 225,
+    "annualised_vol": 0.04833290124750145
+  },
+  "skill_rank_ic_vs_fwd": 0.09151894337342507,
+  "seed": 20261018
+}

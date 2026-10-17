@@ -341,6 +341,24 @@ $$V_{t+1}=V_t\big(1+w_t\,R_{t\to t+1}\big),\qquad V_0=1,\qquad AR=V_T^{\,52/T}-1
 - $T$ total number of weekly rebalance intervals ($T > 0$)
 - $t=0,\dots,T-1$ weekly rebalance index
 
+![Five timing curves on a log scale over ten simulated years: skilled signal, carry-like strategy with the same final value, buy and hold, noise, and the overlapping-return bug.](../assets/figures/signal-metrics/timing-curves.svg)
+
+**Illustrative simulation (自己推理):** one simulated weekly spread market over 10 years ($T = 520$; returns with fat tails, about $15\%$ annual volatility). Each line trades it differently. All are gross of costs; script `python scripts/generate_timing_figures.py` (seed `20261018`).
+
+- **Skilled signal** (blue): $w_t$ from a score with rank IC $\approx 0.09$ against the 4-week forward return, sized as in [[signal-position-construction]].
+- **Carry-like** (orange): small steady gains plus three sharp crashes, with its drift set so it ends at the **same** value as the skilled signal.
+- **Buy and hold** (grey dashed): $w_t = +1$ every week, the no-skill benchmark.
+- **Noise** (purple dotted): $w_t$ from a random score.
+- **Bug** (red dash-dot): the skilled weights, but each week compounds the **overlapping 4-week** forward return instead of the next week's return.
+
+**What you can read from the timing curve:**
+
+1. **Use a log scale.** On a log axis an equal vertical distance is an equal percentage change, so a straight line means steady compounding and the slope is the growth rate. On a linear axis late-period moves look bigger simply because there is more capital.
+2. **End points hide the path.** Skilled and carry-like both end at $V_T = 1.46$ ($AR = 3.9\%$). The carry-like line climbs smoothly and then drops vertically three times; the skilled line is noisier but never falls far.
+3. **Compare with buy and hold.** Buy and hold ends higher ($AR = 4.9\%$) but swings far more ($15.3\%$ volatility vs $6.6\%$). A signal is worth having when it beats the benchmark per unit of risk, not necessarily in raw return.
+4. **Noise drifts sideways.** The noise line ends at $1.05$ after 10 years, which is what zero skill looks like before costs (after costs it would slope down, [[turnover-cost-drag]]).
+5. **A curve that is too good is a bug first.** The overlapping-return line reaches $2.56$ ($AR = 9.9\%$) from the *same* positions as the skilled line, because each market move is compounded about four times. When a backtest earns far more than its modest IC suggests, check the return labels before anything else.
+
 ### Underwater drawdown curve
 $$DD_t=\frac{V_t}{\max_{0\le u\le t}V_u}-1,\qquad \text{Max }DD=\min_{1\le t\le T}DD_t$$
 
@@ -352,6 +370,21 @@ $$DD_t=\frac{V_t}{\max_{0\le u\le t}V_u}-1,\qquad \text{Max }DD=\min_{1\le t\le 
 - $T$ total number of weekly intervals
 - $t, u$ weekly indices ($0 \le u \le t$)
 
+The **underwater duration** is the length of a run of consecutive weeks with $DD_t < 0$: how long the strategy stays below its previous peak. The longest such run is the time an investor has to wait for a new high.
+
+![Underwater curves for buy and hold, noise, carry-like and skilled strategies, showing depth and length of drawdowns.](../assets/figures/signal-metrics/underwater-curves.svg)
+
+**What you can read from the underwater curve:**
+
+1. **Depth (how far down):** the lowest point of each line is $\text{Max }DD$. Buy and hold $-35\%$, carry-like $-21\%$, noise $-16\%$, skilled $-12\%$.
+2. **Duration (how long down):** the width of each dip until the line returns to $0\%$. Skilled is never more than 1.5 years below a peak; carry-like 4.3 years; noise 4.9 years; buy and hold 7.0 years. Duration is what ends strategies in practice: few investors wait four years for a new high.
+3. **Shape tells the return profile:**
+   - *Many shallow, quickly repaired dips* (blue): steady skill; losses are small and recovered.
+   - *Flat at $0\%$, then a vertical drop and a slow straight-line climb back* (orange): negative payoff skew (carry, short volatility). It earns small gains most weeks, then gives back years of gains in a few weeks ([[eval-directional-hit-rate]]).
+   - *Long, wandering time below zero that never fully recovers* (purple): no edge; the line rarely makes new highs.
+4. **Volatility can rank strategies wrongly.** Return divided by volatility is $0.80$ for carry-like but only $0.58$ for skilled, because three crashes in 10 years barely raise volatility. The underwater curve shows the risk that volatility misses, which is why Check 5 reports $\text{Max }DD$ and duration next to the Sharpe ratio ([[eval-tradable-profitability]]).
+5. **Same final value, different survival:** a strategy that must not lose more than $15\%$, or must make a new high within two years, keeps the skilled signal and closes the carry-like one, even though both earned $3.9\%$ a year.
+
 ### Key points
 - **Never compound overlapping 21-day forecast labels:** Even when a signal is trained or evaluated on 21-day forward returns ($R_{t\to t+21}$), a weekly-rebalanced timing curve must compound **non-overlapping 1-week returns** ($R_{t\to t+1}$). Multiplying overlapping 21-day returns every week compounds each market move $4.2\times$.
 - **Inspect the underwater chart before the equity curve:** Two strategies with the same $AR = 8\%$ have completely different survivability if one recovers from drawdowns in 3 months while the other spends 4 years underwater with $\text{Max }DD = -28\%$.
@@ -359,6 +392,7 @@ $$DD_t=\frac{V_t}{\max_{0\le u\le t}V_u}-1,\qquad \text{Max }DD=\min_{1\le t\le 
 ### Connections
 - **Builds on:** [[signal-position-construction]], [[returns-simple-log]].
 - **Used by:** [[turnover-cost-drag]], [[eval-tradable-profitability]], [[timing-signal-evaluation]].
+- **Payoff profiles:** [[eval-directional-hit-rate]] (win/loss payoff skew).
 - **Related:** [[risk-measures]].
 
 <a id="turnover-cost-drag"></a>
