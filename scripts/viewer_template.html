@@ -457,7 +457,7 @@ function md(src, eq) {
   src = src.replace(WIKI, (m, id, label) => {
     id = id.trim(); const n = byId.get(id);
     const text = esc(label || (n ? cleanTitle(n.title) : id));
-    return n ? `<a class="wl" href="#${esc(id)}" data-id="${esc(id)}">${text}</a>` : `<a class="wl broken">${text}</a>`;
+    return n ? `<a class="wl" href="#${esc(id)}" data-id="${esc(id)}" target="_blank" rel="noopener">${text}</a>` : `<a class="wl broken">${text}</a>`;
   });
   src = src.replace(/@@CODE(\d+)@@/g, (m, i) => code[+i])
            .replace(/@@CURRENCY(\d+)@@/g, (m, i) => CURRENCY_MARK + currency[+i].slice(1));
@@ -527,6 +527,7 @@ function renderTopic(n) {
 
 // Course-notes typesetting: scope formula/example boxes and build "where" tables.
 function enhance(root) {
+  root.querySelectorAll('a[href^="http"]').forEach(l => { l.target = "_blank"; l.rel = "noopener"; });
   const hasDisplayMath = el => /\$\$/.test(el.textContent || "");
   const isVariables = p => {
     const st = p && p.firstElementChild;
@@ -844,7 +845,7 @@ document.addEventListener("click", e => {
     return;
   }
   const a = e.target.closest("a[data-id]");
-  if (!a) return;
+  if (!a || a.target === "_blank") return;  // links in the reading text open in a new tab
   e.preventDefault(); overlay.hidden = true; open(a.dataset.id);
 });
 
