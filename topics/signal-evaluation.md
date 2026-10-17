@@ -17,13 +17,14 @@ This chapter covers:
 
 - the pre-registered protocol;
 - the eight-step diagnostic checklist;
+- the point-in-time data audit;
 - debugging backtest-to-live failures.
 
 **Prerequisites:** [[information-coefficient]], [[ic-significance]], [[icir-stability]], [[hit-rate]], [[fundamental-law-active-management]], [[signal-position-construction]], [[timing-curve-metrics]], [[turnover-cost-drag]], [[cross-validation-leakage]], [[multiple-testing]].
 
 **Leads to:** [[grinold-alpha]], [[signal-to-weight]], [[carry-stock-bond-timing]], [[marginal-sharpe-improvement]].
 
-**Sections:** [[timing-signal-evaluation]] · [[eval-directional-prediction]] · [[eval-statistical-significance]] · [[eval-directional-hit-rate]] · [[eval-sizing-monotonicity]] · [[eval-tradable-profitability]] · [[eval-turnover-costs]] · [[eval-temporal-stability]] · [[eval-correlation-redundancy]] · [[research-workflow]] · [[backtest-pitfalls]]
+**Sections:** [[timing-signal-evaluation]] · [[eval-directional-prediction]] · [[eval-statistical-significance]] · [[eval-directional-hit-rate]] · [[eval-sizing-monotonicity]] · [[eval-tradable-profitability]] · [[eval-turnover-costs]] · [[eval-temporal-stability]] · [[eval-correlation-redundancy]] · [[broker-research-replication]] · [[research-workflow]] · [[backtest-pitfalls]]
 
 ![Three net equity curves on the same simulated market: predictive at 5 bps, noise at 5 bps, and the same predictive signal at 50 bps.](../assets/figures/signal-evaluation/equity-curves.svg)
 
@@ -88,7 +89,7 @@ Check 1 evaluates whether higher signal scores $s_t$ predict higher forward retu
 ### Threshold rationale & failure modes
 - **Target range ($IC \in [0.03, 0.08]$):** Financial returns are dominated by unforecastable shocks ($\varepsilon_{t+1}$). Even an IC of $0.04\text{–}0.06$ explains enough cross-sectional or temporal variation to generate a strong Sharpe ratio when combined with breadth or low turnover.
 - **Zero or inverted ($IC \le 0$):** Gives an immediate stop under the registered orientation. Never flip the sign in-sample and claim a pass on the same dataset.
-- **Too good to be true ($IC > 0.10$):** In liquid equities or macro futures, persistent IC above $0.10$ is a red flag for look-ahead bias (e.g. `shift(-h)` target misalignment, restatement leakage, or survivorship bias, [[backtest-pitfalls]]).
+- **Too good to be true ($IC > 0.10$):** In liquid equities or macro futures, persistent IC above $0.10$ is a red flag for look-ahead bias (e.g. `shift(-h)` target misalignment, restatement leakage, or survivorship bias, [[broker-research-replication]]).
 
 ### Visual diagnostic: score vs forward-return scatter
 
@@ -261,6 +262,53 @@ A signal that passes Checks 1–7 standalone must still clear Check 8: it must a
 - **Used by:** [[research-workflow]], [[signal-to-weight]].
 - **Related:** [[marginal-sharpe-improvement]], [[fundamental-law-active-management]], [[ic-contribution]].
 
+<a id="broker-research-replication"></a>
+
+## Point-in-Time Data Audit & Replicating Broker Research
+<!-- section: broker-research-replication | prerequisites: [timing-signal-evaluation, cross-validation-leakage] | related: [eval-correlation-redundancy, research-workflow, backtest-pitfalls, carry-measurement-protocol] | sources: [src-carry-course-notes, src-squarepoint-dqa-workbook] | tags: [broker-research, replication, point-in-time, data-revisions, look-ahead] -->
+
+Before testing whether a signal predicts returns, verify that every input was actually observable at decision timestamp $t$ and that any replication of an external paper or sell-side note matches the published series mechanically.
+
+### Formula: Replication correlation benchmark
+When reconstructing a published broker or academic signal $s_{\mathrm{broker}}$, verify mechanical replication before testing returns:
+
+$$\rho_{\mathrm{rep}}=\operatorname{corr}(s_{\mathrm{rep}},s_{\mathrm{broker}})\ge 0.60$$
+
+**Variables:**
+
+- $\rho_{\mathrm{rep}}\in[-1,1]$ time-series correlation between the internally reconstructed signal and the published series
+- $s_{\mathrm{rep}}$ internally reconstructed point-in-time signal series
+- $s_{\mathrm{broker}}$ external published signal series over the overlapping historical window
+
+**Replication vs Redundancy:** When *replicating an external paper*, $\rho_{\mathrm{rep}} \ge 0.60$ is the minimum threshold proving your code captures the author's mechanism. When *adding a candidate to your own book*, correlation with existing internal signals must be $|\rho| \le 0.60$ ([[eval-correlation-redundancy]]).
+
+### Seven reasons published broker backtests fail in live replication
+1. **Price-adjustment denominator bug**
+   - *What goes wrong:* Dividing trailing cash dividends by dividend-adjusted close (`auto_adjust=True`) instead of unadjusted close understates early prices and **overstates 2006 SPY dividend yield as 2.48% vs true 1.73%** (+43% relative error).
+   - *Point-in-time fix:* Always pair cash payouts with unadjusted close (`auto_adjust=False`) on the payout date.
+2. **Full-sample normalisation**
+   - *What goes wrong:* Standardising via $z_t = (x_t - \mu_{\text{full}})/\sigma_{\text{full}}$ leaks future mean and volatility (e.g. post-2008 zero rates or 2020 crash vol) into pre-2008 scores.
+   - *Point-in-time fix:* Use an expanding window ($\bar x_{\le t}, \hat\sigma_{\le t}$) or strictly trailing window ([[signal-position-construction]]).
+3. **Retroactive macro revisions**
+   - *What goes wrong:* GDP, payrolls, and composite indices (e.g. NFCI) are revised months or years later; backtesting on revised FRED history uses numbers nobody knew at $t$.
+   - *Point-in-time fix:* Use vintage point-in-time databases (ALFRED) indexed by release date, not reference period.
+4. **Ignored publication lags**
+   - *What goes wrong:* Assuming macro or accounting data stamped "Month $M$" is tradable on the last day of Month $M$ (e.g. FRED `BAA10Y` lags 1 business day; initial jobless claims `ICSA` lag 5–7 days).
+   - *Point-in-time fix:* Lag every series by its conservative publication delay before joining onto the trading calendar.
+5. **Linear interpolation across dates**
+   - *What goes wrong:* Interpolating monthly series onto daily grids pulls next month's level into mid-month trading days.
+   - *Point-in-time fix:* Union calendars and strictly forward-fill (`ffill`) after publication timestamps ([[cross-validation-leakage]]).
+6. **Survivorship bias**
+   - *What goes wrong:* Testing on today's S&P 500 membership excludes delisted bankruptcies (Lehman, Enron, SVB), inflating value and reversal backtests.
+   - *Point-in-time fix:* Use point-in-time constituent lists including delisting returns.
+7. **Clock & friction mismatch**
+   - *What goes wrong:* Evaluating slow annual valuation multiples (CAPE) on daily/weekly clocks without transaction costs or borrow fees.
+   - *Point-in-time fix:* Match forecast horizon $h$ to signal half-life and deduct realistic spread/slippage ([[eval-turnover-costs]]).
+
+### Connections
+- **Builds on:** [[timing-signal-evaluation]], [[cross-validation-leakage]].
+- **Used by:** [[research-workflow]], [[backtest-pitfalls]], [[carry-measurement-protocol]].
+
 <a id="research-workflow"></a>
 
 ## Research Workflow & Interview Project Storytelling
@@ -270,7 +318,7 @@ Every research project should follow a reproducible seven-step lifecycle from ec
 
 ### The 7-step research lifecycle
 1. **Economic Hypothesis:** State *why* the return premium or inefficiency exists (behavioral bias, institutional constraint, or risk transfer) and who takes the other side.
-2. **Point-in-Time Data Audit:** Map every input to its publication timestamp, corporate-action adjustment, and universe roster ([[backtest-pitfalls]]).
+2. **Point-in-Time Data Audit:** Map every input to its publication timestamp, corporate-action adjustment, and universe roster ([[broker-research-replication]]).
 3. **Unparameterised Baseline:** Build the simplest zero-free-parameter benchmark first (e.g. equal-weight or 12M expanding z-score).
 4. **Three-Stage Isolation:** Freeze Select / Validate / Test splits and purge boundary-straddling forward windows ([[cross-validation-leakage]]).
 5. **8-Check Diagnostic & Cost Stress:** Run the frozen candidate through Checks 1–8 under realistic transaction costs.
@@ -298,9 +346,7 @@ Every research project should follow a reproducible seven-step lifecycle from ec
 <a id="backtest-pitfalls"></a>
 
 ## Backtest Pitfalls & Debugging Live Underperformance
-<!-- section: backtest-pitfalls | alias: [broker-research-replication] | prerequisites: [research-workflow, multiple-testing] | related: [cross-validation-leakage, price-reconciliation, sharpe-ratio, conditional-probability-bayes] | sources: [src-squarepoint-dqa-workbook] | tags: [backtest, overfitting, survivorship, debugging] -->
-
-<a id="broker-research-replication"></a>
+<!-- section: backtest-pitfalls | prerequisites: [research-workflow, multiple-testing] | related: [cross-validation-leakage, price-reconciliation, sharpe-ratio, conditional-probability-bayes] | sources: [src-squarepoint-dqa-workbook] | tags: [backtest, overfitting, survivorship, debugging] -->
 
 When a strategy with a strong backtest Sharpe ratio immediately loses money in live trading, investigate strictly from **mechanical plumbing bugs** to **statistical/regime explanations**—never blame a "regime shift" before ruling out a code or execution discrepancy.
 
